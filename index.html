@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>نظام المبيعات</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f3f4f6;
       margin: 0;
       padding: 20px;
     }
@@ -19,7 +18,7 @@
       margin: auto;
       background: white;
       padding: 20px;
-      border-radius: 12px;
+      border-radius: 15px;
     }
 
     h1 {
@@ -29,7 +28,7 @@
     label {
       display: block;
       margin-top: 15px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       font-weight: bold;
     }
 
@@ -46,15 +45,23 @@
       margin-top: 20px;
       background: #222;
       color: white;
-      cursor: pointer;
       border: none;
     }
 
     .total {
       margin-top: 20px;
+      padding: 15px;
+      background: #f1f1f1;
+      border-radius: 8px;
+      text-align: center;
       font-size: 22px;
       font-weight: bold;
+    }
+
+    #status {
+      margin-top: 15px;
       text-align: center;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -73,7 +80,7 @@
 
   <label>المنتج</label>
   <select id="product">
-    <option value="">اختر المنتج</option>
+    <option value="">جاري تحميل المنتجات...</option>
   </select>
 
   <label>الكمية</label>
@@ -94,23 +101,97 @@
 
   <button onclick="saveSale()">حفظ البيع</button>
 
+  <div id="status"></div>
+
 </div>
 
 <script>
-  // سنربط Supabase هنا في الخطوة القادمة
+  const SUPABASE_URL =
+    "https://crihxojzewxhjpsckoew.supabase.co";
 
-  document.getElementById("quantity").addEventListener("input", calculateTotal);
+  const SUPABASE_KEY =
+    "ضع_مفتاحك_العام_هنا";sb_publishable_irCTojKFVHjkc65Y1d95zQ_xVRwQXcQ
+
+  let products = [];
+
+  async function loadProducts() {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?select=id,name,price,quantity&order=name.asc`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("فشل تحميل المنتجات");
+    }
+
+    products = await response.json();
+
+    const select = document.getElementById("product");
+
+    select.innerHTML =
+      '<option value="">اختر المنتج</option>';
+
+    products.forEach(product => {
+
+      const option = document.createElement("option");
+
+      option.value = product.id;
+
+      option.textContent =
+        `${product.name} - ${product.price}`;
+
+      select.appendChild(option);
+    });
+  }
+
+  document.getElementById("product")
+    .addEventListener("change", function () {
+
+      const product = products.find(
+        p => String(p.id) === String(this.value)
+      );
+
+      if (product) {
+        document.getElementById("unitPrice").value =
+          product.price;
+
+        calculateTotal();
+      }
+    });
+
+  document.getElementById("quantity")
+    .addEventListener("input", calculateTotal);
 
   function calculateTotal() {
-    const quantity = Number(document.getElementById("quantity").value);
-    const price = Number(document.getElementById("unitPrice").value);
+
+    const quantity =
+      Number(document.getElementById("quantity").value);
+
+    const price =
+      Number(document.getElementById("unitPrice").value);
 
     document.getElementById("total").textContent =
       quantity * price;
   }
 
+  loadProducts().catch(error => {
+
+    console.error(error);
+
+    document.getElementById("status").textContent =
+      "تعذر تحميل المنتجات";
+  });
+
   function saveSale() {
-    alert("واجهة البيع جاهزة، سنربطها بقاعدة البيانات في الخطوة القادمة.");
+
+    document.getElementById("status").textContent =
+      "حفظ البيع سنفعّله في الخطوة التالية...";
   }
 </script>
 
