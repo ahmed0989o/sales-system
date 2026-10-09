@@ -188,11 +188,75 @@
       "تعذر تحميل المنتجات";
   });
 
-  embedded_widget_unavailable {
+  async function saveSale() {
+  const status = document.getElementById("status");
 
-    document.getElementById("status").textContent =
-      "حفظ البيع سنفعّله في الخطوة التالية...";
+  try {
+    const productId = document.getElementById("product").value;
+    const quantity = Number(document.getElementById("quantity").value);
+    const unitPrice = Number(document.getElementById("unitPrice").value);
+
+    if (!productId || quantity < 1 || unitPrice <= 0) {
+      status.textContent = "اختر المنتج وأدخل الكمية والسعر";
+      return;
+    }
+
+    status.textContent = "جارٍ حفظ البيع...";
+
+    const saleResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/sales`,
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          invoice_number: document.getElementById("invoiceNumber").value || null,
+          customer_name: document.getElementById("customerName").value || null,
+          total_amount: quantity * unitPrice,
+          payment_method: document.getElementById("paymentMethod").value
+        })
+      }
+    );
+
+    const saleData = await saleResponse.json();
+
+    if (!saleResponse.ok) {
+      throw new Error(JSON.stringify(saleData));
+    }
+
+    const detailResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/sale_details`,
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sale_id: saleData[0].id,
+          product_id: Number(productId),
+          quantity: quantity,
+          unit_price: unitPrice,
+          total: quantity * unitPrice
+        })
+      }
+    );
+
+    if (!detailResponse.ok) {
+      throw new Error(await detailResponse.text());
+    }
+
+    status.textContent = "تم حفظ البيع بنجاح ✅";
+
+  } catch (error) {
+    status.textContent = "خطأ في الحفظ: " + error.message;
   }
+}
 </script>
 
 </body>
