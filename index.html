@@ -137,17 +137,37 @@
     select.innerHTML =
       '<option value="">اختر المنتج</option>';
 
+    const lowStock = [];
+
     products.forEach(product => {
 
       const option = document.createElement("option");
 
       option.value = product.id;
 
-      option.textContent =
-        `${product.name} - ${product.price}`;
+      const quantity = Number(product.quantity);
+
+      if (quantity <= 5) {
+        option.textContent =
+          `⚠️ ${product.name} - ${product.price} - المتبقي: ${quantity}`;
+
+        lowStock.push(
+          `${product.name}: المتبقي ${quantity} قطعة`
+        );
+      } else {
+        option.textContent =
+          `${product.name} - ${product.price}`;
+      }
 
       select.appendChild(option);
     });
+
+    if (lowStock.length > 0) {
+      alert(
+        "⚠️ تنبيه المخزون المنخفض\n\n" +
+        lowStock.join("\n")
+      );
+    }
   }
 
   document.getElementById("product")
