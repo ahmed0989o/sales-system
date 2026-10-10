@@ -133,43 +133,34 @@
     products = await response.json();
 
     const select = document.getElementById("product");
+    select.innerHTML = '<option value="">اختر المنتج</option>';
 
-    select.innerHTML =
-      '<option value="">اختر المنتج</option>';
-
-    const lowStock = [];
+    const alerts = [];
 
     products.forEach(product => {
-
       const option = document.createElement("option");
-
       option.value = product.id;
 
       const quantity = Number(product.quantity);
 
-      if (quantity <= 5) {
+      if (quantity <= 0) {
+        option.textContent = `🔴 ${product.name} - نفد المخزون`;
+        alerts.push(`🔴 ${product.name}: نفد المخزون`);
+      } else if (quantity <= 5) {
         option.textContent =
           `⚠️ ${product.name} - ${product.price} - المتبقي: ${quantity}`;
-
-        lowStock.push(
-          `${product.name}: المتبقي ${quantity} قطعة`
-        );
+        alerts.push(`⚠️ ${product.name}: المتبقي ${quantity} قطعة`);
       } else {
-        option.textContent =
-          `${product.name} - ${product.price}`;
+        option.textContent = `${product.name} - ${product.price}`;
       }
 
       select.appendChild(option);
     });
 
-    if (lowStock.length > 0) {
-      alert(
-        "⚠️ تنبيه المخزون المنخفض\n\n" +
-        lowStock.join("\n")
-      );
+    if (alerts.length > 0) {
+      alert("تنبيه المخزون\n\n" + alerts.join("\n"));
     }
   }
-
   document.getElementById("product")
     .addEventListener("change", function () {
 
