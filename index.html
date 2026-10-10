@@ -225,8 +225,18 @@
     const saleData = await saleResponse.json();
 
     if (!saleResponse.ok) {
-      throw new Error(JSON.stringify(saleData));
-    }
+  console.error("Sales insert failed:", {
+    status: saleResponse.status,
+    response: saleData
+  });
+
+  throw new Error(
+    "فشل حفظ الفاتورة (" +
+    saleResponse.status +
+    "): " +
+    JSON.stringify(saleData)
+  );
+}
 
     const detailResponse = await fetch(
       `${SUPABASE_URL}/rest/v1/sale_details`,
