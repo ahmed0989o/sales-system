@@ -102,7 +102,27 @@
   <button onclick="saveSale()">حفظ البيع</button>
 
   <div id="status"></div>
+<hr style="margin-top: 30px;">
 
+<h2 style="text-align: center;">📊 تقرير المبيعات اليومي</h2>
+
+<label for="reportDate">اختر التاريخ</label>
+<input type="date" id="reportDate">
+
+<button type="button" onclick="loadDailyReport()">
+  عرض التقرير
+</button>
+
+<div id="reportStatus" style="text-align: center; margin-top: 15px;"></div>
+
+<div style="margin-top: 15px; padding: 15px; background: #f1f1f1; border-radius: 8px;">
+  <p>عدد الفواتير: <strong id="reportCount">0</strong></p>
+  <p>إجمالي المبيعات: <strong id="reportTotal">0</strong></p>
+  <p>المبيعات النقدية: <strong id="reportCash">0</strong></p>
+  <p>المبيعات الآجلة: <strong id="reportCredit">0</strong></p>
+</div>
+
+<div id="reportDetails" style="overflow-x: auto; margin-top: 15px;"></div>
 </div>
 
 <script>
