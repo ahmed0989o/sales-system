@@ -311,7 +311,134 @@
     console.error("Save sale error:", error);
     status.textContent = "خطأ في الحفظ: " + error.message;
   }
+}async function loadDailyReport() {
+  const reportStatus = document.getElementById("reportStatus");
+  const reportDate = document.getElementById("reportDate").value;
+
+  if (!reportDate) {
+    reportStatus.textContent = "اختر التاريخ أولاً";
+    return;
+  }
+
+  reportStatus.textContent = "جارٍ تحميل التقرير...";
+  document.getElementById("reportDetails").innerHTML = "";
+
+  try {
+    const start = new Date(reportDate + "T00:00:00+03:00");
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+    const from = start.toISOString();
+    const to = end.toISOString();
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/sales?select=id,created_at,invoice_number,customer_name,total_amount,payment_method&created_at=gte.${encodeURIComponent(from)}&created_at=lt.${encodeURIComponent(to)}&order=created_at.desc`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data));
+    }
+
+    const sales = Array.isArray(data) ? data : [];
+
+    const total = sales.reduce(
+      (sum, sale) => sum + Number(sale.total_amount || 0),
+      0
+    );
+
+    const cash = sales
+      .filter(sale => sale.payment_method === "نقدي")
+      .reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0);
+
+    const credit = sales
+      .filter(sale => sale.payment_method === "آجل")
+      .reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0);
+
+    document.getElementById("reportCount").textContent = sales.length;
+    document.getElementById("reportTotal").textContent = total.toLocaleString("en-US");
+    document.getElementById("reportCash").textContent = cash.toLocaleString("en-US");
+    document.getElementById("reportCredit").textContent = credit.toLocaleString("en-US");
+
+    const details = document.getElementById("reportDetails");
+
+    if (sales.length === 0) {
+      details.textContent = "ماكو مبيعات بهذا التاريخ.";
+    } else {
+      const table = document.createElement("table");
+      table.style.width = "100%";
+      table.style.borderCollapse = "collapse";
+
+      const headers = [
+        "رقم الفاتورة",
+        "الزبون",
+        "المبلغ",
+        "الدفع",
+        "الوقت"
+      ];
+
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      headers.forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        th.style.border = "1px solid #ccc";
+        th.style.padding = "8px";
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      sales.forEach(sale => {
+        const row = document.createElement("tr");
+        const values = [
+          sale.invoice_number || "",
+          sale.customer_name || "بدون اسم",
+          Number(sale.total_amount || 0).toLocaleString("en-US"),
+          sale.payment_method || "",
+          new Date(sale.created_at).toLocaleTimeString("en-GB", {
+            timeZone: "Asia/Baghdad",
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        ];
+
+        values.forEach(value => {
+          const td = document.createElement("td");
+          td.textContent = value;
+          td.style.border = "1px solid #ccc";
+          td.style.padding = "8px";
+          row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      details.replaceChildren(table);
+    }
+
+    reportStatus.textContent = "تم تحميل التقرير بنجاح ✅";
+  } catch (error) {
+    console.error("Daily report error:", error);
+    reportStatus.textContent = "تعذر تحميل التقرير: " + error.message;
+  }
 }
+
+document.getElementById("reportDate").value =
+  new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Baghdad"
+  });
 </script>
 
 </body>
