@@ -204,9 +204,43 @@
 
   try {
     const productId = document.getElementById("product").value;
-    const quantity = Number(document.getElementById("quantity").value);
-    const unitPrice = Number(document.getElementById("unitPrice").value);
+const quantity = Number(document.getElementById("quantity").value);
+const unitPrice = Number(document.getElementById("unitPrice").value);
 
+if (!productId) {
+  status.textContent = "اختر المنتج أولاً";
+  return;
+}
+
+const selectedProduct = products.find(
+  p => String(p.id) === String(productId)
+);
+    
+    if (!selectedProduct) {
+      status.textContent = "المنتج غير موجود، حدّث الصفحة";
+      return;
+    }
+
+    const availableQuantity = Number(selectedProduct.quantity);
+
+    if (availableQuantity <= 0) {
+      status.textContent = "🔴 نفد مخزون هذا المنتج";
+      return;
+    }
+
+    if (
+      !Number.isInteger(quantity) ||
+      quantity < 1
+    ) {
+      status.textContent = "أدخل كمية صحيحة لا تقل عن قطعة واحدة";
+      return;
+    }
+
+    if (quantity > availableQuantity) {
+      status.textContent =
+        `⚠️ الكمية المطلوبة ${quantity}، والمتوفر فقط ${availableQuantity}`;
+      return;
+    }
     if (!productId || quantity < 1 || unitPrice <= 0) {
       status.textContent = "اختر المنتج وأدخل الكمية والسعر";
       return;
