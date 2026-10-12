@@ -374,48 +374,105 @@ const detailsResponse = await fetch(
   }
 );
 
-const detailsText = await detailsResponse.text();
+async function loadDailyReport() {
+  const reportStatus = document.getElementById("reportStatus");
+  const reportDate = document.getElementById("reportDate").value;
 
-if (!detailsResponse.ok) {
-  throw new Error(
-    `خطأ في تفاصيل المبيعات (${detailsResponse.status}): ${detailsText.slice(0, 200)}`
-  );
-}
+  if (!reportDate) {
+    reportStatus.textContent = "اختر التاريخ أولاً";
+    return;
+  }
 
-let details;
+  reportStatus.textContent = "جارٍ تحميل التقرير...";
+  document.getElementById("reportDetails").innerHTML = "";
 
-try {
-  details = JSON.parse(detailsText);
-} catch {
-  throw new Error("تعذر قراءة تفاصيل المبيعات بصيغة JSON.");
-}
+  try {
+    const start = new Date(reportDate + "T00:00:00+03:00");
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 
-if (!Array.isArray(details)) {
-  throw new Error("بيانات تفاصيل المبيعات ليست بالقائمة المتوقعة.");
-}
+    const from = start.toISOString();
+    const to = end.toISOString();
 
-throw new Error(JSON.stringify(details));
-}
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/sales?select=id,created_at,invoice_number,customer_name,total_amount,payment_method&created_at=gte.${encodeURIComponent(from)}&created_at=lt.${encodeURIComponent(to)}&order=created_at.desc`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
 
-cost = details.reduce(
-(sum, item) =>
-sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
-0
-);
+    const responseText = await response.text();
 
-profit = details.reduce(
-(sum, item) =>
-sum + (Number(item.unit_price || 0) - Number(item.unit_cost || 0))
-* Number(item.quantity || 0),
-0
-);
-}
+    if (!response.ok) {
+      throw new Error(
+        `خطأ في المبيعات (${response.status}): ${responseText.slice(0, 200)}`
+      );
+    }
 
-document.getElementById("reportCost").textContent =
-cost.toLocaleString("en-US");
+    let sales;
+    try {
+      sales = JSON.parse(responseText);
+    } catch {
+      throw new Error("استجابة المبيعات ليست بصيغة JSON صحيحة.");
+    }
 
-document.getElementById("reportProfit").textContent =
-profit.toLocaleString("en-US");
+    if (!Array.isArray(sales)) {
+      throw new Error("بيانات المبيعات غير صحيحة.");
+    }
+
+    let cost = 0;
+    let profit = 0;
+
+    if (sales.length > 0) {
+      const ids = sales.map(sale => sale.id).join(",");
+
+      const detailsResponse = await fetch(
+        `${SUPABASE_URL}/rest/v1/sale_details?select=sale_id,quantity,unit_price,unit_cost&sale_id=in.(${ids})`,
+        {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+      const detailsText = await detailsResponse.text();
+
+      if (!detailsResponse.ok) {
+        throw new Error(
+          `خطأ في تفاصيل المبيعات (${detailsResponse.status}): ${detailsText.slice(0, 200)}`
+        );
+      }
+
+      let saleItems;
+      try {
+        saleItems = JSON.parse(detailsText);
+      } catch {
+        throw new Error("تعذر قراءة تفاصيل المبيعات بصيغة JSON.");
+      }
+
+      if (!Array.isArray(saleItems)) {
+        throw new Error("بيانات تفاصيل المبيعات غير صحيحة.");
+      }
+
+      cost = saleItems.reduce(
+        (sum, item) =>
+          sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
+        0
+      );
+
+      profit = saleItems.reduce(
+        (sum, item) =>
+          sum + (
+            Number(item.unit_price || 0) -
+            Number(item.unit_cost || 0)
+          ) * Number(item.quantity || 0),
+        0
+      );
+    }
+
     const total = sales.reduce(
       (sum, sale) => sum + Number(sale.total_amount || 0),
       0
@@ -433,28 +490,22 @@ profit.toLocaleString("en-US");
     document.getElementById("reportTotal").textContent = total.toLocaleString("en-US");
     document.getElementById("reportCash").textContent = cash.toLocaleString("en-US");
     document.getElementById("reportCredit").textContent = credit.toLocaleString("en-US");
+    document.getElementById("reportCost").textContent = cost.toLocaleString("en-US");
+    document.getElementById("reportProfit").textContent = profit.toLocaleString("en-US");
 
-    const details = document.getElementById("reportDetails");
+    const detailsContainer = document.getElementById("reportDetails");
 
     if (sales.length === 0) {
-      details.textContent = "ماكو مبيعات بهذا التاريخ.";
+      detailsContainer.textContent = "ماكو مبيعات بهذا التاريخ.";
     } else {
       const table = document.createElement("table");
       table.style.width = "100%";
       table.style.borderCollapse = "collapse";
 
-      const headers = [
-        "رقم الفاتورة",
-        "الزبون",
-        "المبلغ",
-        "الدفع",
-        "الوقت"
-      ];
-
       const thead = document.createElement("thead");
       const headerRow = document.createElement("tr");
 
-      headers.forEach(label => {
+      ["رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"].forEach(label => {
         const th = document.createElement("th");
         th.textContent = label;
         th.style.border = "1px solid #ccc";
@@ -469,6 +520,7 @@ profit.toLocaleString("en-US");
 
       sales.forEach(sale => {
         const row = document.createElement("tr");
+
         const values = [
           sale.invoice_number || "",
           sale.customer_name || "بدون اسم",
@@ -493,10 +545,11 @@ profit.toLocaleString("en-US");
       });
 
       table.appendChild(tbody);
-      details.replaceChildren(table);
+      detailsContainer.replaceChildren(table);
     }
 
     reportStatus.textContent = "تم تحميل التقرير بنجاح ✅";
+
   } catch (error) {
     console.error("Daily report error:", error);
     reportStatus.textContent = "تعذر تحميل التقرير: " + error.message;
