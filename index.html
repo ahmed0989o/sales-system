@@ -364,19 +364,37 @@ let profit = 0;
 if (sales.length > 0) {
 const ids = sales.map(sale => sale.id).join(",");
 
+
 const detailsResponse = await fetch(
-"${SUPABASE_URL}/rest/v1/sale_details?select=sale_id,quantity,unit_price,unit_cost&sale_id=in.(${ids})",
-{
-headers: {
-"apikey": SUPABASE_KEY,
-"Authorization": "Bearer ${SUPABASE_KEY}"
-}
-}
+  `${SUPABASE_URL}/rest/v1/sale_details?select=sale_id,quantity,unit_price,unit_cost&sale_id=in.(${ids})`,
+  {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  }
 );
 
-const details = await detailsResponse.json();
+const detailsText = await detailsResponse.text();
 
 if (!detailsResponse.ok) {
+  throw new Error(
+    `خطأ في تفاصيل المبيعات (${detailsResponse.status}): ${detailsText.slice(0, 200)}`
+  );
+}
+
+let details;
+
+try {
+  details = JSON.parse(detailsText);
+} catch {
+  throw new Error("تعذر قراءة تفاصيل المبيعات بصيغة JSON.");
+}
+
+if (!Array.isArray(details)) {
+  throw new Error("بيانات تفاصيل المبيعات ليست بالقائمة المتوقعة.");
+}
+
 throw new Error(JSON.stringify(details));
 }
 
