@@ -353,9 +353,8 @@ try {
   );
 }
 
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data));
-    }
+
+    
 
     const sales = Array.isArray(data) ? data : [];
 let cost = 0;
