@@ -192,7 +192,8 @@ async function loadProducts() {
   } catch (error) {
     console.error("خطأ تحميل المنتجات:", error);
 
-    select.innerHTML = '<option value="">فشل تحميل المنتجات</option>';
+    select.innerHTML =
+      '<option value="">فشل تحميل المنتجات</option>';
 
     status.textContent = error.name === "AbortError"
       ? "انتهت مهلة الاتصال بعد 15 ثانية."
@@ -200,22 +201,20 @@ async function loadProducts() {
 
   } finally {
     clearTimeout(timeout);
-  }
-}
+document.getElementById("product")
+  .addEventListener("change", function () {
+    const product = products.find(
+      p => String(p.id) === String(this.value)
+    );
 
+    if (product) {
+      document.getElementById("unitPrice").value = product.price;
+    } else {
+      document.getElementById("unitPrice").value = "";
+    }
 
-
-      const product = products.find(
-        p => String(p.id) === String(this.value)
-      );
-
-      if (product) {
-        document.getElementById("unitPrice").value =
-          product.price;
-
-        calculateTotal();
-      }
-    });
+    calculateTotal();
+  });
 
   document.getElementById("quantity")
     .addEventListener("input", calculateTotal);
