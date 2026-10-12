@@ -488,12 +488,161 @@ async function loadDailyReport() {
 
     document.getElementById("reportCount").textContent = sales.length;
     document.getElementById("reportTotal").textContent = total.toLocaleString("en-US");
+وجدت المشكلة في الكود الذي أرسلته. ✅
+
+المشكلة الأساسية: دالة `loadDailyReport()` مكررة داخل نفسها، كما أن الدالة الأولى غير مكتملة قبل بداية الدالة الثانية. هذا يجعل كود التقرير غير صحيح، وقد يمنع تحميله.
+
+سنصلح التقرير دون تغيير نظام حفظ المبيعات أو المنتجات.
+
+### اتبع هذه الخطوات في GitHub
+
+* افتح ملف `index.html` واضغط Edit.
+
+* ابحث عن هذا السطر الموجود بعد كود `saveSale()`:
+
+```javascript
+}async function loadDailyReport() {
+```
+
+3\. لا تحذف هذا السطر وحده ولا تحذف أجزاء عشوائية. لأن المشكلة تشمل جزءًا كبيرًا من الكود المتداخل.
+
+الطريقة الأكثر أمانًا هي استبدال الجزء الخاص بالتقرير فقط.
+
+### الكود الصحيح للتقرير
+
+ابحث عن بداية الدالة الأولى:
+
+```javascript
+async function loadDailyReport() {
+```
+
+واستبدل من هذا السطر حتى نهاية الدالة المكررة وقبل سطر تعيين تاريخ التقرير بالكود التالي:
+
+```javascript
+async function loadDailyReport() {
+  const reportStatus = document.getElementById("reportStatus");
+  const reportDate = document.getElementById("reportDate").value;
+  const detailsContainer = document.getElementById("reportDetails");
+
+  if (!reportDate) {
+    reportStatus.textContent = "اختر التاريخ أولاً";
+    return;
+  }
+
+  reportStatus.textContent = "جارٍ تحميل التقرير...";
+  detailsContainer.innerHTML = "";
+
+  try {
+    const start = new Date(reportDate + "T00:00:00+03:00");
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+    const url =
+      `${SUPABASE_URL}/rest/v1/sales` +
+      `?select=id,created_at,invoice_number,customer_name,total_amount,payment_method` +
+      `&created_at=gte.${encodeURIComponent(start.toISOString())}` +
+      `&created_at=lt.${encodeURIComponent(end.toISOString())}` +
+      `&order=created_at.desc`;
+
+    const response = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+      throw new Error(
+        `خطأ المبيعات (${response.status}): ${responseText.slice(0, 200)}`
+      );
+    }
+
+    let sales;
+
+    try {
+      sales = JSON.parse(responseText);
+    } catch {
+      throw new Error("استجابة المبيعات ليست JSON صحيحة.");
+    }
+
+    if (!Array.isArray(sales)) {
+      throw new Error("بيانات المبيعات غير صحيحة.");
+    }
+
+    let cost = 0;
+    let profit = 0;
+
+    if (sales.length > 0) {
+      const ids = sales.map(s => s.id).join(",");
+
+      const detailsResponse = await fetch(
+        `${SUPABASE_URL}/rest/v1/sale_details` +
+        `?select=sale_id,quantity,unit_price,unit_cost` +
+        `&sale_id=in.(${ids})`,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+      const detailsText = await detailsResponse.text();
+
+      if (!detailsResponse.ok) {
+        throw new Error(
+          `خطأ تفاصيل المبيعات (${detailsResponse.status}): ` +
+          detailsText.slice(0, 200)
+        );
+      }
+
+      let items;
+
+      try {
+        items = JSON.parse(detailsText);
+      } catch {
+        throw new Error("تعذر قراءة تفاصيل المبيعات.");
+      }
+
+      if (!Array.isArray(items)) {
+        throw new Error("بيانات تفاصيل المبيعات غير صحيحة.");
+      }
+
+      cost = items.reduce(
+        (sum, item) =>
+          sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
+        0
+      );
+
+      profit = items.reduce(
+        (sum, item) =>
+          sum + (
+            Number(item.unit_price || 0) -
+            Number(item.unit_cost || 0)
+          ) * Number(item.quantity || 0),
+        0
+      );
+    }
+
+    const total = sales.reduce(
+      (sum, s) => sum + Number(s.total_amount || 0), 0
+    );
+
+    const cash = sales
+      .filter(s => s.payment_method === "نقدي")
+      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+
+    const credit = sales
+      .filter(s => s.payment_method === "آجل")
+      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+
+    document.getElementById("reportCount").textContent = sales.length;
+    document.getElementById("reportTotal").textContent = total.toLocaleString("en-US");
     document.getElementById("reportCash").textContent = cash.toLocaleString("en-US");
     document.getElementById("reportCredit").textContent = credit.toLocaleString("en-US");
     document.getElementById("reportCost").textContent = cost.toLocaleString("en-US");
     document.getElementById("reportProfit").textContent = profit.toLocaleString("en-US");
-
-    const detailsContainer = document.getElementById("reportDetails");
 
     if (sales.length === 0) {
       detailsContainer.textContent = "ماكو مبيعات بهذا التاريخ.";
@@ -503,17 +652,18 @@ async function loadDailyReport() {
       table.style.borderCollapse = "collapse";
 
       const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
+      const header = document.createElement("tr");
 
-      ["رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"].forEach(label => {
-        const th = document.createElement("th");
-        th.textContent = label;
-        th.style.border = "1px solid #ccc";
-        th.style.padding = "8px";
-        headerRow.appendChild(th);
-      });
+      ["رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"]
+        .forEach(label => {
+          const th = document.createElement("th");
+          th.textContent = label;
+          th.style.border = "1px solid #ccc";
+          th.style.padding = "8px";
+          header.appendChild(th);
+        });
 
-      thead.appendChild(headerRow);
+      thead.appendChild(header);
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
@@ -552,9 +702,27 @@ async function loadDailyReport() {
 
   } catch (error) {
     console.error("Daily report error:", error);
-    reportStatus.textContent = "تعذر تحميل التقرير: " + error.message;
+    reportStatus.textContent =
+      "تعذر تحميل التقرير: " + error.message;
   }
 }
+```
+
+مهم جدًا: احتفظ بسطر تعيين التاريخ الموجود بعد الدالة، وهو:
+
+```javascript
+document.getElementById("reportDate").value =
+  new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Baghdad"
+  });
+```
+
+ثم اضغط Commit changes لحفظ التعديل.
+
+بعدها افتح نظام المبيعات وحدّث الصفحة، واختر التاريخ واضغط «عرض التقرير».
+
+إذا ظهر خطأ جديد، أرسل لي نص الخطأ كما يظهر. وإذا ظهر خطأ متعلق بجدول `sale_details` أو أعمدة قاعدة البيانات، سنعالج السبب المحدد بدل تغيير بقية النظام.
+
 
 document.getElementById("reportDate").value =
   new Date().toLocaleDateString("en-CA", {
