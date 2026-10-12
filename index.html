@@ -208,12 +208,14 @@
   }
 
   loadProducts().catch(error => {
+  console.error("خطأ تحميل المنتجات:", error);
 
-    console.error(error);
+  document.getElementById("product").innerHTML =
+    '<option value="">فشل تحميل المنتجات</option>';
 
-    document.getElementById("status").textContent =
-      "تعذر تحميل المنتجات";
-  });
+  document.getElementById("status").textContent =
+    "خطأ تحميل المنتجات: " + error.message;
+});
 
   async function saveSale() {
   const status = document.getElementById("status");
