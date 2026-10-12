@@ -203,58 +203,7 @@ async function loadProducts() {
   }
 }
 
-      `${SUPABASE_URL}/rest/v1/products?select=id,name,price,quantity&order=name.asc`,
-      {
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
 
-    
-if (!response.ok) {
-  const errorText = await response.text();
-  throw new Error(
-    "فشل تحميل المنتجات: " +
-    response.status + " - " + errorText
-  );
-}
-
-
-    products = await response.json();
-
-    const select = document.getElementById("product");
-    select.innerHTML = '<option value="">اختر المنتج</option>';
-
-    const alerts = [];
-
-    products.forEach(product => {
-      const option = document.createElement("option");
-      option.value = product.id;
-
-      const quantity = Number(product.quantity);
-
-      if (quantity <= 0) {
-        option.textContent = `🔴 ${product.name} - نفد المخزون`;
-        alerts.push(`🔴 ${product.name}: نفد المخزون`);
-      } else if (quantity <= 5) {
-        option.textContent =
-          `⚠️ ${product.name} - ${product.price} - المتبقي: ${quantity}`;
-        alerts.push(`⚠️ ${product.name}: المتبقي ${quantity} قطعة`);
-      } else {
-        option.textContent = `${product.name} - ${product.price}`;
-      }
-
-      select.appendChild(option);
-    });
-
-    if (alerts.length > 0) {
-      alert("تنبيه المخزون\n\n" + alerts.join("\n"));
-    }
-  }
-  document.getElementById("product")
-    .addEventListener("change", function () {
 
       const product = products.find(
         p => String(p.id) === String(this.value)
