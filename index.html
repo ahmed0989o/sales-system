@@ -201,6 +201,9 @@ async function loadProducts() {
 
   } finally {
     clearTimeout(timeout);
+  }
+}
+
 document.getElementById("product")
   .addEventListener("change", function () {
     const product = products.find(
