@@ -142,9 +142,16 @@
       }
     );
 
-    if (!response.ok) {
-      throw new Error("فشل تحميل المنتجات");
-    }
+    
+if (!response.ok) {
+  const errorText = await response.text();
+
+  throw new Error(
+    "فشل تحميل المنتجات: " +
+    response.status + " - " + errorText
+  );
+}
+
 
     products = await response.json();
 
