@@ -343,7 +343,47 @@
     }
 
     const sales = Array.isArray(data) ? data : [];
+let cost = 0;
+let profit = 0;
 
+if (sales.length > 0) {
+const ids = sales.map(sale => sale.id).join(",");
+
+const detailsResponse = await fetch(
+"${SUPABASE_URL}/rest/v1/sale_details?select=sale_id,quantity,unit_price,unit_cost&sale_id=in.(${ids})",
+{
+headers: {
+"apikey": SUPABASE_KEY,
+"Authorization": "Bearer ${SUPABASE_KEY}"
+}
+}
+);
+
+const details = await detailsResponse.json();
+
+if (!detailsResponse.ok) {
+throw new Error(JSON.stringify(details));
+}
+
+cost = details.reduce(
+(sum, item) =>
+sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
+0
+);
+
+profit = details.reduce(
+(sum, item) =>
+sum + (Number(item.unit_price || 0) - Number(item.unit_cost || 0))
+* Number(item.quantity || 0),
+0
+);
+}
+
+document.getElementById("reportCost").textContent =
+cost.toLocaleString("en-US");
+
+document.getElementById("reportProfit").textContent =
+profit.toLocaleString("en-US");
     const total = sales.reduce(
       (sum, sale) => sum + Number(sale.total_amount || 0),
       0
