@@ -630,7 +630,7 @@ async function loadDailyReport() {
         throw new Error("بيانات تفاصيل المبيعات غير صحيحة.");
       }
 
-      cost = items.reduce(
+      const cost = items.reduce(
         (sum, item) =>
           sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
         0
