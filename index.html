@@ -461,12 +461,15 @@
 
         const detailsText = await detailsResponse.text();
 
-        if (!detailsResponse.ok) {
-          throw new Error(
-            `خطأ تفاصيل المبيعات (${detailsResponse.status}): ` +
-            detailsText.slice(0, 200)
-          );
-        }
+document.getElementById("reportStatus").textContent =
+  "نتيجة تفاصيل المبيعات: " + detailsText;
+
+if (!detailsResponse.ok) {
+  throw new Error(
+    `خطأ تفاصيل المبيعات (${detailsResponse.status}): ` +
+    detailsText.slice(0, 200)
+  );
+}
 
         let items;
 
