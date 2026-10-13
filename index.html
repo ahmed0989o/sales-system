@@ -461,8 +461,7 @@
 
         const detailsText = await detailsResponse.text();
 
-document.getElementById("reportStatus").textContent =
-  "نتيجة تفاصيل المبيعات: " + detailsText;
+alert("تفاصيل المبيعات من قاعدة البيانات:\n" + detailsText);
 
 if (!detailsResponse.ok) {
   throw new Error(
