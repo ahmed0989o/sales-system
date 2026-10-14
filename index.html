@@ -446,6 +446,7 @@
       // جلب تفاصيل المنتجات المباعة وحساب التكلفة والربح
       if (sales.length > 0) {
         const ids = sales.map(sale => sale.id).join(",");
+alert("أرقام الفواتير التي يبحث عنها التقرير: " + ids);
 
         const detailsResponse = await fetch(
           `${SUPABASE_URL}/rest/v1/sale_details` +
