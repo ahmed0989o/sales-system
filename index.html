@@ -483,7 +483,7 @@ if (!detailsResponse.ok) {
           throw new Error("بيانات تفاصيل المبيعات غير صحيحة.");
         }
 
-        cost = items.reduce(
+        const cost = items.reduce(
           (sum, item) =>
             sum +
             Number(item.unit_cost || 0) *
@@ -491,7 +491,7 @@ if (!detailsResponse.ok) {
           0
         );
 
-        profit = items.reduce(
+        const profit = items.reduce(
           (sum, item) =>
             sum +
             (
