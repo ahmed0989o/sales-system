@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -21,9 +22,7 @@
       border-radius: 15px;
     }
 
-    h1, h2 {
-      text-align: center;
-    }
+    h1, h2 { text-align: center; }
 
     label {
       display: block;
@@ -47,6 +46,11 @@
       color: white;
       border: none;
       cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .total, .report-summary {
@@ -79,8 +83,7 @@
       border-collapse: collapse;
     }
 
-    #reportDetails th,
-    #reportDetails td {
+    #reportDetails th, #reportDetails td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: right;
@@ -97,15 +100,13 @@
   <label for="invoiceNumber">رقم الفاتورة</label>
   <input type="text" id="invoiceNumber">
 
-  <label for="customerName">اسم الزبون</label>
+  <label for="customerSelect">اختيار الزبون</label>
+  <select id="customerSelect">
+    <option value="">جارٍ تحميل الزبائن...</option>
+  </select>
 
-<label for="customerName">اسم الزبون (اختياري للنقدي)</label>
-<input type="text" id="customerName">
-
-<label for="customerSelect">اختيار الزبون للبيع الآجل</label>
-<select id="customerSelect">
-  <option value="">جارٍ تحميل الزبائن...</option>
-</select>
+  <label for="customerName">اسم الزبون (اختياري إذا لم تختر زبونًا)</label>
+  <input type="text" id="customerName" placeholder="اسم الزبون">
 
   <label for="product">المنتج</label>
   <select id="product">
@@ -168,18 +169,11 @@
 
   let products = [];
 
-  // تحميل المنتجات
   async function loadProducts() {
     const select = document.getElementById("product");
     const status = document.getElementById("status");
 
-    select.innerHTML =
-      '<option value="">جارٍ الاتصال بقاعدة البيانات...</option>';
-
-    status.textContent = "جارٍ تحميل المنتجات...";
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    select.innerHTML = '<option value="">جارٍ تحميل المنتجات...</option>';
 
     try {
       const response = await fetch(
@@ -188,27 +182,18 @@
           headers: {
             apikey: SUPABASE_KEY,
             Authorization: `Bearer ${SUPABASE_KEY}`
-          },
-          signal: controller.signal
+          }
         }
       );
 
-      const responseText = await response.text();
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}: ${responseText.slice(0, 300)}`
-        );
+        throw new Error(JSON.stringify(data));
       }
 
-      products = JSON.parse(responseText);
-
-      if (!Array.isArray(products)) {
-        throw new Error("البيانات المستلمة ليست قائمة منتجات.");
-      }
-
-      select.innerHTML =
-        '<option value="">اختر المنتج</option>';
+      products = data;
+      select.innerHTML = '<option value="">اختر المنتج</option>';
 
       products.forEach(product => {
         const option = document.createElement("option");
@@ -216,128 +201,133 @@
 
         const quantity = Number(product.quantity);
 
-        option.textContent =
-          quantity <= 0
-            ? `🔴 ${product.name} - نفد المخزون`
-            : quantity <= 5
-              ? `⚠️ ${product.name} - ${product.price} - المتبقي: ${quantity}`
-              : `${product.name} - ${product.price}`;
+        option.textContent = quantity <= 0
+          ? `🔴 ${product.name} - نفد المخزون`
+          : quantity <= 5
+            ? `⚠️ ${product.name} - ${product.price} - المتبقي: ${quantity}`
+            : `${product.name} - ${product.price}`;
 
         select.appendChild(option);
       });
 
       status.textContent = products.length
         ? `تم تحميل ${products.length} منتج بنجاح ✅`
-        : "تم الاتصال، لكن جدول المنتجات فارغ.";
+        : "جدول المنتجات فارغ.";
 
     } catch (error) {
-      console.error("خطأ تحميل المنتجات:", error);
-
-      select.innerHTML =
-        '<option value="">فشل تحميل المنتجات</option>';
-
-      status.textContent =
-        error.name === "AbortError"
-          ? "انتهت مهلة الاتصال بعد 15 ثانية."
-          : "خطأ تحميل المنتجات: " + error.message;
-
-    
-async function loadCustomers() {
-  const customerSelect = document.getElementById("customerSelect");
-
-  try {
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/customers?select=id,name&order=name.asc`,
-      {
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data));
+      console.error("Load products:", error);
+      select.innerHTML = '<option value="">فشل تحميل المنتجات</option>';
+      status.textContent = "خطأ تحميل المنتجات: " + error.message;
     }
-
-    customerSelect.replaceChildren();
-
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "اختر الزبون";
-    customerSelect.appendChild(defaultOption);
-
-    data.forEach(customer => {
-      const option = document.createElement("option");
-      option.value = customer.id;
-      option.textContent = customer.name;
-      customerSelect.appendChild(option);
-    });
-
-  } catch (error) {
-  } catch (error) {
-  console.error("Load customers error:", error);
-
-  customerSelect.replaceChildren();
-
-  const option = document.createElement("option");
-  option.value = "";
-  option.textContent = "خطأ: " + error.message;
-
-  customerSelect.appendChild(option);
-}
   }
-}
 
-      const product = products.find(
-        p => String(p.id) === String(this.value)
+  async function loadCustomers() {
+    const select = document.getElementById("customerSelect");
+
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/customers?select=id,name&order=name.asc`,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
+        }
       );
 
-      document.getElementById("unitPrice").value =
-        product ? product.price : "";
+      const data = await response.json();
 
-      calculateTotal();
-    });
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data));
+      }
+
+      select.innerHTML = '<option value="">لا يوجد زبون محدد</option>';
+
+      data.forEach(customer => {
+        const option = document.createElement("option");
+        option.value = customer.id;
+        option.textContent = customer.name;
+        select.appendChild(option);
+      });
+
+    } catch (error) {
+      console.error("Load customers:", error);
+      select.innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
+      document.getElementById("status").textContent =
+        "تعذر تحميل الزبائن: " + error.message;
+    }
+  }
+
+  document.getElementById("product").addEventListener("change", function () {
+    const product = products.find(
+      p => String(p.id) === String(this.value)
+    );
+
+    document.getElementById("unitPrice").value =
+      product ? product.price : "";
+
+    calculateTotal();
+  });
 
   document.getElementById("quantity")
     .addEventListener("input", calculateTotal);
 
-  // حساب الإجمالي
-  function calculateTotal() {
-    const quantity =
-      Number(document.getElementById("quantity").value);
+  // إذا اختار المستخدم زبونًا مسجلًا، نعرض اسمه أيضًا.
+  document.getElementById("customerSelect")
+    .addEventListener("change", function () {
+      const option = this.options[this.selectedIndex];
 
-    const price =
-      Number(document.getElementById("unitPrice").value);
+      if (this.value) {
+        document.getElementById("customerName").value =
+          option.textContent;
+      }
+    });
+
+  function calculateTotal() {
+    const quantity = Number(document.getElementById("quantity").value);
+    const price = Number(document.getElementById("unitPrice").value);
 
     document.getElementById("total").textContent =
-      quantity * price;
+      (quantity * price).toLocaleString("en-US");
   }
 
-  // حفظ البيع - الإبقاء على دالة قاعدة البيانات الحالية
   async function saveSale() {
     const status = document.getElementById("status");
     const saveButton = document.getElementById("saveSaleButton");
 
+    if (saveButton.disabled) return;
+
     try {
-      const productId =
-        document.getElementById("product").value;
-
-      const quantity =
-        Number(document.getElementById("quantity").value);
-
+      const productId = document.getElementById("product").value;
+      const quantity = Number(document.getElementById("quantity").value);
       const invoiceNumber =
         document.getElementById("invoiceNumber").value.trim();
 
+      const paymentMethod =
+        document.getElementById("paymentMethod").value;
+
+      const customerSelect =
+        document.getElementById("customerSelect");
+
+      const customerId = customerSelect.value
+        ? Number(customerSelect.value)
+        : null;
+
+      const customerName =
+        document.getElementById("customerName").value.trim();
+
       if (!invoiceNumber) {
-        status.textContent = "أدخل رقم الفاتورة أولاً";
+        status.textContent = "أدخل رقم الفاتورة أولاً.";
         return;
       }
 
       if (!productId) {
-        status.textContent = "اختر المنتج أولاً";
+        status.textContent = "اختر المنتج أولاً.";
+        return;
+      }
+
+      if (paymentMethod === "آجل" && !customerId) {
+        status.textContent = "اختر زبونًا مسجلًا للبيع الآجل.";
         return;
       }
 
@@ -346,35 +336,28 @@ async function loadCustomers() {
       );
 
       if (!selectedProduct) {
-        status.textContent = "المنتج غير موجود، حدّث الصفحة";
+        status.textContent = "المنتج غير موجود؛ حدّث الصفحة.";
         return;
       }
 
-      const availableQuantity =
-        Number(selectedProduct.quantity);
-
-      if (availableQuantity <= 0) {
-        status.textContent = "🔴 نفد مخزون هذا المنتج";
-        return;
-      }
+      const available = Number(selectedProduct.quantity);
 
       if (!Number.isInteger(quantity) || quantity < 1) {
-        status.textContent =
-          "أدخل كمية صحيحة لا تقل عن قطعة واحدة";
+        status.textContent = "أدخل كمية صحيحة لا تقل عن قطعة واحدة.";
         return;
       }
 
-      if (quantity > availableQuantity) {
+      if (quantity > available) {
         status.textContent =
-          `⚠️ الكمية المطلوبة ${quantity}، والمتوفر فقط ${availableQuantity}`;
+          `الكمية المطلوبة ${quantity}، والمتوفر ${available} فقط.`;
         return;
       }
 
       saveButton.disabled = true;
       status.textContent = "جارٍ حفظ البيع...";
 
-      const saleResponse = await fetch(
-        `${SUPABASE_URL}/rest/v1/rpc/create_sale_with_stock`,
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/create_sale_with_stock_for_customer`,
         {
           method: "POST",
           headers: {
@@ -384,64 +367,58 @@ async function loadCustomers() {
           },
           body: JSON.stringify({
             p_invoice_number: invoiceNumber,
-            p_customer_name:
-              document.getElementById("customerName").value.trim() || null,
-            p_payment_method:
-              document.getElementById("paymentMethod").value,
+            p_customer_name: customerName || null,
+            p_payment_method: paymentMethod,
             p_product_id: Number(productId),
-            p_quantity: quantity
+            p_quantity: quantity,
+            p_customer_id: customerId
           })
         }
       );
 
-      const saleData =
-        await saleResponse.json().catch(() => null);
+      const result = await response.json().catch(() => null);
 
-      if (!saleResponse.ok) {
+      if (!response.ok) {
         throw new Error(
-          "فشل حفظ الفاتورة (" +
-          saleResponse.status +
-          "): " +
-          JSON.stringify(saleData)
+          `فشل حفظ الفاتورة (${response.status}): ` +
+          JSON.stringify(result)
         );
       }
 
-      if (
-        saleData &&
-        saleData.remaining_quantity !== undefined
-      ) {
-        selectedProduct.quantity =
-          Number(saleData.remaining_quantity);
+      if (result && result.remaining_quantity !== undefined) {
+        selectedProduct.quantity = Number(result.remaining_quantity);
       } else {
-        // تحديث المخزون من قاعدة البيانات إذا اختلف شكل الاستجابة
         await loadProducts();
       }
 
       status.textContent =
-        `تم حفظ البيع بنجاح ✅ المتبقي بالمخزون: ${selectedProduct.quantity}`;
+        `تم حفظ البيع بنجاح ✅ الإجمالي: ` +
+        Number(result.total || 0).toLocaleString("en-US") +
+        ` — المتبقي بالمخزون: ${selectedProduct.quantity}`;
+
+      document.getElementById("invoiceNumber").value = "";
+      document.getElementById("customerName").value = "";
+      document.getElementById("customerSelect").value = "";
+      document.getElementById("product").value = "";
+      document.getElementById("quantity").value = 1;
+      document.getElementById("unitPrice").value = "";
+      document.getElementById("total").textContent = "0";
 
     } catch (error) {
-      console.error("Save sale error:", error);
+      console.error("Save sale:", error);
       status.textContent = "خطأ في الحفظ: " + error.message;
-
     } finally {
       saveButton.disabled = false;
     }
   }
 
-  // تقرير المبيعات اليومي
   async function loadDailyReport() {
-    const reportStatus =
-      document.getElementById("reportStatus");
-
-    const reportDate =
-      document.getElementById("reportDate").value;
-
-    const detailsContainer =
-      document.getElementById("reportDetails");
+    const reportStatus = document.getElementById("reportStatus");
+    const reportDate = document.getElementById("reportDate").value;
+    const detailsContainer = document.getElementById("reportDetails");
 
     if (!reportDate) {
-      reportStatus.textContent = "اختر التاريخ أولاً";
+      reportStatus.textContent = "اختر التاريخ أولاً.";
       return;
     }
 
@@ -449,11 +426,8 @@ async function loadCustomers() {
     detailsContainer.innerHTML = "";
 
     try {
-      const start =
-        new Date(reportDate + "T00:00:00+03:00");
-
-      const end =
-        new Date(start.getTime() + 24 * 60 * 60 * 1000);
+      const start = new Date(reportDate + "T00:00:00+03:00");
+      const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 
       const url =
         `${SUPABASE_URL}/rest/v1/sales` +
@@ -469,20 +443,10 @@ async function loadCustomers() {
         }
       });
 
-      const responseText = await response.text();
+      const sales = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          `خطأ المبيعات (${response.status}): ${responseText.slice(0, 200)}`
-        );
-      }
-
-      let sales;
-
-      try {
-        sales = JSON.parse(responseText);
-      } catch {
-        throw new Error("استجابة المبيعات ليست JSON صحيحة.");
+        throw new Error("خطأ قراءة المبيعات: " + JSON.stringify(sales));
       }
 
       if (!Array.isArray(sales)) {
@@ -492,10 +456,8 @@ async function loadCustomers() {
       let cost = 0;
       let profit = 0;
 
-      // جلب تفاصيل المنتجات المباعة وحساب التكلفة والربح
       if (sales.length > 0) {
         const ids = sales.map(sale => sale.id).join(",");
-alert("أرقام الفواتير التي يبحث عنها التقرير: " + ids);
 
         const detailsResponse = await fetch(
           `${SUPABASE_URL}/rest/v1/sale_details` +
@@ -509,104 +471,58 @@ alert("أرقام الفواتير التي يبحث عنها التقرير: " 
           }
         );
 
-        const detailsText = await detailsResponse.text();
+        const items = await detailsResponse.json();
 
-alert("تفاصيل المبيعات من قاعدة البيانات:\n" + detailsText);
-
-if (!detailsResponse.ok) {
-  throw new Error(
-    `خطأ تفاصيل المبيعات (${detailsResponse.status}): ` +
-    detailsText.slice(0, 200)
-  );
-}
-
-        let items;
-
-        try {
-          items = JSON.parse(detailsText);
-        } catch {
-          throw new Error("تعذر قراءة تفاصيل المبيعات.");
+        if (!detailsResponse.ok) {
+          throw new Error(
+            "خطأ قراءة تفاصيل المبيعات: " + JSON.stringify(items)
+          );
         }
 
-        if (!Array.isArray(items)) {
-          throw new Error("بيانات تفاصيل المبيعات غير صحيحة.");
-        }
-
-        const cost = items.reduce(
+        cost = items.reduce(
           (sum, item) =>
-            sum +
-            Number(item.unit_cost || 0) *
-            Number(item.quantity || 0),
+            sum + Number(item.unit_cost || 0) * Number(item.quantity || 0),
           0
         );
 
-        const profit = items.reduce(
+        profit = items.reduce(
           (sum, item) =>
-            sum +
-            (
+            sum + (
               Number(item.unit_price || 0) -
               Number(item.unit_cost || 0)
-            ) *
-            Number(item.quantity || 0),
+            ) * Number(item.quantity || 0),
           0
         );
       }
 
       const total = sales.reduce(
-        (sum, sale) =>
-          sum + Number(sale.total_amount || 0),
-        0
+        (sum, sale) => sum + Number(sale.total_amount || 0), 0
       );
 
       const cash = sales
         .filter(sale => sale.payment_method === "نقدي")
-        .reduce(
-          (sum, sale) =>
-            sum + Number(sale.total_amount || 0),
-          0
-        );
+        .reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0);
 
       const credit = sales
         .filter(sale => sale.payment_method === "آجل")
-        .reduce(
-          (sum, sale) =>
-            sum + Number(sale.total_amount || 0),
-          0
-        );
+        .reduce((sum, sale) => sum + Number(sale.total_amount || 0), 0);
 
-      document.getElementById("reportCount").textContent =
-        sales.length;
-
-      document.getElementById("reportTotal").textContent =
-        total.toLocaleString("en-US");
-
-      document.getElementById("reportCash").textContent =
-        cash.toLocaleString("en-US");
-
-      document.getElementById("reportCredit").textContent =
-        credit.toLocaleString("en-US");
-
-      document.getElementById("reportCost").textContent =
-        cost.toLocaleString("en-US");
-
-      document.getElementById("reportProfit").textContent =
-        profit.toLocaleString("en-US");
+      document.getElementById("reportCount").textContent = sales.length;
+      document.getElementById("reportTotal").textContent = total.toLocaleString("en-US");
+      document.getElementById("reportCash").textContent = cash.toLocaleString("en-US");
+      document.getElementById("reportCredit").textContent = credit.toLocaleString("en-US");
+      document.getElementById("reportCost").textContent = cost.toLocaleString("en-US");
+      document.getElementById("reportProfit").textContent = profit.toLocaleString("en-US");
 
       if (sales.length === 0) {
-        detailsContainer.textContent =
-          "ماكو مبيعات بهذا التاريخ.";
+        detailsContainer.textContent = "ماكو مبيعات بهذا التاريخ.";
       } else {
         const table = document.createElement("table");
-
         const thead = document.createElement("thead");
         const header = document.createElement("tr");
 
         [
-          "رقم الفاتورة",
-          "الزبون",
-          "المبلغ",
-          "الدفع",
-          "الوقت"
+          "رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"
         ].forEach(label => {
           const th = document.createElement("th");
           th.textContent = label;
@@ -646,26 +562,21 @@ if (!detailsResponse.ok) {
         detailsContainer.replaceChildren(table);
       }
 
-      reportStatus.textContent =
-        "تم تحميل التقرير بنجاح ✅";
+      reportStatus.textContent = "تم تحميل التقرير بنجاح ✅";
 
     } catch (error) {
-      console.error("Daily report error:", error);
-
-      reportStatus.textContent =
-        "تعذر تحميل التقرير: " + error.message;
+      console.error("Daily report:", error);
+      reportStatus.textContent = "تعذر تحميل التقرير: " + error.message;
     }
   }
 
-  // تعيين تاريخ اليوم بتوقيت بغداد
   document.getElementById("reportDate").value =
     new Date().toLocaleDateString("en-CA", {
       timeZone: "Asia/Baghdad"
     });
 
-  // بدء تحميل المنتجات مرة واحدة
   loadProducts();
+  loadCustomers();
 </script>
-
 </body>
 </html>
