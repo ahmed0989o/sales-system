@@ -578,5 +578,32 @@
   loadProducts();
   loadCustomers();
 </script>
+  
+<hr>
+<h2>💰 تسديد ديون الزبائن</h2>
+
+<div class="container">
+  <label for="paymentCustomer">اختر الزبون:</label>
+  <select id="paymentCustomer" style="width:100%;padding:10px;margin:8px 0;">
+    <option value="">جارٍ تحميل الزبائن...</option>
+  </select>
+
+  <label for="paymentAmount">مبلغ الدفعة:</label>
+  <input
+    id="paymentAmount"
+    type="number"
+    min="1"
+    step="0.01"
+    placeholder="أدخل مبلغ الدفعة"
+    style="width:100%;padding:10px;margin:8px 0;box-sizing:border-box;"
+  >
+
+  <button type="button" onclick="saveCustomerPayment()">
+    تسجيل الدفعة
+  </button>
+
+  <p id="paymentStatus"></p>
+</div>
+
 </body>
 </html>
