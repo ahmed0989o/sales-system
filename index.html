@@ -670,6 +670,13 @@ async function init() {
   }
 }
 
+window.addEventListener("error", function (event) {
+  const status = document.getElementById("loginStatus");
+  if (status) {
+    status.textContent = "خطأ JavaScript: " + event.message;
+  }
+});
+
 init();
 </script>
 </body>
