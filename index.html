@@ -577,6 +577,113 @@
 
   loadProducts();
   loadCustomers();
+  
+  // تحميل الزبائن في قائمة تسديد الديون
+  async function loadPaymentCustomers() {
+    const select = document.getElementById("paymentCustomer");
+    const status = document.getElementById("paymentStatus");
+
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/customers?select=id,name&order=name.asc`,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(JSON.stringify(data));
+      }
+
+      select.innerHTML = '<option value="">اختر الزبون</option>';
+
+      data.forEach(customer => {
+        const option = document.createElement("option");
+        option.value = customer.id;
+        option.textContent = customer.name;
+        select.appendChild(option);
+      });
+
+    } catch (error) {
+      console.error("Load payment customers:", error);
+      select.innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
+      status.textContent = "خطأ تحميل الزبائن: " + error.message;
+    }
+  }
+
+  // تسجيل دفعة لتسديد دين زبون
+  async function saveCustomerPayment() {
+    const select = document.getElementById("paymentCustomer");
+    const amountInput = document.getElementById("paymentAmount");
+    const status = document.getElementById("paymentStatus");
+    const button = document.querySelector(
+      'button[onclick="saveCustomerPayment()"]'
+    );
+
+    if (button.disabled) return;
+
+    const customerId = select.value;
+    const amount = Number(amountInput.value);
+
+    if (!customerId) {
+      status.textContent = "يرجى اختيار الزبون أولاً.";
+      return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      status.textContent = "أدخل مبلغ دفعة صحيحًا أكبر من صفر.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "جارٍ تسجيل الدفعة...";
+
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/rpc/record_customer_payment`,
+        {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            p_customer_id: Number(customerId),
+            p_amount: amount
+          })
+        }
+      );
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          `خطأ (${response.status}): ${JSON.stringify(result)}`
+        );
+      }
+
+      status.textContent =
+        "تم تسجيل الدفعة بنجاح ✅ المبلغ: " +
+        amount.toLocaleString("en-US");
+
+      amountInput.value = "";
+
+    } catch (error) {
+      console.error("Save customer payment:", error);
+      status.textContent = "تعذر تسجيل الدفعة: " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  loadPaymentCustomers();
+
 </script>
   
 <hr>
