@@ -1,483 +1,676 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام المبيعات</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body{font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:20px}
-    .container{max-width:700px;margin:auto;background:white;padding:20px;border-radius:15px}
-    h1,h2{text-align:center}
-    label{display:block;margin-top:15px;margin-bottom:6px;font-weight:bold}
-    input,select,button{width:100%;padding:12px;box-sizing:border-box;font-size:16px;border-radius:8px;border:1px solid #ccc}
-    button{margin-top:20px;background:#222;color:white;border:none;cursor:pointer}
-    button:disabled{opacity:.6}
-    .total,.report-summary{margin-top:20px;padding:15px;background:#f1f1f1;border-radius:8px}
-    .total{text-align:center;font-size:22px;font-weight:bold}
-    #status,#reportStatus,#loginStatus,#purchaseStatus,#paymentStatus{margin-top:15px;text-align:center;font-weight:bold;overflow-wrap:anywhere}
-    #reportDetails,#purchaseDetails{overflow-x:auto;margin-top:15px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #ccc;padding:8px;text-align:right;white-space:nowrap}
-    .hidden{display:none!important}
-    .secondary{background:#555}
-    .note{background:#fff8db;padding:12px;border-radius:8px;line-height:1.7}
-    .topline{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .topline button{width:auto;margin:0}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>نظام المبيعات</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:14px}
+.container{max-width:760px;margin:auto;background:white;padding:18px;border-radius:14px}
+h1,h2{text-align:center}
+label{display:block;margin:14px 0 6px;font-weight:bold}
+input,select,button{width:100%;box-sizing:border-box;padding:12px;font-size:16px;border:1px solid #ccc;border-radius:8px}
+button{background:#222;color:white;border:0;margin-top:14px;cursor:pointer}
+button:disabled{opacity:.6}
+.hidden{display:none!important}
+.status{margin-top:12px;overflow-wrap:anywhere;line-height:1.7}
+.note,.summary{background:#f1f1f1;padding:12px;border-radius:8px;margin-top:12px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ccc;padding:8px;text-align:right;white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.secondary{background:#555}
+.total{text-align:center;font-size:22px;font-weight:bold;margin-top:15px}
+hr{margin-top:28px}
+</style>
 </head>
 <body>
 <div class="container">
 
-  <section id="loginPanel">
-    <h1>🔐 تسجيل الدخول</h1>
-    <p>سجّل الدخول باستخدام حسابك الموجود في Supabase Authentication.</p>
-    <label for="loginEmail">البريد الإلكتروني</label>
-    <input type="email" id="loginEmail" autocomplete="username">
-    <label for="loginPassword">كلمة المرور</label>
-    <input type="password" id="loginPassword" autocomplete="current-password">
-    <button type="button" id="loginButton" onclick="login()">دخول</button>
-    <div id="loginStatus" aria-live="polite"></div>
-  </section>
+<section id="loginPanel">
+<h1>🔐 تسجيل الدخول</h1>
+<p>استخدم البريد الإلكتروني وكلمة المرور لحسابك في Supabase.</p>
+<label for="loginEmail">البريد الإلكتروني</label>
+<input id="loginEmail" type="email" autocomplete="username">
+<label for="loginPassword">كلمة المرور</label>
+<input id="loginPassword" type="password" autocomplete="current-password">
+<button id="loginButton" type="button" onclick="login()">دخول</button>
+<div id="loginStatus" class="status" aria-live="polite"></div>
+</section>
 
-  <section id="appPanel" class="hidden">
-    <div class="topline">
-      <span id="userInfo"></span>
-      <button type="button" class="secondary" onclick="logout()">تسجيل الخروج</button>
-    </div>
+<section id="appPanel" class="hidden">
+<div class="note">
+<span id="userInfo"></span>
+<button type="button" class="secondary" onclick="logout()">تسجيل الخروج</button>
+</div>
 
-    <section id="salesPanel">
-      <h1>🧾 فاتورة بيع</h1>
+<section id="salesPanel">
+<h1>🧾 فاتورة بيع</h1>
+<label for="invoiceNumber">رقم الفاتورة</label>
+<input id="invoiceNumber" type="text">
 
-      <label for="invoiceNumber">رقم الفاتورة</label>
-      <input type="text" id="invoiceNumber">
+<label for="customerSelect">اختر الزبون</label>
+<select id="customerSelect">
+<option value="">بدون تحديد زبون</option>
+</select>
+<div id="customerStatus" class="status"></div>
 
-      <label for="customerSelect">اختر الزبون المسجل</label>
-      <select id="customerSelect">
-        <option value="">بدون تحديد زبون</option>
-      </select>
-      <div id="customerStatus" class="note">سيتم تحميل الزبائن بعد تسجيل الدخول.</div>
+<label for="product">المنتج</label>
+<select id="product">
+<option value="">اختر المنتج</option>
+</select>
 
-      <label for="product">المنتج</label>
-      <select id="product">
-        <option value="">جارٍ تحميل المنتجات...</option>
-      </select>
+<label for="quantity">الكمية</label>
+<input id="quantity" type="number" min="1" step="1" value="1">
 
-      <label for="quantity">الكمية</label>
-      <input type="number" id="quantity" value="1" min="1">
+<label for="unitPrice">سعر الوحدة</label>
+<input id="unitPrice" type="number" readonly>
+<div class="total">الإجمالي: <span id="total">0</span></div>
 
-      <label for="unitPrice">سعر الوحدة</label>
-      <input type="number" id="unitPrice" readonly>
+<label for="paymentMethod">طريقة الدفع</label>
+<select id="paymentMethod">
+<option value="نقدي">نقدي</option>
+<option value="آجل">آجل</option>
+</select>
 
-      <div class="total">الإجمالي: <span id="total">0</span></div>
+<button id="saveSaleButton" type="button" onclick="saveSale()">حفظ البيع</button>
+<div id="status" class="status" aria-live="polite"></div>
 
-      <label for="paymentMethod">طريقة الدفع</label>
-      <select id="paymentMethod">
-        <option value="نقدي">نقدي</option>
-        <option value="آجل">آجل</option>
-      </select>
+<hr>
+<h2>📊 تقرير المبيعات اليومي</h2>
+<label for="reportDate">اختر التاريخ</label>
+<input id="reportDate" type="date">
+<button type="button" onclick="loadDailyReport()">عرض التقرير</button>
+<div id="reportStatus" class="status"></div>
+<div class="summary">
+<p>عدد الفواتير: <strong id="reportCount">0</strong></p>
+<p>إجمالي المبيعات: <strong id="reportTotal">0</strong></p>
+<p>المبيعات النقدية: <strong id="reportCash">0</strong></p>
+<p>المبيعات الآجلة: <strong id="reportCredit">0</strong></p>
+<p>تكلفة البضاعة المباعة: <strong id="reportCost">0</strong></p>
+<p>الربح اليومي: <strong id="reportProfit">0</strong></p>
+</div>
+<div id="reportDetails" class="tablewrap"></div>
+</section>
 
-      <button type="button" id="saveSaleButton" onclick="saveSale()">حفظ البيع</button>
-      <div id="status" aria-live="polite"></div>
+<section id="customerPaymentsPanel">
+<hr>
+<h2>💰 تسديد ديون الزبائن</h2>
+<label for="paymentCustomer">اختر الزبون</label>
+<select id="paymentCustomer">
+<option value="">اختر الزبون</option>
+</select>
+<label for="paymentAmount">مبلغ الدفعة</label>
+<input id="paymentAmount" type="number" min="0.01" step="0.01">
+<button id="savePaymentButton" type="button" onclick="saveCustomerPayment()">تسجيل الدفعة</button>
+<div id="paymentStatus" class="status"></div>
+</section>
 
-      <hr style="margin-top:30px">
-      <h2>📊 تقرير المبيعات اليومي</h2>
-
-      <label for="reportDate">اختر التاريخ</label>
-      <input type="date" id="reportDate">
-      <button type="button" onclick="loadDailyReport()">عرض التقرير</button>
-      <div id="reportStatus" aria-live="polite"></div>
-
-      <div class="report-summary">
-        <p>عدد الفواتير: <strong id="reportCount">0</strong></p>
-        <p>إجمالي المبيعات: <strong id="reportTotal">0</strong></p>
-        <p>المبيعات النقدية: <strong id="reportCash">0</strong></p>
-        <p>المبيعات الآجلة: <strong id="reportCredit">0</strong></p>
-        <p>تكلفة البضاعة المباعة: <strong id="reportCost">0</strong></p>
-        <p>الربح اليومي: <strong id="reportProfit">0</strong></p>
-      </div>
-      <div id="reportDetails"></div>
-    </section>
-
-    <section id="customerPaymentsPanel">
-      <hr style="margin-top:30px">
-      <h2>💰 تسديد ديون الزبائن</h2>
-      <p class="note">اختر الزبون وأدخل مبلغ الدفعة لتسجيل التسديد.</p>
-
-      <label for="paymentCustomer">اختر الزبون</label>
-      <select id="paymentCustomer">
-        <option value="">جارٍ تحميل الزبائن...</option>
-      </select>
-
-      <label for="paymentAmount">مبلغ الدفعة</label>
-      <input type="number" id="paymentAmount" min="0.01" step="0.01" placeholder="أدخل مبلغ الدفعة">
-
-      <button type="button" id="savePaymentButton" onclick="saveCustomerPayment()">تسجيل الدفعة</button>
-      <div id="paymentStatus" aria-live="polite"></div>
-    </section>
-
-    <section id="ownerPanel" class="hidden">
-      <hr>
-      <h2>🔒 إعدادات المالك</h2>
-      <p class="note">شاشة المشتريات خاصة بحساب المالك. تعتمد حماية البيانات الفعلية على سياسات Supabase.</p>
-
-      <section id="purchasesPanel">
-        <h2>📦 المشتريات</h2>
-
-        <label for="purchaseProduct">المنتج</label>
-        <select id="purchaseProduct">
-          <option value="">اختر المنتج</option>
-        </select>
-
-        <label for="purchaseQuantity">الكمية المشتراة</label>
-        <input type="number" id="purchaseQuantity" min="1" step="1" value="1">
-
-        <label for="purchaseUnitCost">تكلفة الوحدة</label>
-        <input type="number" id="purchaseUnitCost" min="0" step="0.01">
-
-        <label for="purchaseTotalCost">إجمالي التكلفة</label>
-        <input type="number" id="purchaseTotalCost" readonly>
-
-        <button type="button" id="savePurchaseButton" onclick="savePurchase()">حفظ المشتريات</button>
-        <div id="purchaseStatus" aria-live="polite"></div>
-
-        <button type="button" class="secondary" onclick="loadPurchases()">تحديث سجل المشتريات</button>
-        <div id="purchaseDetails"></div>
-      </section>
-    </section>
-  </section>
+<section id="ownerPanel" class="hidden">
+<hr>
+<h2>🔒 المشتريات — المسؤول فقط</h2>
+<label for="purchaseProduct">المنتج</label>
+<select id="purchaseProduct">
+<option value="">اختر المنتج</option>
+</select>
+<label for="purchaseQuantity">الكمية المشتراة</label>
+<input id="purchaseQuantity" type="number" min="1" step="1" value="1">
+<label for="purchaseUnitCost">تكلفة الوحدة</label>
+<input id="purchaseUnitCost" type="number" min="0" step="0.01">
+<label for="purchaseTotalCost">إجمالي التكلفة</label>
+<input id="purchaseTotalCost" type="number" readonly>
+<button id="savePurchaseButton" type="button" onclick="savePurchase()">حفظ المشتريات</button>
+<div id="purchaseStatus" class="status"></div>
+<button type="button" class="secondary" onclick="loadPurchases()">تحديث سجل المشتريات</button>
+<div id="purchaseDetails" class="tablewrap"></div>
+<p class="note">تسجيل المشتريات هنا يحفظ سجل الشراء فقط ولا يزيد كمية المخزون تلقائيًا.</p>
+</section>
+</section>
 </div>
 
 <script>
-  const SUPABASE_URL = "https://crihxojzewxhjpsckoew.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_irCTojKFVHjkc65Y1d95zQ_xVRwQXcQ";
-  const OWNER_USER_ID = "1070d12c-c9ff-4915-9775-2367e5cd1d73";
+"use strict";
 
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = "https://crihxojzewxhjpsckoew.supabase.co";
+const SUPABASE_KEY = "sb_publishable_irCTojKFVHjkc65Y1d95zQ_xVRwQXcQ";
+const OWNER_USER_ID = "1070d12c-c9ff-4915-9775-2367e5cd1d73";
 
-  let products = [];
-  let customers = [];
-  let currentUser = null;
-  let appLoading = false;
+let db = null;
+let currentUser = null;
+let products = [];
+let customers = [];
+let appLoading = false;
 
-  const $ = id => document.getElementById(id);
-  const money = value => Number(value || 0).toLocaleString("en-US");
+const $ = id => document.getElementById(id);
+const money = value => Number(value || 0).toLocaleString("en-US");
 
-  function isOwnerAccount(user) {
-    return !!user && (
-      user.app_metadata?.role === "admin" ||
-      user.id === OWNER_USER_ID
-    );
+function setMessage(id, message) {
+  $(id).textContent = message || "";
+}
+
+function isOwner(user) {
+  return !!user && (
+    user.id === OWNER_USER_ID ||
+    user.app_metadata?.role === "admin"
+  );
+}
+
+function todayInBaghdad() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Baghdad",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+  const values = {};
+  parts.forEach(p => values[p.type] = p.value);
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function showLogin(message = "") {
+  $("loginPanel").classList.remove("hidden");
+  $("appPanel").classList.add("hidden");
+  setMessage("loginStatus", message);
+}
+
+async function login() {
+  const button = $("loginButton");
+  setMessage("loginStatus", "");
+
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
+
+  if (!email || !password) {
+    setMessage("loginStatus", "أدخل البريد الإلكتروني وكلمة المرور.");
+    return;
   }
 
-  function todayInBaghdad() {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Baghdad",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).formatToParts(new Date());
-
-    const values = {};
-    parts.forEach(part => values[part.type] = part.value);
-    return `${values.year}-${values.month}-${values.day}`;
+  if (!db) {
+    setMessage("loginStatus", "مكتبة الاتصال لم تُحمّل. تحقق من الإنترنت ثم حدّث الصفحة.");
+    return;
   }
 
-  async function login() {
-    const btn = $("loginButton");
-    $("loginStatus").textContent = "";
+  button.disabled = true;
+  setMessage("loginStatus", "جارٍ تسجيل الدخول...");
 
-    const email = $("loginEmail").value.trim();
-    const password = $("loginPassword").value;
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+    if (error) throw error;
+    if (!data.user) throw new Error("لم يتم العثور على بيانات المستخدم.");
 
-    if (!email || !password) {
-      $("loginStatus").textContent = "أدخل البريد الإلكتروني وكلمة المرور.";
-      return;
-    }
-
-    btn.disabled = true;
-    $("loginStatus").textContent = "جارٍ تسجيل الدخول...";
-
-    try {
-      const { data, error } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      currentUser = data.user;
-      await showApp();
-    } catch (e) {
-      $("loginStatus").textContent = "تعذر تسجيل الدخول: " + e.message;
-    } finally {
-      btn.disabled = false;
-    }
+    currentUser = data.user;
+    await showApp();
+  } catch (error) {
+    console.error("Login error:", error);
+    setMessage("loginStatus", "تعذر تسجيل الدخول: " + (error.message || error));
+  } finally {
+    button.disabled = false;
   }
+}
 
-  async function logout() {
+async function logout() {
+  try {
     const { error } = await db.auth.signOut();
+    if (error) throw error;
+    currentUser = null;
+    showLogin("تم تسجيل الخروج.");
+  } catch (error) {
+    alert("تعذر تسجيل الخروج: " + error.message);
+  }
+}
 
-    if (error) {
-      alert("تعذر تسجيل الخروج: " + error.message);
+async function showApp() {
+  if (!currentUser || appLoading) return;
+  appLoading = true;
+
+  $("loginPanel").classList.add("hidden");
+  $("appPanel").classList.remove("hidden");
+  $("userInfo").textContent =
+    "الحساب: " + (currentUser.email || "مستخدم") +
+    (isOwner(currentUser) ? " — مسؤول" : "");
+
+  $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
+  $("reportDate").value = todayInBaghdad();
+
+  try {
+    await Promise.all([loadProducts(), loadCustomers()]);
+    if (isOwner(currentUser)) await loadPurchases();
+    await loadDailyReport();
+  } catch (error) {
+    console.error("Loading app:", error);
+  } finally {
+    appLoading = false;
+  }
+}
+
+async function loadProducts() {
+  $("product").innerHTML = '<option value="">جارٍ تحميل المنتجات...</option>';
+
+  try {
+    const { data, error } = await db
+      .from("products")
+      .select("id,name,price,quantity,purchase_price")
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    products = data || [];
+
+    ["product", "purchaseProduct"].forEach(id => {
+      const select = $(id);
+      select.innerHTML = '<option value="">اختر المنتج</option>';
+      products.forEach(p => {
+        const option = document.createElement("option");
+        option.value = p.id;
+        option.textContent = `${p.name} — السعر: ${money(p.price)} — المتبقي: ${p.quantity}`;
+        select.appendChild(option);
+      });
+    });
+
+    setMessage("status", products.length
+      ? `تم تحميل ${products.length} منتج.`
+      : "جدول المنتجات فارغ.");
+  } catch (error) {
+    console.error("Products:", error);
+    $("product").innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
+    $("purchaseProduct").innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
+    setMessage("status", "خطأ تحميل المنتجات: " + error.message);
+  }
+}
+
+async function loadCustomers() {
+  $("customerSelect").innerHTML = '<option value="">جارٍ تحميل الزبائن...</option>';
+  $("paymentCustomer").innerHTML = '<option value="">جارٍ تحميل الزبائن...</option>';
+
+  try {
+    let result = await db
+      .from("customers")
+      .select("id,name,phone")
+      .order("name", { ascending: true });
+
+    if (result.error && /phone|column|schema cache|42703/i.test(result.error.message || "")) {
+      result = await db.from("customers").select("id,name").order("name", { ascending: true });
+    }
+    if (result.error) throw result.error;
+
+    customers = result.data || [];
+    $("customerSelect").innerHTML = '<option value="">بدون تحديد زبون</option>';
+    $("paymentCustomer").innerHTML = '<option value="">اختر الزبون</option>';
+
+    customers.forEach(c => {
+      const label = c.phone ? `${c.name} — ${c.phone}` : c.name;
+      [ "customerSelect", "paymentCustomer" ].forEach(id => {
+        const option = document.createElement("option");
+        option.value = c.id;
+        option.textContent = label;
+        $(id).appendChild(option);
+      });
+    });
+
+    setMessage("customerStatus", `تم تحميل ${customers.length} زبون.`);
+  } catch (error) {
+    console.error("Customers:", error);
+    customers = [];
+    $("customerSelect").innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
+    $("paymentCustomer").innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
+    setMessage("customerStatus", "خطأ تحميل الزبائن: " + error.message);
+  }
+}
+
+$("product").addEventListener("change", () => {
+  const p = products.find(x => String(x.id) === $("product").value);
+  $("unitPrice").value = p ? p.price : "";
+  calculateTotal();
+});
+
+$("quantity").addEventListener("input", calculateTotal);
+
+function calculateTotal() {
+  $("total").textContent = money(
+    Number($("quantity").value || 0) * Number($("unitPrice").value || 0)
+  );
+}
+
+async function saveSale() {
+  const button = $("saveSaleButton");
+  if (!currentUser) {
+    setMessage("status", "سجّل الدخول أولًا.");
+    return;
+  }
+
+  const invoiceNumber = $("invoiceNumber").value.trim();
+  const productId = $("product").value;
+  const quantity = Number($("quantity").value);
+  const customerId = $("customerSelect").value;
+  const customer = customers.find(c => String(c.id) === String(customerId));
+  const product = products.find(p => String(p.id) === String(productId));
+  const paymentMethod = $("paymentMethod").value;
+
+  if (!invoiceNumber) return setMessage("status", "أدخل رقم الفاتورة.");
+  if (!product) return setMessage("status", "اختر المنتج.");
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    return setMessage("status", "أدخل كمية صحيحة لا تقل عن واحد.");
+  }
+  if (quantity > Number(product.quantity)) {
+    return setMessage("status", `المتوفر من المنتج هو ${product.quantity} فقط.`);
+  }
+
+  button.disabled = true;
+  setMessage("status", "جارٍ حفظ البيع...");
+
+  try {
+    const { data, error } = await db.rpc("create_sale_with_stock_for_customer", {
+      p_invoice_number: invoiceNumber,
+      p_customer_name: customer ? customer.name : null,
+      p_payment_method: paymentMethod,
+      p_product_id: Number(productId),
+      p_quantity: quantity,
+      p_customer_id: customer ? Number(customer.id) : null
+    });
+
+    if (error) throw error;
+
+    setMessage("status", "تم حفظ البيع بنجاح.");
+    $("invoiceNumber").value = "";
+    $("product").value = "";
+    $("quantity").value = "1";
+    $("unitPrice").value = "";
+    $("customerSelect").value = "";
+    $("total").textContent = "0";
+
+    await loadProducts();
+    await loadDailyReport();
+  } catch (error) {
+    console.error("Save sale:", error);
+    setMessage("status", "تعذر حفظ البيع: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function saveCustomerPayment() {
+  const button = $("savePaymentButton");
+  const customerId = $("paymentCustomer").value;
+  const amount = Number($("paymentAmount").value);
+
+  if (!currentUser) return setMessage("paymentStatus", "سجّل الدخول أولًا.");
+  if (!customerId) return setMessage("paymentStatus", "اختر الزبون.");
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return setMessage("paymentStatus", "أدخل مبلغًا أكبر من صفر.");
+  }
+
+  button.disabled = true;
+  setMessage("paymentStatus", "جارٍ تسجيل الدفعة...");
+
+  try {
+    const { error } = await db.rpc("record_customer_payment", {
+      p_customer_id: Number(customerId),
+      p_amount: amount
+    });
+    if (error) throw error;
+
+    $("paymentAmount").value = "";
+    setMessage("paymentStatus", "تم تسجيل الدفعة بنجاح.");
+  } catch (error) {
+    console.error("Customer payment:", error);
+    setMessage("paymentStatus", "تعذر تسجيل الدفعة: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function loadDailyReport() {
+  if (!db || !currentUser) return;
+
+  const date = $("reportDate").value;
+  if (!date) return setMessage("reportStatus", "اختر التاريخ أولًا.");
+
+  setMessage("reportStatus", "جارٍ تحميل التقرير...");
+  $("reportDetails").replaceChildren();
+
+  try {
+    const start = new Date(date + "T00:00:00+03:00");
+    const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+    const { data: sales, error } = await db
+      .from("sales")
+      .select("id,created_at,invoice_number,customer_name,total_amount,payment_method")
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString())
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    const list = sales || [];
+    let cost = 0;
+    let profit = 0;
+
+    if (list.length) {
+      const { data: items, error: detailError } = await db
+        .from("sale_details")
+        .select("sale_id,quantity,unit_price,unit_cost")
+        .in("sale_id", list.map(s => s.id));
+
+      if (detailError) throw detailError;
+
+      cost = (items || []).reduce(
+        (sum, item) => sum + Number(item.unit_cost || 0) * Number(item.quantity || 0), 0
+      );
+      profit = (items || []).reduce(
+        (sum, item) => sum +
+          (Number(item.unit_price || 0) - Number(item.unit_cost || 0)) *
+          Number(item.quantity || 0), 0
+      );
+    }
+
+    const total = list.reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+    const cash = list.filter(s => s.payment_method === "نقدي")
+      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+    const credit = list.filter(s => s.payment_method === "آجل")
+      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+
+    $("reportCount").textContent = list.length;
+    $("reportTotal").textContent = money(total);
+    $("reportCash").textContent = money(cash);
+    $("reportCredit").textContent = money(credit);
+    $("reportCost").textContent = money(cost);
+    $("reportProfit").textContent = money(profit);
+
+    if (!list.length) {
+      $("reportDetails").textContent = "لا توجد مبيعات في هذا التاريخ.";
+    } else {
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const header = document.createElement("tr");
+
+      ["رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"].forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        header.appendChild(th);
+      });
+      thead.appendChild(header);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      list.forEach(s => {
+        const row = document.createElement("tr");
+        [
+          s.invoice_number || "",
+          s.customer_name || "بدون اسم",
+          money(s.total_amount),
+          s.payment_method || "",
+          new Date(s.created_at).toLocaleTimeString("en-GB", {
+            timeZone: "Asia/Baghdad", hour: "2-digit", minute: "2-digit"
+          })
+        ].forEach(value => {
+          const td = document.createElement("td");
+          td.textContent = value;
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      $("reportDetails").appendChild(table);
+    }
+
+    setMessage("reportStatus", "تم تحميل التقرير.");
+  } catch (error) {
+    console.error("Daily report:", error);
+    setMessage("reportStatus", "تعذر تحميل التقرير: " + error.message);
+  }
+}
+
+$("purchaseQuantity").addEventListener("input", calculatePurchaseTotal);
+$("purchaseUnitCost").addEventListener("input", calculatePurchaseTotal);
+
+function calculatePurchaseTotal() {
+  $("purchaseTotalCost").value = (
+    Number($("purchaseQuantity").value || 0) *
+    Number($("purchaseUnitCost").value || 0)
+  ).toFixed(2);
+}
+
+async function savePurchase() {
+  const button = $("savePurchaseButton");
+  if (!isOwner(currentUser)) {
+    return setMessage("purchaseStatus", "غير مصرح لك.");
+  }
+
+  const productId = $("purchaseProduct").value;
+  const quantity = Number($("purchaseQuantity").value);
+  const unitCost = Number($("purchaseUnitCost").value);
+
+  if (!productId) return setMessage("purchaseStatus", "اختر المنتج.");
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    return setMessage("purchaseStatus", "أدخل كمية صحيحة.");
+  }
+  if (!Number.isFinite(unitCost) || unitCost < 0) {
+    return setMessage("purchaseStatus", "أدخل تكلفة وحدة صحيحة.");
+  }
+
+  button.disabled = true;
+  setMessage("purchaseStatus", "جارٍ حفظ المشتريات...");
+
+  try {
+    const { error } = await db.from("stock_purchases").insert({
+      product_id: Number(productId),
+      quantity,
+      unit_cost: unitCost,
+      total_cost: quantity * unitCost
+    });
+    if (error) throw error;
+
+    setMessage("purchaseStatus", "تم حفظ سجل المشتريات. لم تتغير كمية المخزون تلقائيًا.");
+    await loadPurchases();
+  } catch (error) {
+    console.error("Save purchase:", error);
+    setMessage("purchaseStatus", "تعذر حفظ المشتريات: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function loadPurchases() {
+  if (!isOwner(currentUser)) return;
+
+  setMessage("purchaseStatus", "جارٍ تحميل سجل المشتريات...");
+
+  try {
+    const { data, error } = await db
+      .from("stock_purchases")
+      .select("id,created_at,product_id,quantity,unit_cost,total_cost")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+    const rows = data || [];
+
+    if (!rows.length) {
+      $("purchaseDetails").textContent = "لا توجد سجلات مشتريات.";
+      setMessage("purchaseStatus", "");
       return;
     }
 
-    currentUser = null;
-    $("appPanel").classList.add("hidden");
-    $("loginPanel").classList.remove("hidden");
-    $("loginPassword").value = "";
-    $("loginStatus").textContent = "تم تسجيل الخروج.";
-  }
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const header = document.createElement("tr");
 
-  async function showApp() {
-    if (!currentUser || appLoading) return;
-    appLoading = true;
+    ["التاريخ", "المنتج", "الكمية", "تكلفة الوحدة", "الإجمالي"].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      header.appendChild(th);
+    });
+    thead.appendChild(header);
+    table.appendChild(thead);
 
-    try {
-      $("loginPanel").classList.add("hidden");
-      $("appPanel").classList.remove("hidden");
-
-      const owner = isOwnerAccount(currentUser);
-
-      $("userInfo").textContent =
-        "الحساب: " + (currentUser.email || "مستخدم") +
-        (owner ? " — مسؤول" : "");
-
-      $("ownerPanel").classList.toggle("hidden", !owner);
-      $("purchasesPanel").classList.toggle("hidden", !owner);
-
-      $("reportDate").value = todayInBaghdad();
-
-      await Promise.all([
-        loadProducts(),
-        loadCustomers()
-      ]);
-
-      if (owner) await loadPurchases();
-      await loadDailyReport();
-    } finally {
-      appLoading = false;
-    }
-  }
-
-  async function loadProducts() {
-    const select = $("product");
-    select.innerHTML = '<option value="">جارٍ تحميل المنتجات...</option>';
-
-    try {
-      const { data, error } = await db
-        .from("products")
-        .select("id,name,price,quantity")
-        .order("name", { ascending: true });
-
-      if (error) throw error;
-
-      products = data || [];
-
-      [select, $("purchaseProduct")].forEach(el => {
-        el.innerHTML = '<option value="">اختر المنتج</option>';
-
-        products.forEach(p => {
-          const option = document.createElement("option");
-          option.value = p.id;
-          option.textContent =
-            `${p.name} — السعر: ${p.price} — المتبقي: ${p.quantity}`;
-          el.appendChild(option);
-        });
+    const tbody = document.createElement("tbody");
+    rows.forEach(purchase => {
+      const product = products.find(p => String(p.id) === String(purchase.product_id));
+      const row = document.createElement("tr");
+      [
+        new Date(purchase.created_at).toLocaleString("en-GB", { timeZone: "Asia/Baghdad" }),
+        product ? product.name : `منتج #${purchase.product_id}`,
+        purchase.quantity,
+        money(purchase.unit_cost),
+        money(purchase.total_cost)
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        row.appendChild(td);
       });
+      tbody.appendChild(row);
+    });
 
-      $("status").textContent = products.length
-        ? `تم تحميل ${products.length} منتج بنجاح ✅`
-        : "تم الاتصال، لكن جدول المنتجات فارغ.";
-    } catch (e) {
-      products = [];
-      select.innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
-      $("purchaseProduct").innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
-      $("status").textContent = "خطأ تحميل المنتجات: " + e.message;
-    }
+    table.appendChild(tbody);
+    $("purchaseDetails").replaceChildren(table);
+    setMessage("purchaseStatus", "تم تحميل سجل المشتريات.");
+  } catch (error) {
+    console.error("Load purchases:", error);
+    setMessage("purchaseStatus", "تعذر تحميل المشتريات: " + error.message);
+  }
+}
+
+async function init() {
+  $("reportDate").value = todayInBaghdad();
+
+  if (!window.supabase || typeof window.supabase.createClient !== "function") {
+    showLogin("تعذر تحميل مكتبة Supabase. تحقق من الإنترنت وافتح الصفحة مجددًا.");
+    return;
   }
 
-  async function loadCustomers() {
-    const select = $("customerSelect");
-    const paymentSelect = $("paymentCustomer");
+  try {
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    select.innerHTML = '<option value="">جارٍ تحميل الزبائن...</option>';
-    paymentSelect.innerHTML = '<option value="">جارٍ تحميل الزبائن...</option>';
-    $("customerStatus").textContent = "جارٍ تحميل الزبائن...";
-
-    try {
-      let result = await db
-        .from("customers")
-        .select("id,name,phone")
-        .order("name", { ascending: true });
-
-      if (
-        result.error &&
-        /phone|column|schema cache|42703/i.test(result.error.message || "")
-      ) {
-        result = await db
-          .from("customers")
-          .select("id,name")
-          .order("name", { ascending: true });
-      }
-
-      if (result.error) throw result.error;
-
-      customers = (result.data || []).map(c => ({
-        ...c,
-        phone: c.phone || ""
-      }));
-
-      select.innerHTML = '<option value="">بدون تحديد زبون</option>';
-      paymentSelect.innerHTML = '<option value="">اختر الزبون</option>';
-
-      customers.forEach(customer => {
-        const label = customer.phone
-          ? `${customer.name} — ${customer.phone}`
-          : customer.name;
-
-        const option1 = document.createElement("option");
-        option1.value = customer.id;
-        option1.textContent = label;
-        select.appendChild(option1);
-
-        const option2 = document.createElement("option");
-        option2.value = customer.id;
-        option2.textContent = label;
-        paymentSelect.appendChild(option2);
-      });
-
-      $("customerStatus").textContent = customers.length
-        ? `تم تحميل ${customers.length} زبون بنجاح ✅`
-        : "لا توجد زبائن مسجلون حالياً.";
-    } catch (e) {
-      customers = [];
-      select.innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
-      paymentSelect.innerHTML = '<option value="">تعذر تحميل الزبائن</option>';
-
-      const message = e.message || String(e);
-
-      $("customerStatus").textContent =
-        "خطأ تحميل الزبائن: " + message +
-        " — تحقق من الاتصال بالإنترنت وصلاحيات SELECT لجدول customers في Supabase.";
-    }
-  }
-
-  $("product").addEventListener("change", function() {
-    const p = products.find(x => String(x.id) === String(this.value));
-    $("unitPrice").value = p ? p.price : "";
-    calculateTotal();
-  });
-
-  $("quantity").addEventListener("input", calculateTotal);
-
-  function calculateTotal() {
-    $("total").textContent =
-      money(Number($("quantity").value || 0) * Number($("unitPrice").value || 0));
-  }
-
-  async function saveSale() {
-    const btn = $("saveSaleButton");
-
-    try {
-      if (!currentUser) throw new Error("سجّل الدخول أولاً.");
-
-      const productId = $("product").value;
-      const quantity = Number($("quantity").value);
-      const invoiceNumber = $("invoiceNumber").value.trim();
-
-      if (!invoiceNumber) throw new Error("أدخل رقم الفاتورة أولاً.");
-      if (!productId) throw new Error("اختر المنتج أولاً.");
-
-      const p = products.find(x => String(x.id) === String(productId));
-      if (!p) throw new Error("المنتج غير موجود، حدّث الصفحة.");
-
-      const available = Number(p.quantity);
-
-      if (available <= 0) throw new Error("نفد مخزون هذا المنتج.");
-      if (!Number.isInteger(quantity) || quantity < 1) {
-        throw new Error("أدخل كمية صحيحة لا تقل عن قطعة واحدة.");
-      }
-      if (quantity > available) {
-        throw new Error(`الكمية المطلوبة ${quantity}، والمتوفر فقط ${available}.`);
-      }
-
-      btn.disabled = true;
-      $("status").textContent = "جارٍ حفظ البيع...";
-
-      const selectedCustomerId = $("customerSelect").value;
-      const selectedCustomer = customers.find(
-        customer => String(customer.id) === String(selectedCustomerId)
-      );
-
-      const { data, error } = await db.rpc(
-        "create_sale_with_stock_for_customer",
-        {
-          p_invoice_number: invoiceNumber,
-          p_customer_name: selectedCustomer ? selectedCustomer.name : null,
-          p_payment_method: $("paymentMethod").value,
-          p_product_id: Number(productId),
-          p_quantity: quantity,
-          p_customer_id: selectedCustomer ? Number(selectedCustomer.id) : null
+    db.auth.onAuthStateChange((event, session) => {
+      setTimeout(async () => {
+        if (session?.user) {
+          currentUser = session.user;
+          await showApp();
+        } else if (event === "SIGNED_OUT") {
+          currentUser = null;
+          showLogin();
         }
-      );
+      }, 0);
+    });
 
-      if (error) throw error;
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
 
-      const saleData = Array.isArray(data) ? data[0] : data;
-
-      if (saleData && saleData.remaining_quantity !== undefined) {
-        p.quantity = Number(saleData.remaining_quantity);
-      } else {
-        await loadProducts();
-      }
-
-      $("status").textContent =
-        `تم حفظ البيع بنجاح ✅ المتبقي بالمخزون: ${p.quantity}`;
-
-      await loadDailyReport();
-    } catch (e) {
-      console.error("Save sale error:", e);
-      $("status").textContent = "خطأ في الحفظ: " + e.message;
-    } finally {
-      btn.disabled = false;
+    if (data.session?.user) {
+      currentUser = data.session.user;
+      await showApp();
+    } else {
+      showLogin();
     }
+  } catch (error) {
+    console.error("Initialization:", error);
+    showLogin("تعذر تشغيل النظام: " + error.message);
   }
+}
 
-  async function saveCustomerPayment() {
-    const btn = $("savePaymentButton");
-    const customerId = $("paymentCustomer").value;
-    const amount = Number($("paymentAmount").value);
-
-    $("paymentStatus").textContent = "";
-
-    try {
-      if (!currentUser) throw new Error("سجّل الدخول أولاً.");
-      if (!customerId) throw new Error("اختر الزبون أولاً.");
-      if (!Number.isFinite(amount) || amount <= 0) {
-        throw new Error("أدخل مبلغ دفعة أكبر من صفر.");
-      }
-
-      btn.disabled = true;
-      $("paymentStatus").textContent = "جارٍ تسجيل الدفعة...";
-
-      const { error } = await db.rpc("record_customer_payment", {
-        p_customer_id: Number(customerId),
-        p_amount: amount
-      });
-
-      if (error) throw error;
-
-      $("paymentAmount").value = "";
-      $("paymentStatus").textContent = "تم تسجيل الدفعة بنجاح ✅";
-    } catch (e) {
-      console.error("Customer payment error:", e);
-      $("paymentStatus").textContent = "تعذر تسجيل الدفعة: " + e.message;
-    } finally {
-      btn.disabled = false;
-    }
-  }
-
-  async function loadDailyReport() {
-    const date = $("reportDate").value;
+init();
+</script>
+</body>
+</html>
