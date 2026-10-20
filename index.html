@@ -533,6 +533,7 @@ function calculatePurchaseTotal() {
 }
 
 
+
 async function savePurchase() {
   const button = $("savePurchaseButton");
 
@@ -557,18 +558,24 @@ async function savePurchase() {
   }
 
   button.disabled = true;
-  setMessage("purchaseStatus", "جارٍ حفظ المشتريات...");
+  setMessage("purchaseStatus", "جارٍ حفظ المشتريات وتحديث المخزون...");
 
   try {
-    const { error } = await db.from("stock_purchases").insert({
-      product_id: Number(productId),
-      quantity: quantity,
-      unit_cost: unitCost
+    const { error } = await db.rpc("record_stock_purchase", {
+      p_product_id: Number(productId),
+      p_quantity: quantity,
+      p_unit_cost: unitCost
     });
 
     if (error) throw error;
 
-    setMessage("purchaseStatus", "تم حفظ سجل المشتريات.");
+    setMessage("purchaseStatus", "تم حفظ المشتريات وتحديث المخزون بنجاح.");
+
+    $("purchaseQuantity").value = "1";
+    $("purchaseUnitCost").value = "";
+    calculatePurchaseTotal();
+
+    await loadProducts();
     await loadPurchases();
   } catch (error) {
     console.error("Save purchase:", error);
@@ -577,6 +584,7 @@ async function savePurchase() {
     button.disabled = false;
   }
 }
+
 
 async function loadPurchases() {
   if (!isOwner(currentUser)) return;
