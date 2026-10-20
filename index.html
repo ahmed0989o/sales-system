@@ -532,8 +532,10 @@ function calculatePurchaseTotal() {
   ).toFixed(2);
 }
 
+
 async function savePurchase() {
   const button = $("savePurchaseButton");
+
   if (!isOwner(currentUser)) {
     return setMessage("purchaseStatus", "غير مصرح لك.");
   }
@@ -542,10 +544,14 @@ async function savePurchase() {
   const quantity = Number($("purchaseQuantity").value);
   const unitCost = Number($("purchaseUnitCost").value);
 
-  if (!productId) return setMessage("purchaseStatus", "اختر المنتج.");
+  if (!productId) {
+    return setMessage("purchaseStatus", "اختر المنتج.");
+  }
+
   if (!Number.isInteger(quantity) || quantity < 1) {
     return setMessage("purchaseStatus", "أدخل كمية صحيحة.");
   }
+
   if (!Number.isFinite(unitCost) || unitCost < 0) {
     return setMessage("purchaseStatus", "أدخل تكلفة وحدة صحيحة.");
   }
@@ -555,14 +561,14 @@ async function savePurchase() {
 
   try {
     const { error } = await db.from("stock_purchases").insert({
-  product_id: Number(productId),
-  quantity,
-  unit_cost: unitCost
-});
+      product_id: Number(productId),
+      quantity: quantity,
+      unit_cost: unitCost
     });
+
     if (error) throw error;
 
-    setMessage("purchaseStatus", "تم حفظ سجل المشتريات. لم تتغير كمية المخزون تلقائيًا.");
+    setMessage("purchaseStatus", "تم حفظ سجل المشتريات.");
     await loadPurchases();
   } catch (error) {
     console.error("Save purchase:", error);
