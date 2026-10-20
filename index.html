@@ -473,7 +473,7 @@ if (
   throw new Error("حساب Supabase الحالي لا يطابق حساب المالك.");
 }
 
-
+console.log("Payment session:", await db.auth.getSession());
     const { error } = await db.rpc("record_customer_payment", {
       p_customer_id: Number(customerId),
       p_amount: amount
