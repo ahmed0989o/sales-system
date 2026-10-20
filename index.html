@@ -465,8 +465,13 @@ async function saveCustomerPayment() {
     });
     if (error) throw error;
 
-    $("paymentAmount").value = "";
-    setMessage("paymentStatus", "تم تسجيل الدفعة بنجاح.");
+    
+$("paymentAmount").value = "";
+
+setMessage("paymentStatus", "تم تسجيل الدفعة بنجاح.");
+
+await loadCustomers();
+
   } catch (error) {
     console.error("Customer payment:", error);
     setMessage("paymentStatus", "تعذر تسجيل الدفعة: " + error.message);
