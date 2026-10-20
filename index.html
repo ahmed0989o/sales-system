@@ -555,10 +555,10 @@ async function savePurchase() {
 
   try {
     const { error } = await db.from("stock_purchases").insert({
-      product_id: Number(productId),
-      quantity,
-      unit_cost: unitCost,
-      total_cost: quantity * unitCost
+  product_id: Number(productId),
+  quantity,
+  unit_cost: unitCost
+});
     });
     if (error) throw error;
 
