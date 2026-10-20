@@ -460,18 +460,19 @@ async function saveCustomerPayment() {
 
   try {
     
-const { data: authData, error: authError } = await db.auth.getUser();
 
-console.log("Supabase user ID:", authData?.user?.id);
-console.log("Supabase auth error:", authError?.message);
+const { data: sessionData, error: sessionError } =
+  await db.auth.refreshSession();
 
-if (authError) throw authError;
+if (sessionError) throw sessionError;
 
-if (authData?.user?.id !== "1070d12c-c9ff-4915-9775-2367e5cd1d73") {
-  throw new Error(
-    "حساب Supabase الحالي لا يطابق حساب المالك. أعد تسجيل الدخول."
-  );
+if (
+  sessionData?.user?.id !==
+  "1070d12c-c9ff-4915-9775-2367e5cd1d73"
+) {
+  throw new Error("حساب Supabase الحالي لا يطابق حساب المالك.");
 }
+
 
     const { error } = await db.rpc("record_customer_payment", {
       p_customer_id: Number(customerId),
