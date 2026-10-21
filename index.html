@@ -272,6 +272,7 @@ async function showApp() {
   try {
     await Promise.all([loadProducts(), loadCustomers()]);
     if (isOwner(currentUser)) await loadPurchases();
+    if (isOwner(currentUser)) await loadRentHistory();
     await loadDailyReport();
   } catch (error) {
     console.error("Loading app:", error);
