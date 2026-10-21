@@ -125,6 +125,39 @@ hr{margin-top:28px}
 <button type="button" class="secondary" onclick="loadPurchases()">تحديث سجل المشتريات</button>
 <div id="purchaseDetails" class="tablewrap"></div>
 <p class="note">تسجيل المشتريات هنا يحفظ سجل الشراء فقط ولا يزيد كمية المخزون تلقائيًا.</p>
+  
+<section id="rentPanel">
+  <hr>
+  <h2>🏠 إدارة الإيجار السنوي</h2>
+
+  <label for="rentAnnualAmount">مبلغ الإيجار السنوي (د.ع)</label>
+  <input id="rentAnnualAmount" type="number" min="1" step="1">
+
+  <label for="rentValidFrom">تاريخ بداية الإيجار الجديد</label>
+  <input id="rentValidFrom" type="date">
+
+  <label for="rentPaymentStatus">حالة الدفع</label>
+  <select id="rentPaymentStatus">
+    <option value="غير مدفوع">غير مدفوع</option>
+    <option value="مدفوع">مدفوع</option>
+    <option value="مدفوع جزئياً">مدفوع جزئياً</option>
+  </select>
+
+  <label for="rentNotes">ملاحظات</label>
+  <input id="rentNotes" type="text" placeholder="ملاحظات عن الإيجار">
+
+  <button id="saveRentButton" type="button" onclick="saveRentChange()">
+    حفظ تغيير الإيجار
+  </button>
+
+  <button type="button" class="secondary" onclick="loadRentHistory()">
+    تحديث سجل الإيجارات
+  </button>
+
+  <div id="rentStatus" class="status" aria-live="polite"></div>
+  <div id="rentHistory" class="tablewrap"></div>
+</section>
+
 </section>
 </section>
 </div>
