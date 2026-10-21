@@ -125,7 +125,23 @@ hr{margin-top:28px}
 <button type="button" class="secondary" onclick="loadPurchases()">تحديث سجل المشتريات</button>
 <div id="purchaseDetails" class="tablewrap"></div>
 <p class="note">تسجيل المشتريات هنا يحفظ سجل الشراء فقط ولا يزيد كمية المخزون تلقائيًا.</p>
-  
+  <section id="cashboxPanel">
+  <hr>
+  <h2>💰 حركة الصندوق — المالك فقط</h2>
+
+  <div class="summary">
+    <p>الرصيد الحالي: <strong id="cashboxBalance">—</strong> د.ع</p>
+    <p>إجمالي المقبوضات: <strong id="cashboxIncome">—</strong> د.ع</p>
+    <p>إجمالي المصروفات: <strong id="cashboxExpenses">—</strong> د.ع</p>
+  </div>
+
+  <button type="button" class="secondary" onclick="loadCashbox()">
+    تحديث حركة الصندوق
+  </button>
+
+  <div id="cashboxStatus" class="status" aria-live="polite"></div>
+  <div id="cashboxDetails" class="tablewrap"></div>
+</section>
 <section id="rentPanel">
   
 <div id="rentPaymentsPanel">
