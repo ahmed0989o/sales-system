@@ -1036,6 +1036,99 @@ window.addEventListener("error", function (event) {
 
 init();
   
+async function loadCashbox() {
+  if (!isOwner(currentUser)) {
+    return setMessage("cashboxStatus", "غير مصرح لك.");
+  }
+
+  setMessage("cashboxStatus", "جارٍ تحميل حركة الصندوق...");
+  $("cashboxDetails").replaceChildren();
+
+  try {
+    const { data, error } = await db
+      .from("accounting_cash_movements")
+      .select("id,movement_date,movement_type,description,amount")
+      .order("movement_date", { ascending: false })
+      .limit(500);
+
+    if (error) throw error;
+
+    const movements = data || [];
+    let income = 0;
+    let expenses = 0;
+
+    movements.forEach(m => {
+      const amount = Number(m.amount || 0);
+
+      if (["purchase_payment", "rent_payment"].includes(m.movement_type)) {
+        expenses += amount;
+      } else {
+        income += amount;
+      }
+    });
+
+    $("cashboxIncome").textContent = money(income);
+    $("cashboxExpenses").textContent = money(expenses);
+    $("cashboxBalance").textContent = money(income - expenses);
+
+    if (!movements.length) {
+      $("cashboxDetails").textContent = "لا توجد حركات مسجلة.";
+      setMessage("cashboxStatus", "تم التحميل.");
+      return;
+    }
+
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const header = document.createElement("tr");
+
+    ["التاريخ", "نوع الحركة", "الوصف", "المبلغ (د.ع)"].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      header.appendChild(th);
+    });
+
+    thead.appendChild(header);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    movements.forEach(m => {
+      const tr = document.createElement("tr");
+      const isExpense = ["purchase_payment", "rent_payment"].includes(m.movement_type);
+
+      const typeLabels = {
+        capital_in: "رأس المال",
+        cash_sale: "مبيعات نقدية",
+        customer_payment: "تسديد دين زبون",
+        purchase_payment: "دفعة مشتريات",
+        rent_payment: "دفعة إيجار"
+      };
+
+      [
+        new Date(m.movement_date).toLocaleString("en-GB", {
+          timeZone: "Asia/Baghdad"
+        }),
+        typeLabels[m.movement_type] || m.movement_type,
+        m.description || "—",
+        (isExpense ? "−" : "+") + money(m.amount)
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    $("cashboxDetails").replaceChildren(table);
+    setMessage("cashboxStatus", `تم تحميل ${movements.length} حركة (بحد أقصى 500).`);
+  } catch (error) {
+    console.error("Cashbox:", error);
+    setMessage("cashboxStatus", "تعذر تحميل حركة الصندوق: " + error.message);
+  }
+}
+
 async function loadRentPaymentContracts() {
   const select = $("rentPaymentContract");
   if (!select) return;
