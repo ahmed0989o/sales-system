@@ -160,6 +160,27 @@ hr{margin-top:28px}
 </div>
 
   <hr>
+  
+<hr>
+<h3>✏️ تعديل عقد إيجار موجود</h3>
+
+<label for="editRentContract">اختر العقد المراد تعديله</label>
+<select id="editRentContract" onchange="selectRentContractToEdit()">
+  <option value="">اختر عقد الإيجار</option>
+</select>
+
+<label for="editRentAmount">المبلغ السنوي الجديد (د.ع)</label>
+<input id="editRentAmount" type="number" min="1" step="1">
+
+<label for="editRentNotes">الملاحظات</label>
+<input id="editRentNotes" type="text" placeholder="ملاحظات العقد">
+
+<button id="updateRentButton" type="button" onclick="updateRentContract()">
+  حفظ تعديل العقد
+</button>
+
+<div id="editRentStatus" class="status" aria-live="polite"></div>
+
   <h2>🏠 إدارة الإيجار السنوي</h2>
 
   <label for="rentAnnualAmount">مبلغ الإيجار السنوي (د.ع)</label>
