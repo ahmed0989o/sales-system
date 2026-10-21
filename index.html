@@ -752,6 +752,125 @@ async function loadPurchases() {
   }
 }
 
+async function loadRentHistory() {
+  if (!isOwner(currentUser)) return;
+
+  setMessage("rentStatus", "جارٍ تحميل سجل الإيجارات...");
+
+  try {
+    const { data, error } = await db
+      .from("shop_rent_history")
+      .select("id,annual_amount,valid_from,valid_to,payment_status,notes")
+      .order("id", { ascending: false });
+
+    if (error) throw error;
+
+    const rows = data || [];
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const header = document.createElement("tr");
+
+    ["المبلغ السنوي", "من تاريخ", "إلى تاريخ", "حالة الدفع", "ملاحظات"]
+      .forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        header.appendChild(th);
+      });
+
+    thead.appendChild(header);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    rows.forEach(rent => {
+      const tr = document.createElement("tr");
+
+      [
+        Number(rent.annual_amount).toLocaleString("en-US") + " د.ع",
+        rent.valid_from || "غير محدد",
+        rent.valid_to || "الفترة الحالية",
+        rent.payment_status || "—",
+        rent.notes || "—"
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    $("rentHistory").replaceChildren(table);
+
+    if (!rows.length) {
+      $("rentHistory").textContent = "لا توجد سجلات إيجار.";
+    }
+
+    setMessage("rentStatus", "تم تحميل سجل الإيجارات.");
+  } catch (error) {
+    console.error("Rent history:", error);
+    setMessage("rentStatus", "تعذر تحميل السجل: " + error.message);
+  }
+}
+
+async function saveRentChange() {
+  if (!isOwner(currentUser)) {
+    return setMessage("rentStatus", "غير مصرح لك.");
+  }
+
+  const amount = Number($("rentAnnualAmount").value);
+  const validFrom = $("rentValidFrom").value;
+  const paymentStatus = $("rentPaymentStatus").value;
+  const notes = $("rentNotes").value.trim() || null;
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return setMessage("rentStatus", "أدخل مبلغاً أكبر من صفر.");
+  }
+
+  if (!validFrom) {
+    return setMessage("rentStatus", "حدد تاريخ بداية الإيجار.");
+  }
+
+  const confirmed = confirm(
+    "هل تريد تسجيل الإيجار الجديد؟ " +
+    "سيتم إغلاق فترة الإيجار المفتوحة السابقة حسب قواعد قاعدة البيانات."
+  );
+
+  if (!confirmed) return;
+
+  const button = $("saveRentButton");
+  button.disabled = true;
+  setMessage("rentStatus", "جارٍ حفظ الإيجار...");
+
+  try {
+    const { error } = await db.rpc("change_shop_rent", {
+      p_annual_amount: amount,
+      p_valid_from: validFrom,
+      p_payment_status: paymentStatus,
+      p_notes: notes
+    });
+
+    if (error) throw error;
+
+    $("rentAnnualAmount").value = "";
+    $("rentValidFrom").value = "";
+    $("rentNotes").value = "";
+
+    setMessage(
+      "rentStatus",
+      "تم حفظ تغيير الإيجار. لم تُسجّل دفعة نقدية."
+    );
+
+    await loadRentHistory();
+  } catch (error) {
+    console.error("Save rent:", error);
+    setMessage("rentStatus", "تعذر حفظ الإيجار: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
 async function init() {
   $("reportDate").value = todayInBaghdad();
 
