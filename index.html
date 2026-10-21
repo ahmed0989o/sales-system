@@ -814,44 +814,82 @@ async function loadPurchases() {
   }
 }
 
+
 async function loadRentHistory() {
   if (!isOwner(currentUser)) return;
 
   setMessage("rentStatus", "جارٍ تحميل سجل الإيجارات...");
 
   try {
-    const { data, error } = await db
+    const { data: rents, error: rentError } = await db
       .from("shop_rent_history")
       .select("id,annual_amount,valid_from,valid_to,payment_status,notes")
       .order("id", { ascending: false });
 
-    if (error) throw error;
+    if (rentError) throw rentError;
 
-    const rows = data || [];
+    const { data: payments, error: paymentError } = await db
+      .from("shop_rent_payments")
+      .select("rent_id,amount");
+
+    if (paymentError) throw paymentError;
+
+    const paidByRent = new Map();
+
+    (payments || []).forEach(payment => {
+      const key = String(payment.rent_id);
+      paidByRent.set(
+        key,
+        (paidByRent.get(key) || 0) + Number(payment.amount || 0)
+      );
+    });
+
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const header = document.createElement("tr");
 
-    ["المبلغ السنوي", "من تاريخ", "إلى تاريخ", "حالة الدفع", "ملاحظات"]
-      .forEach(label => {
-        const th = document.createElement("th");
-        th.textContent = label;
-        header.appendChild(th);
-      });
+    [
+      "رقم العقد",
+      "المبلغ السنوي",
+      "المدفوع",
+      "المتبقي",
+      "من تاريخ",
+      "إلى تاريخ",
+      "حالة الدفع",
+      "ملاحظات"
+    ].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      header.appendChild(th);
+    });
 
     thead.appendChild(header);
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
 
-    rows.forEach(rent => {
+    (rents || []).forEach(rent => {
+      const annual = Number(rent.annual_amount || 0);
+      const paid = paidByRent.get(String(rent.id)) || 0;
+      const remaining = Math.max(0, annual - paid);
+
+      let status = "غير مدفوع";
+      if (paid >= annual && annual > 0) {
+        status = "مدفوع";
+      } else if (paid > 0) {
+        status = "مدفوع جزئياً";
+      }
+
       const tr = document.createElement("tr");
 
       [
-        Number(rent.annual_amount).toLocaleString("en-US") + " د.ع",
+        rent.id,
+        money(annual) + " د.ع",
+        money(paid) + " د.ع",
+        money(remaining) + " د.ع",
         rent.valid_from || "غير محدد",
         rent.valid_to || "الفترة الحالية",
-        rent.payment_status || "—",
+        status,
         rent.notes || "—"
       ].forEach(value => {
         const td = document.createElement("td");
@@ -863,18 +901,20 @@ async function loadRentHistory() {
     });
 
     table.appendChild(tbody);
-    $("rentHistory").replaceChildren(table);
 
-    if (!rows.length) {
+    if (!rents || rents.length === 0) {
       $("rentHistory").textContent = "لا توجد سجلات إيجار.";
+    } else {
+      $("rentHistory").replaceChildren(table);
     }
 
-    setMessage("rentStatus", "تم تحميل سجل الإيجارات.");
+    setMessage("rentStatus", "تم تحديث سجل الإيجارات وحساب الدفعات.");
   } catch (error) {
     console.error("Rent history:", error);
     setMessage("rentStatus", "تعذر تحميل السجل: " + error.message);
   }
 }
+
 
 async function saveRentChange() {
   if (!isOwner(currentUser)) {
