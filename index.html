@@ -342,7 +342,7 @@ async function showApp() {
     await Promise.all([loadProducts(), loadCustomers()]);
     
 if (isOwner(currentUser)) await loadPurchases();
-
+if (isOwner(currentUser)) await loadCashbox();
 if (isOwner(currentUser)) {
   await loadRentHistory();
   await loadRentPaymentContracts();
