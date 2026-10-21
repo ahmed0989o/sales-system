@@ -127,6 +127,38 @@ hr{margin-top:28px}
 <p class="note">تسجيل المشتريات هنا يحفظ سجل الشراء فقط ولا يزيد كمية المخزون تلقائيًا.</p>
   
 <section id="rentPanel">
+  
+<div id="rentPaymentsPanel">
+  <hr>
+  <h3>💵 تسجيل دفعة إيجار</h3>
+
+  <label for="rentPaymentContract">عقد الإيجار</label>
+  <select id="rentPaymentContract">
+    <option value="">اختر عقد الإيجار</option>
+  </select>
+
+  <label for="rentPaymentAmount">مبلغ الدفعة (د.ع)</label>
+  <input id="rentPaymentAmount" type="number" min="1" step="1"
+         placeholder="أدخل مبلغ الدفعة">
+
+  <label for="rentPaymentDate">تاريخ الدفع</label>
+  <input id="rentPaymentDate" type="date">
+
+  <label for="rentPaymentNotes">ملاحظات</label>
+  <input id="rentPaymentNotes" type="text"
+         placeholder="ملاحظات اختيارية">
+
+  <button type="button" onclick="saveRentPayment()">
+    تسجيل الدفعة
+  </button>
+
+  <div id="rentPaymentStatus" class="status"
+       aria-live="polite"></div>
+
+  <h3>📋 سجل دفعات الإيجار</h3>
+  <div id="rentPaymentsHistory" class="tablewrap"></div>
+</div>
+
   <hr>
   <h2>🏠 إدارة الإيجار السنوي</h2>
 
@@ -918,6 +950,141 @@ window.addEventListener("error", function (event) {
 });
 
 init();
+  
+async function loadRentPaymentContracts() {
+  const select = $("rentPaymentContract");
+  if (!select) return;
+
+  select.innerHTML = '<option value="">جاري تحميل العقود...</option>';
+
+  const { data, error } = await db
+    .from("shop_rent_history")
+    .select("id, annual_amount, valid_from, valid_to")
+    .order("valid_from", { ascending: false });
+
+  if (error) {
+    select.innerHTML = '<option value="">تعذر تحميل العقود</option>';
+    setMessage("rentPaymentStatus", error.message);
+    return;
+  }
+
+  select.innerHTML = '<option value="">اختر عقد الإيجار</option>';
+
+  (data || []).forEach(rent => {
+    const option = document.createElement("option");
+    option.value = rent.id;
+    option.textContent =
+      `${rent.valid_from} — ${money(rent.annual_amount)} د.ع`;
+    select.appendChild(option);
+  });
+}
+
+async function loadRentPaymentsHistory() {
+  const container = $("rentPaymentsHistory");
+  if (!container) return;
+
+  const { data, error } = await db
+    .from("shop_rent_payments")
+    .select("id, rent_id, amount, payment_date, notes")
+    .order("payment_date", { ascending: false });
+
+  if (error) {
+    container.textContent = "تعذر تحميل سجل الدفعات: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.textContent = "لا توجد دفعات إيجار مسجلة لحد الآن.";
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>العقد</th>
+        <th>التاريخ</th>
+        <th>المبلغ</th>
+        <th>ملاحظات</th>
+      </tr>
+    </thead>
+  `;
+
+  const tbody = document.createElement("tbody");
+
+  data.forEach(payment => {
+    const tr = document.createElement("tr");
+    [
+      payment.rent_id,
+      String(payment.payment_date).slice(0, 10),
+      money(payment.amount) + " د.ع",
+      payment.notes || "—"
+    ].forEach(value => {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  container.replaceChildren(table);
+}
+
+async function saveRentPayment() {
+  const rentId = Number($("rentPaymentContract").value);
+  const amount = Number($("rentPaymentAmount").value);
+  const date = $("rentPaymentDate").value;
+  const notes = $("rentPaymentNotes").value.trim();
+
+  if (!rentId || !Number.isFinite(amount) || amount <= 0 || !date) {
+    setMessage(
+      "rentPaymentStatus",
+      "اختار عقد الإيجار وأدخل المبلغ وتاريخ الدفع."
+    );
+    return;
+  }
+
+  const button = document.querySelector(
+    '#rentPaymentsPanel button[onclick="saveRentPayment()"]'
+  );
+  if (button) button.disabled = true;
+
+  try {
+    setMessage("rentPaymentStatus", "جاري تسجيل الدفعة...");
+
+    const { data, error } = await db.rpc("record_shop_rent_payment", {
+      p_rent_id: rentId,
+      p_amount: amount,
+      p_payment_date: date,
+      p_notes: notes || null
+    });
+
+    if (error) throw error;
+
+    $("rentPaymentAmount").value = "";
+    $("rentPaymentNotes").value = "";
+
+    setMessage(
+      "rentPaymentStatus",
+      `تم تسجيل الدفعة بنجاح. المتبقي: ${money(data.remaining)} د.ع`
+    );
+
+    await loadRentPaymentsHistory();
+
+    if (typeof loadRentHistory === "function") {
+      await loadRentHistory();
+    }
+  } catch (error) {
+    setMessage(
+      "rentPaymentStatus",
+      "تعذر تسجيل الدفعة: " + error.message
+    );
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 </script>
 </body>
 </html>
