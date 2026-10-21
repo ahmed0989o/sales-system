@@ -1113,6 +1113,109 @@ async function saveRentPayment() {
   }
 }
 
+async function loadRentContractsForEdit() {
+  const select = $("editRentContract");
+  if (!select) return;
+
+  select.innerHTML = '<option value="">جارٍ تحميل العقود...</option>';
+
+  const { data, error } = await db
+    .from("shop_rent_history")
+    .select("id, annual_amount, valid_from, valid_to, notes")
+    .order("valid_from", { ascending: false });
+
+  if (error) {
+    select.innerHTML = '<option value="">تعذر تحميل العقود</option>';
+    setMessage("editRentStatus", error.message);
+    return;
+  }
+
+  select.innerHTML = '<option value="">اختر عقد الإيجار</option>';
+
+  (data || []).forEach(rent => {
+    const option = document.createElement("option");
+    option.value = rent.id;
+    option.textContent =
+      `${rent.valid_from || "تاريخ غير محدد"} — ${money(rent.annual_amount)} د.ع`;
+    select.appendChild(option);
+  });
+}
+
+async function selectRentContractToEdit() {
+  const rentId = $("editRentContract").value;
+
+  $("editRentAmount").value = "";
+  $("editRentNotes").value = "";
+  setMessage("editRentStatus", "");
+
+  if (!rentId) return;
+
+  const { data, error } = await db
+    .from("shop_rent_history")
+    .select("id, annual_amount, notes")
+    .eq("id", Number(rentId))
+    .single();
+
+  if (error) {
+    setMessage("editRentStatus", "تعذر تحميل العقد: " + error.message);
+    return;
+  }
+
+  $("editRentAmount").value = data.annual_amount;
+  $("editRentNotes").value = data.notes || "";
+}
+
+async function updateRentContract() {
+  if (!isOwner(currentUser)) {
+    return setMessage("editRentStatus", "غير مصرح لك.");
+  }
+
+  const rentId = Number($("editRentContract").value);
+  const amount = Number($("editRentAmount").value);
+  const notes = $("editRentNotes").value.trim() || null;
+
+  if (!rentId) {
+    return setMessage("editRentStatus", "اختر عقد الإيجار أولاً.");
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return setMessage("editRentStatus", "أدخل مبلغاً أكبر من صفر.");
+  }
+
+  if (!confirm("تأكيد تعديل مبلغ وملاحظات عقد الإيجار المحدد؟")) {
+    return;
+  }
+
+  const button = $("updateRentButton");
+  button.disabled = true;
+  setMessage("editRentStatus", "جارٍ حفظ التعديل...");
+
+  try {
+    const { data, error } = await db.rpc("update_shop_rent_contract", {
+      p_rent_id: rentId,
+      p_annual_amount: amount,
+      p_notes: notes
+    });
+
+    if (error) throw error;
+
+    setMessage(
+      "editRentStatus",
+      `تم تعديل العقد بنجاح. المدفوع: ${money(data.paid_total)} د.ع، المتبقي: ${money(data.remaining)} د.ع`
+    );
+
+    await loadRentHistory();
+    await loadRentPaymentContracts();
+    await loadRentContractsForEdit();
+    $("editRentContract").value = String(rentId);
+    await selectRentContractToEdit();
+  } catch (error) {
+    setMessage("editRentStatus", "تعذر تعديل العقد: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
 </script>
 </body>
 </html>
