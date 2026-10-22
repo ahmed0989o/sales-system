@@ -194,10 +194,35 @@ hr{margin-top:28px}
 </button>
 <div id="barcodeStatus" class="status" aria-live="polite"></div>
 
-<label for="product">المنتج</label>
+
+<label for="productSearch">ابحث عن المنتج بالاسم</label>
+<input
+  id="productSearch"
+  type="text"
+  placeholder="اكتب اسم المنتج..."
+  autocomplete="off"
+>
+
+<div id="productSearchResults" class="tablewrap"></div>
+
+<label for="product">المنتج المحدد</label>
 <select id="product">
   <option value="">اختر المنتج</option>
 </select>
+
+<button
+  type="button"
+  id="addProductButton"
+  onclick="addProductToInvoice()"
+>
+  ➕ إضافة المنتج إلى الفاتورة
+</button>
+
+<div id="invoiceItems" class="tablewrap"></div>
+<div class="total">
+  إجمالي الفاتورة: <span id="invoiceGrandTotal">0</span> د.ع
+</div>
+
 
 <div id="barcodeCameraArea" class="hidden">
   <video
