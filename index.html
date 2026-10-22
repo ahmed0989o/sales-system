@@ -504,11 +504,19 @@ $("unitPrice").value = product ? money(product.price) : "";
 $("product").addEventListener("change", updateUnitPrice);
 $("quantity").addEventListener("input", calculateTotal);
 
+
 function calculateTotal() {
+  const product = products.find(
+    p => String(p.id) === String($("product").value)
+  );
+
+  const price = product ? Number(product.price || 0) : 0;
+
   $("total").textContent = money(
-    Number($("quantity").value || 0) * Number($("unitPrice").value || 0)
+    Number($("quantity").value || 0) * price
   );
 }
+
 
 async function saveSale() {
   const button = $("saveSaleButton");
