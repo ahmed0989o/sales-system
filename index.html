@@ -1100,7 +1100,19 @@ $("invoiceNumber").value = invoiceNumber;
       `تم حفظ الفاتورة بنجاح. الإجمالي: ${Number(data.total_amount).toLocaleString()} د.ع`
     );
 
-    $("invoiceNumber").value = "";
+    
+$("invoiceNumber").value = "";
+
+const { data: nextInvoiceNumber, error: nextInvoiceError } =
+  await db.rpc("generate_invoice_number");
+
+if (nextInvoiceError || !nextInvoiceNumber) {
+  console.error("Next invoice number error:", nextInvoiceError);
+  setMessage("status", "تم حفظ الفاتورة، لكن تعذر تجهيز رقم الفاتورة التالية.");
+} else {
+  $("invoiceNumber").value = nextInvoiceNumber;
+}
+
     $("product").value = "";
     $("quantity").value = "1";
     $("unitPrice").value = "";
