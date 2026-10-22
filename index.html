@@ -1018,46 +1018,78 @@ function renderInvoiceItems() {
   grandTotalElement.textContent = grandTotal.toLocaleString();
 }
 
+
 async function saveSale() {
   const button = $("saveSaleButton");
+
   if (!currentUser) {
     setMessage("status", "سجّل الدخول أولًا.");
     return;
   }
 
   const invoiceNumber = $("invoiceNumber").value.trim();
-  const productId = $("product").value;
-  const quantity = Number($("quantity").value);
   const customerId = $("customerSelect").value;
-  const customer = customers.find(c => String(c.id) === String(customerId));
-  const product = products.find(p => String(p.id) === String(productId));
+  const customer = customers.find(
+    c => String(c.id) === String(customerId)
+  );
   const paymentMethod = $("paymentMethod").value;
 
-  if (!invoiceNumber) return setMessage("status", "أدخل رقم الفاتورة.");
-  if (!product) return setMessage("status", "اختر المنتج.");
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    return setMessage("status", "أدخل كمية صحيحة لا تقل عن واحد.");
+  if (!invoiceNumber) {
+    return setMessage("status", "أدخل رقم الفاتورة.");
   }
-  if (quantity > Number(product.quantity)) {
-    return setMessage("status", `المتوفر من المنتج هو ${product.quantity} فقط.`);
+
+  if (!Array.isArray(invoiceCart) || invoiceCart.length === 0) {
+    return setMessage("status", "أضف منتجاً واحداً على الأقل إلى الفاتورة.");
+  }
+
+  const items = invoiceCart.map(item => ({
+    product_id: Number(item.productId),
+    quantity: Number(item.quantity)
+  }));
+
+  for (const item of items) {
+    const product = products.find(
+      p => Number(p.id) === item.product_id
+    );
+
+    if (
+      !product ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1
+    ) {
+      return setMessage("status", "تأكد من المنتجات والكميات في الفاتورة.");
+    }
+
+    if (item.quantity > Number(product.quantity)) {
+      return setMessage(
+        "status",
+        `المتوفر من ${product.name} هو ${product.quantity} فقط.`
+      );
+    }
   }
 
   button.disabled = true;
-  setMessage("status", "جارٍ حفظ البيع...");
+  setMessage("status", "جارٍ حفظ الفاتورة...");
 
   try {
-    const { data, error } = await db.rpc("create_sale_with_stock_for_customer", {
-      p_invoice_number: invoiceNumber,
-      p_customer_name: customer ? customer.name : null,
-      p_payment_method: paymentMethod,
-      p_product_id: Number(productId),
-      p_quantity: quantity,
-      p_customer_id: customer ? Number(customer.id) : null
-    });
+    const { data, error } = await db.rpc(
+      "create_multi_sale_with_stock",
+      {
+        p_invoice_number: invoiceNumber,
+        p_customer_name: customer ? customer.name : null,
+        p_payment_method: paymentMethod,
+        p_customer_id: customer ? Number(customer.id) : null,
+        p_items: items
+      }
+    );
 
     if (error) throw error;
 
-    setMessage("status", "تم حفظ البيع بنجاح.");
+    setMessage(
+      "status",
+      `تم حفظ الفاتورة بنجاح. الإجمالي: ${Number(data.total_amount).toLocaleString()} د.ع`
+    );
+
     $("invoiceNumber").value = "";
     $("product").value = "";
     $("quantity").value = "1";
@@ -1065,15 +1097,25 @@ async function saveSale() {
     $("customerSelect").value = "";
     $("total").textContent = "0";
 
+    if ($("productSearch")) $("productSearch").value = "";
+    if ($("productSearchResults")) {
+      $("productSearchResults").replaceChildren();
+    }
+
+    invoiceCart = [];
+    renderInvoiceItems();
+
     await loadProducts();
     await loadDailyReport();
+
   } catch (error) {
     console.error("Save sale:", error);
-    setMessage("status", "تعذر حفظ البيع: " + error.message);
+    setMessage("status", "تعذر حفظ الفاتورة: " + error.message);
   } finally {
     button.disabled = false;
   }
 }
+
 
 async function saveCustomerPayment() {
   const button = $("savePaymentButton");
