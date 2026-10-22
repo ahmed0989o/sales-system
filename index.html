@@ -491,6 +491,19 @@ async function loadCustomers() {
 }
 
 
+function updateUnitPrice() {
+  const productId = $("product").value;
+  const product = products.find(
+    p => String(p.id) === String(productId)
+  );
+
+  $("unitPrice").value = product ? Number(product.price) : "";
+  calculateTotal();
+}
+
+$("product").addEventListener("change", updateUnitPrice);
+$("quantity").addEventListener("input", calculateTotal);
+
 function calculateTotal() {
   $("total").textContent = money(
     Number($("quantity").value || 0) * Number($("unitPrice").value || 0)
