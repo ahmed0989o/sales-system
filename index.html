@@ -175,10 +175,41 @@ hr{margin-top:28px}
 </select>
 <div id="customerStatus" class="status"></div>
 
+
+<label for="barcodeInput">باركود المنتج</label>
+<input
+  id="barcodeInput"
+  type="text"
+  placeholder="امسح الباركود هنا"
+  autocomplete="off"
+  inputmode="none"
+>
+<button
+  type="button"
+  id="cameraBarcodeButton"
+  class="secondary"
+  onclick="startBarcodeCamera()"
+>
+  📷 مسح بالكاميرا
+</button>
+<div id="barcodeStatus" class="status" aria-live="polite"></div>
+
 <label for="product">المنتج</label>
 <select id="product">
-<option value="">اختر المنتج</option>
+  <option value="">اختر المنتج</option>
 </select>
+
+<div id="barcodeCameraArea" class="hidden">
+  <video
+    id="barcodeVideo"
+    playsinline
+    style="width:100%;max-width:400px;border-radius:8px"
+  ></video>
+  <button type="button" class="secondary" onclick="stopBarcodeCamera()">
+    إيقاف الكاميرا
+  </button>
+</div>
+
 
 <label for="quantity">الكمية</label>
 <input id="quantity" type="number" min="1" step="1" value="1">
