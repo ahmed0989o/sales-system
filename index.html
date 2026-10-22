@@ -458,8 +458,7 @@ async function loadCustomers() {
       if (balancesByCustomer.has(String(c.id))) {
         const debt = balancesByCustomer.get(String(c.id));
         const formattedDebt = debt.toLocaleString("de-DE", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
+  maximumFractionDigits: 0
 });
 
         paymentOption.textContent =
