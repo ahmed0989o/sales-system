@@ -136,21 +136,40 @@ hr{margin-top:28px}
 <button id="saveSaleButton" type="button" onclick="saveSale()">حفظ البيع</button>
 <div id="status" class="status" aria-live="polite"></div>
 
-<hr>
-<h2>📊 تقرير المبيعات اليومي</h2>
-<label for="reportDate">اختر التاريخ</label>
-<input id="reportDate" type="date">
-<button type="button" onclick="loadDailyReport()">عرض التقرير</button>
-<div id="reportStatus" class="status"></div>
-<div class="summary">
-<p>عدد الفواتير: <strong id="reportCount">0</strong></p>
-<p>إجمالي المبيعات: <strong id="reportTotal">0</strong></p>
-<p>المبيعات النقدية: <strong id="reportCash">0</strong></p>
-<p>المبيعات الآجلة: <strong id="reportCredit">0</strong></p>
-<p>تكلفة البضاعة المباعة: <strong id="reportCost">0</strong></p>
-<p>الربح اليومي: <strong id="reportProfit">0</strong></p>
+<hr class="no-print">
+<div class="no-print">
+  <h2>📊 تقرير المبيعات اليومي</h2>
+
+  <label for="reportDate">اختر التاريخ</label>
+  <input id="reportDate" type="date">
+
+  <button type="button" onclick="loadDailyReport()">
+    عرض التقرير
+  </button>
+
+  <button type="button" class="secondary" onclick="printDailyReport()">
+    🖨️ طباعة التقرير
+  </button>
+
+  <div id="reportStatus" class="status"></div>
 </div>
-<div id="reportDetails" class="tablewrap"></div>
+
+<div id="dailyReportPrint">
+  <h2>📊 تقرير المبيعات اليومي</h2>
+  <p id="reportPrintDate" class="print-only"></p>
+
+  <div class="summary">
+    <p>عدد الفواتير: <strong id="reportCount">0</strong></p>
+    <p>إجمالي المبيعات: <strong id="reportTotal">0</strong></p>
+    <p>المبيعات النقدية: <strong id="reportCash">0</strong></p>
+    <p>المبيعات الآجلة: <strong id="reportCredit">0</strong></p>
+    <p>تكلفة البضاعة المباعة: <strong id="reportCost">0</strong></p>
+    <p>الربح اليومي: <strong id="reportProfit">0</strong></p>
+  </div>
+
+  <div id="reportDetails" class="tablewrap"></div>
+</div>
+
 </section>
 
 <section id="customerPaymentsPanel">
