@@ -703,7 +703,25 @@ await loadCustomers();
     button.disabled = false;
   }
 }
+async function printDailyReport() {
+  const date = $("reportDate").value;
 
+  if (!date) {
+    setMessage("reportStatus", "اختر التاريخ أولًا قبل الطباعة.");
+    return;
+  }
+
+  await loadDailyReport();
+
+  if ($("reportStatus").textContent !== "تم تحميل التقرير.") {
+    return;
+  }
+
+  $("reportPrintDate").textContent =
+    "تاريخ التقرير: " + date.split("-").reverse().join("/");
+
+  window.print();
+}
 async function loadDailyReport() {
   if (!db || !currentUser) return;
 
