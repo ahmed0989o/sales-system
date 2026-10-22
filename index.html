@@ -502,7 +502,7 @@ async function loadProducts() {
   try {
     const { data, error } = await db
       .from("products")
-      .select("id,name,price,quantity,purchase_price")
+      .select('id,name,price,quantity,purchase_price,barcode')
       .order("name", { ascending: true });
 
     if (error) throw error;
