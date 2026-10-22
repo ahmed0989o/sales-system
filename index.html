@@ -1070,6 +1070,18 @@ async function saveSale() {
   setMessage("status", "جارٍ حفظ الفاتورة...");
 
   try {
+    
+const { data: generatedInvoiceNumber, error: invoiceError } =
+  await db.rpc("generate_invoice_number");
+
+if (invoiceError || !generatedInvoiceNumber) {
+  console.error("Invoice number generation error:", invoiceError);
+  return setMessage("status", "تعذر إنشاء رقم الفاتورة تلقائياً.");
+}
+
+const invoiceNumber = generatedInvoiceNumber;
+$("invoiceNumber").value = invoiceNumber;
+
     const { data, error } = await db.rpc(
       "create_multi_sale_with_stock",
       {
