@@ -636,7 +636,12 @@ async function loadDailyReport() {
         .select("sale_id,quantity,unit_price,unit_cost")
         .in("sale_id", list.map(s => s.id));
 
-      if (detailError) throw detailError;
+      if (detailError) {
+  console.error("خطأ تفاصيل المبيعات:", detailError);
+  throw detailError;
+}
+
+console.log("تفاصيل المبيعات المستلمة:", items);
 
       cost = (items || []).reduce(
         (sum, item) => sum + Number(item.unit_cost || 0) * Number(item.quantity || 0), 0
