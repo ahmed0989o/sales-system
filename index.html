@@ -1054,22 +1054,21 @@ async function loadCashbox() {
     if (error) throw error;
 
     const movements = data || [];
-    let income = 0;
-    let expenses = 0;
 
-    movements.forEach(m => {
-      const amount = Number(m.amount || 0);
+const { data: summaryData, error: summaryError } =
+  await db.rpc("get_cashbox_summary");
 
-      if (["purchase_payment", "rent_payment"].includes(m.movement_type)) {
-        expenses += amount;
-      } else {
-        income += amount;
-      }
-    });
+if (summaryError) throw summaryError;
 
-    $("cashboxIncome").textContent = money(income);
-    $("cashboxExpenses").textContent = money(expenses);
-    $("cashboxBalance").textContent = money(income - expenses);
+const summary = summaryData?.[0];
+
+if (!summary) {
+  throw new Error("تعذر الحصول على ملخص الصندوق.");
+}
+
+$("cashboxIncome").textContent = money(summary.total_income);
+$("cashboxExpenses").textContent = money(summary.total_expenses);
+$("cashboxBalance").textContent = money(summary.balance);
 
     if (!movements.length) {
       $("cashboxDetails").textContent = "لا توجد حركات مسجلة.";
