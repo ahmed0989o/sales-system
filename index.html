@@ -1030,7 +1030,6 @@ async function saveSale() {
     return;
   }
 
-  const invoiceNumber = $("invoiceNumber").value.trim();
   const customerId = $("customerSelect").value;
   const customer = customers.find(
     c => String(c.id) === String(customerId)
