@@ -1100,13 +1100,7 @@ if (!invoiceNumber) {
   $("invoiceNumber").value = invoiceNumber;
 }
 
-if (invoiceError || !generatedInvoiceNumber) {
-  console.error("Invoice number generation error:", invoiceError);
-  return setMessage("status", "تعذر إنشاء رقم الفاتورة تلقائياً.");
-}
 
-const invoiceNumber = generatedInvoiceNumber;
-$("invoiceNumber").value = invoiceNumber;
 
     const { data, error } = await db.rpc(
       "create_multi_sale_with_stock",
