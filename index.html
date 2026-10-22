@@ -673,6 +673,38 @@ $("unitPrice").value = product ? money(product.price) : "";
 $("product").addEventListener("change", updateUnitPrice);
 $("quantity").addEventListener("input", calculateTotal);
 
+function findProductByBarcode() {
+  const barcodeInput = $("barcodeInput");
+  const status = $("barcodeStatus");
+  const barcode = barcodeInput.value.trim();
+
+  if (!barcode) return;
+
+  const product = products.find(
+    p => String(p.barcode || "").trim() === barcode
+  );
+
+  if (!product) {
+    status.textContent = "❌ الباركود غير موجود";
+    return;
+  }
+
+  $("product").value = String(product.id);
+  updateUnitPrice();
+
+  status.textContent = "✅ تم اختيار: " + product.name;
+  barcodeInput.value = "";
+  barcodeInput.focus();
+}
+
+$("barcodeInput").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    findProductByBarcode();
+  }
+});
+
+  
 
 function calculateTotal() {
   const product = products.find(
