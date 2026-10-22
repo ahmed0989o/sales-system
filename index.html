@@ -704,6 +704,92 @@ $("barcodeInput").addEventListener("keydown", function(event) {
   }
 });
 
+let barcodeStream = null;
+let barcodeScanActive = false;
+let barcodeDetector = null;
+
+async function startBarcodeCamera() {
+  const video = $("barcodeVideo");
+  const area = $("barcodeCameraArea");
+  const status = $("barcodeStatus");
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    status.textContent =
+      "المتصفح لا يدعم الكاميرا أو أن الصفحة ليست عبر HTTPS";
+    return;
+  }
+
+  if (!("BarcodeDetector" in window)) {
+    status.textContent =
+      "قراءة الباركود بالكاميرا غير مدعومة في هذا المتصفح. نحتاج إضافة مكتبة للقراءة.";
+    return;
+  }
+
+  try {
+    barcodeDetector = new BarcodeDetector({
+      formats: ["ean_13", "ean_8", "code_128", "upc_a", "upc_e", "qr_code"]
+    });
+
+    barcodeStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } },
+      audio: false
+    });
+
+    video.srcObject = barcodeStream;
+    area.classList.remove("hidden");
+    await video.play();
+
+    barcodeScanActive = true;
+    status.textContent = "وجّه الكاميرا نحو باركود المنتج";
+
+    scanBarcodeFrame();
+  } catch (error) {
+    status.textContent =
+      "تعذر فتح الكاميرا. تأكد من السماح بإذن الكاميرا واستخدام HTTPS.";
+    stopBarcodeCamera();
+  }
+}
+
+async function scanBarcodeFrame() {
+  if (!barcodeScanActive) return;
+
+  const video = $("barcodeVideo");
+
+  if (video.readyState >= 2) {
+    try {
+      const codes = await barcodeDetector.detect(video);
+
+      if (codes.length && codes[0].rawValue) {
+        $("barcodeInput").value = codes[0].rawValue;
+        findProductByBarcode();
+        stopBarcodeCamera();
+        return;
+      }
+    } catch (error) {
+      console.error("Barcode scan error:", error);
+    }
+  }
+
+  if (barcodeScanActive) {
+    requestAnimationFrame(scanBarcodeFrame);
+  }
+}
+
+function stopBarcodeCamera() {
+  barcodeScanActive = false;
+
+  if (barcodeStream) {
+    barcodeStream.getTracks().forEach(track => track.stop());
+    barcodeStream = null;
+  }
+
+  const video = $("barcodeVideo");
+  if (video) video.srcObject = null;
+
+  const area = $("barcodeCameraArea");
+  if (area) area.classList.add("hidden");
+}
+
   
 
 function calculateTotal() {
