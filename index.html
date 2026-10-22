@@ -1666,6 +1666,17 @@ window.addEventListener("error", function (event) {
   }
 });
 
+window.login = login;
+
+window.addEventListener("unhandledrejection", function (event) {
+  const status = document.getElementById("loginStatus");
+  if (status) {
+    status.textContent =
+      "خطأ أثناء التشغيل: " +
+      (event.reason?.message || String(event.reason));
+  }
+});
+
 init();
   
 async function loadCashbox() {
