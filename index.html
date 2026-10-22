@@ -542,7 +542,21 @@ async function logout() {
     alert("تعذر تسجيل الخروج: " + error.message);
   }
 }
+async function prepareNextInvoiceNumber() {
+  const input = $("invoiceNumber");
 
+  if (!input || input.value.trim()) return;
+
+  const { data, error } = await db.rpc("generate_invoice_number");
+
+  if (error || !data) {
+    console.error("Next invoice number error:", error);
+    setMessage("status", "تعذر تجهيز رقم الفاتورة تلقائياً.");
+    return;
+  }
+
+  input.value = data;
+}
 async function showApp() {
   if (!currentUser || appLoading) return;
   appLoading = true;
