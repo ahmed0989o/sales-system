@@ -1036,10 +1036,6 @@ async function saveSale() {
   );
   const paymentMethod = $("paymentMethod").value;
 
-  if (!invoiceNumber) {
-    return setMessage("status", "أدخل رقم الفاتورة.");
-  }
-
   if (!Array.isArray(invoiceCart) || invoiceCart.length === 0) {
     return setMessage("status", "أضف منتجاً واحداً على الأقل إلى الفاتورة.");
   }
