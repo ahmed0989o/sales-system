@@ -482,8 +482,11 @@ async function login() {
     return;
   }
 
-  if (!db) {
-    setMessage("loginStatus", "مكتبة الاتصال لم تُحمّل. تحقق من الإنترنت ثم حدّث الصفحة.");
+  if (!db || !window.supabase) {
+    setMessage(
+      "loginStatus",
+      "تعذر الاتصال بمكتبة Supabase. تحقق من الإنترنت وحدّث الصفحة."
+    );
     return;
   }
 
@@ -495,14 +498,30 @@ async function login() {
       email,
       password
     });
-    if (error) throw error;
-    if (!data.user) throw new Error("لم يتم العثور على بيانات المستخدم.");
+
+    if (error) {
+      console.error("Supabase login error:", error);
+      throw error;
+    }
+
+    if (!data.user) {
+      throw new Error("لم تُرجع الخدمة بيانات المستخدم.");
+    }
 
     currentUser = data.user;
+    setMessage("loginStatus", "نجح تسجيل الدخول، جارٍ تحميل النظام...");
+
     await showApp();
+
   } catch (error) {
     console.error("Login error:", error);
-    setMessage("loginStatus", "تعذر تسجيل الدخول: " + (error.message || error));
+
+    setMessage(
+      "loginStatus",
+      "فشل تسجيل الدخول: " +
+      (error.message || "خطأ غير معروف") +
+      (error.status ? " (HTTP " + error.status + ")" : "")
+    );
   } finally {
     button.disabled = false;
   }
