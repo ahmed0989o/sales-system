@@ -570,8 +570,8 @@ async function showApp() {
   $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
   $("reportDate").value = todayInBaghdad();
 
-  try {
-    await Promise.all([loadProducts(), loadCustomers()]);
+  try {await Promise.all([loadProducts(), loadCustomers()]);
+await prepareNextInvoiceNumber();
     
 if (isOwner(currentUser)) await loadPurchases();
 if (isOwner(currentUser)) await loadCashbox();
