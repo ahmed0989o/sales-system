@@ -1083,11 +1083,11 @@ function renderInvoiceItems() {
     tbody.appendChild(tr);
   });
 
-  table.appendChild(tbody);
-  container.appendChild(table);
-  grandTotalElement.textContent = grandTotal.toLocaleString();
-}
+table.appendChild(tbody);
+container.appendChild(table);
+grandTotalElement.textContent = grandTotal.toLocaleString();
 updatePartialPayment();
+}
 
 async function saveSale() {
   const button = $("saveSaleButton");
