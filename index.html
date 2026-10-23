@@ -636,6 +636,7 @@ setMessage(
 );
 
   $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
+  $("returnsPanel").classList.toggle("hidden", !isOwner(currentUser));
   $("reportDate").value = todayInBaghdad();
 
   try {await Promise.all([loadProducts(), loadCustomers()]);
