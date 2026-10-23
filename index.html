@@ -894,6 +894,37 @@ function calculateTotal() {
 
 let invoiceCart = [];
 
+function getInvoiceTotal() {
+  return invoiceCart.reduce(
+    (sum, item) => sum + Number(item.price) * Number(item.quantity),
+    0
+  );
+}
+
+function updatePartialPayment() {
+  const method = $("paymentMethod").value;
+  const isPartial = method === "واصل جزئي";
+  const total = getInvoiceTotal();
+  const input = $("amountReceived");
+  const received = isPartial
+    ? Math.max(0, Number(input.value) || 0)
+    : method === "نقدي"
+      ? total
+      : 0;
+
+  $("partialPaymentBox").classList.toggle("hidden", !isPartial);
+  input.required = isPartial;
+
+  $("partialTotal").textContent = money(total);
+  $("partialReceived").textContent = money(received);
+  $("remainingAmount").textContent = money(
+    Math.max(0, total - received)
+  );
+}
+
+$("paymentMethod").addEventListener("change", updatePartialPayment);
+$("amountReceived").addEventListener("input", updatePartialPayment);
+
 function searchProducts() {
   const input = $("productSearch");
   const results = $("productSearchResults");
