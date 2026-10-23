@@ -2451,6 +2451,7 @@ function createReturnRequestKey() {
 }
 
 async function processReturn() {
+  if (returnProcessing) return;
   if (!isOwner(currentUser)) {
     return setMessage("returnStatus", "غير مصرح لك.");
   }
