@@ -1199,8 +1199,11 @@ if (nextInvoiceError || !nextInvoiceNumber) {
       $("productSearchResults").replaceChildren();
     }
 
-    invoiceCart = [];
-    renderInvoiceItems();
+   invoiceCart = [];
+renderInvoiceItems();
+
+$("amountReceived").value = "";
+updatePartialPayment();
 
     await loadProducts();
     await loadDailyReport();
