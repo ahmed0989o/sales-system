@@ -2243,7 +2243,7 @@ async function searchReturnInvoice() {
       .in("sale_detail_id", detailIds);
 
     if (returnsError) throw returnsError;
-
+console.log("Previous returns:", previousReturns);
     const returnedQuantities = new Map();
 
     (previousReturns || []).forEach(item => {
