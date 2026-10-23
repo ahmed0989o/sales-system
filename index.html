@@ -848,12 +848,14 @@ async function scanBarcodeFrame() {
     try {
       const codes = await barcodeDetector.detect(video);
 
-      if (codes.length && codes[0].rawValue) {
-        $("barcodeInput").value = codes[0].rawValue;
-        findProductByBarcode();
-        stopBarcodeCamera();
-        return;
-      }
+     
+if (codes.length && codes[0].rawValue) {
+  $("barcodeInput").value = codes[0].rawValue;
+  findProductByBarcode($("barcodeInput").value);
+  stopBarcodeCamera();
+  return;
+}
+
     } catch (error) {
       console.error("Barcode scan error:", error);
     }
