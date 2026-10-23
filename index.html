@@ -2175,7 +2175,400 @@ async function updateRentContract() {
     button.disabled = false;
   }
 }
+// =====================================
+// مرتجعات المبيعات
+// =====================================
 
+let currentReturnSale = null;
+let currentReturnItems = [];
+
+async function searchReturnInvoice() {
+  if (!isOwner(currentUser)) {
+    return setMessage("returnStatus", "غير مصرح لك.");
+  }
+
+  const invoiceNumber = $("returnInvoiceNumber").value.trim();
+
+  if (!invoiceNumber) {
+    return setMessage("returnStatus", "أدخل رقم الفاتورة.");
+  }
+
+  const button = $("searchReturnInvoiceButton");
+  button.disabled = true;
+
+  setMessage("returnStatus", "جارٍ البحث عن الفاتورة...");
+  $("returnInvoiceInfo").classList.add("hidden");
+  $("returnInvoiceInfo").replaceChildren();
+  $("returnItems").replaceChildren();
+  $("returnTotal").textContent = "0";
+  $("processReturnButton").disabled = true;
+
+  currentReturnSale = null;
+  currentReturnItems = [];
+
+  try {
+    const { data: sale, error: saleError } = await db
+      .from("sales")
+      .select(
+        "id,invoice_number,customer_name,total_amount,payment_method,customer_id,created_at"
+      )
+      .eq("invoice_number", invoiceNumber)
+      .maybeSingle();
+
+    if (saleError) throw saleError;
+
+    if (!sale) {
+      throw new Error("لم يتم العثور على فاتورة بهذا الرقم.");
+    }
+
+    const { data: details, error: detailsError } = await db
+      .from("sale_details")
+      .select(
+        "id,sale_id,product_id,quantity,unit_price,total"
+      )
+      .eq("sale_id", sale.id);
+
+    if (detailsError) throw detailsError;
+
+    if (!details || !details.length) {
+      throw new Error("الفاتورة لا تحتوي على تفاصيل منتجات.");
+    }
+
+    const detailIds = details.map(item => item.id);
+
+    const { data: previousReturns, error: returnsError } = await db
+      .from("sales_return_details")
+      .select("sale_detail_id,quantity")
+      .in("sale_detail_id", detailIds);
+
+    if (returnsError) throw returnsError;
+
+    const returnedQuantities = new Map();
+
+    (previousReturns || []).forEach(item => {
+      const key = String(item.sale_detail_id);
+
+      returnedQuantities.set(
+        key,
+        (returnedQuantities.get(key) || 0) +
+        Number(item.quantity || 0)
+      );
+    });
+
+    const productIds = [
+      ...new Set(details.map(item => item.product_id))
+    ];
+
+    const { data: productRows, error: productsError } = await db
+      .from("products")
+      .select("id,name")
+      .in("id", productIds);
+
+    if (productsError) throw productsError;
+
+    const productNames = new Map(
+      (productRows || []).map(p => [String(p.id), p.name])
+    );
+
+    currentReturnSale = sale;
+
+    currentReturnItems = details.map(detail => {
+      const soldQuantity = Number(detail.quantity || 0);
+      const returnedQuantity =
+        returnedQuantities.get(String(detail.id)) || 0;
+
+      return {
+        saleDetailId: detail.id,
+        productId: detail.product_id,
+        name: productNames.get(String(detail.product_id)) ||
+          `منتج #${detail.product_id}`,
+        soldQuantity,
+        returnedQuantity,
+        remainingQuantity: Math.max(
+          0,
+          soldQuantity - returnedQuantity
+        ),
+        unitPrice: Number(detail.unit_price || 0),
+        returnQuantity: 0
+      };
+    });
+
+    $("returnInvoiceInfo").classList.remove("hidden");
+    $("returnInvoiceInfo").textContent =
+      `الفاتورة: ${sale.invoice_number} | ` +
+      `الزبون: ${sale.customer_name || "بدون اسم"} | ` +
+      `طريقة الدفع: ${sale.payment_method} | ` +
+      `الإجمالي: ${money(sale.total_amount)} د.ع`;
+
+    renderReturnItems();
+
+    setMessage(
+      "returnStatus",
+      "تم تحميل الفاتورة. حدد الكميات التي تريد إرجاعها."
+    );
+
+  } catch (error) {
+    console.error("Search return invoice:", error);
+    setMessage("returnStatus", "تعذر تحميل الفاتورة: " + error.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function renderReturnItems() {
+  const container = $("returnItems");
+  container.replaceChildren();
+
+  if (!currentReturnItems.length) {
+    container.textContent = "لا توجد منتجات.";
+    return;
+  }
+
+  const table = document.createElement("table");
+
+  const thead = document.createElement("thead");
+  const header = document.createElement("tr");
+
+  [
+    "المنتج",
+    "الكمية المباعة",
+    "المرتجع سابقاً",
+    "المتبقي للإرجاع",
+    "سعر الوحدة",
+    "كمية المرتجع"
+  ].forEach(label => {
+    const th = document.createElement("th");
+    th.textContent = label;
+    header.appendChild(th);
+  });
+
+  thead.appendChild(header);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  currentReturnItems.forEach((item, index) => {
+    const tr = document.createElement("tr");
+
+    const values = [
+      item.name,
+      item.soldQuantity,
+      item.returnedQuantity,
+      item.remainingQuantity,
+      money(item.unitPrice)
+    ];
+
+    values.forEach(value => {
+      const td = document.createElement("td");
+      td.textContent = String(value);
+      tr.appendChild(td);
+    });
+
+    const inputCell = document.createElement("td");
+    const input = document.createElement("input");
+
+    input.type = "number";
+    input.min = "0";
+    input.max = String(item.remainingQuantity);
+    input.step = "1";
+    input.value = "0";
+    input.disabled = item.remainingQuantity <= 0;
+    input.style.width = "90px";
+
+    input.addEventListener("input", () => {
+      const quantity = Number(input.value);
+
+      if (
+        !Number.isInteger(quantity) ||
+        quantity < 0 ||
+        quantity > item.remainingQuantity
+      ) {
+        input.setCustomValidity(
+          `الكمية المتاحة للإرجاع هي ${item.remainingQuantity}`
+        );
+      } else {
+        input.setCustomValidity("");
+      }
+
+      item.returnQuantity = quantity;
+      updateReturnTotal();
+    });
+
+    inputCell.appendChild(input);
+    tr.appendChild(inputCell);
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+
+  updateReturnTotal();
+}
+
+function updateReturnTotal() {
+  const total = currentReturnItems.reduce((sum, item) => {
+    return sum +
+      Number(item.returnQuantity || 0) *
+      Number(item.unitPrice || 0);
+  }, 0);
+
+  $("returnTotal").textContent = money(total);
+
+  const hasItems = currentReturnItems.some(
+    item => Number(item.returnQuantity) > 0
+  );
+
+  $("processReturnButton").disabled =
+    !currentReturnSale || !hasItems;
+}
+
+function createReturnRequestKey() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  if (window.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(bytes, b =>
+      b.toString(16).padStart(2, "0")
+    ).join("");
+
+    return [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20)
+    ].join("-");
+  }
+
+  throw new Error("المتصفح لا يدعم إنشاء مفتاح طلب آمن.");
+}
+
+async function processReturn() {
+  if (!isOwner(currentUser)) {
+    return setMessage("returnStatus", "غير مصرح لك.");
+  }
+
+  if (!currentReturnSale) {
+    return setMessage("returnStatus", "ابحث عن الفاتورة أولاً.");
+  }
+
+  const items = currentReturnItems
+    .filter(item => Number(item.returnQuantity) > 0)
+    .map(item => ({
+      sale_detail_id: Number(item.saleDetailId),
+      quantity: Number(item.returnQuantity)
+    }));
+
+  if (!items.length) {
+    return setMessage(
+      "returnStatus",
+      "حدد كمية واحدة على الأقل للإرجاع."
+    );
+  }
+
+  for (const item of items) {
+    const original = currentReturnItems.find(
+      x => Number(x.saleDetailId) === item.sale_detail_id
+    );
+
+    if (
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1 ||
+      item.quantity > original.remainingQuantity
+    ) {
+      return setMessage(
+        "returnStatus",
+        "توجد كمية غير صحيحة أو أكبر من الكمية المتبقية."
+      );
+    }
+  }
+
+  const total = items.reduce((sum, item) => {
+    const original = currentReturnItems.find(
+      x => Number(x.saleDetailId) === item.sale_detail_id
+    );
+
+    return sum + item.quantity * original.unitPrice;
+  }, 0);
+
+  if (total <= 0) {
+    return setMessage("returnStatus", "قيمة المرتجع غير صحيحة.");
+  }
+
+  const confirmed = confirm(
+    `تأكيد إرجاع المنتجات؟\n` +
+    `رقم الفاتورة: ${currentReturnSale.invoice_number}\n` +
+    `مبلغ المرتجع: ${money(total)} د.ع`
+  );
+
+  if (!confirmed) return;
+
+  const button = $("processReturnButton");
+  button.disabled = true;
+
+  setMessage("returnStatus", "جارٍ تسجيل المرتجع...");
+
+  try {
+    const requestKey = createReturnRequestKey();
+
+    const { data, error } = await db.rpc(
+      "process_sales_return",
+      {
+        p_sale_id: currentReturnSale.id,
+        p_items: items,
+        p_request_key: requestKey,
+        p_notes: $("returnNotes").value.trim() || null
+      }
+    );
+
+    if (error) throw error;
+
+    if (data?.success === false) {
+      throw new Error(data.message || "لم يتم تسجيل المرتجع.");
+    }
+
+    const settlementMessage =
+      data?.settlement_type === "refund_cash"
+        ? "استرداد نقدي"
+        : data?.settlement_type === "reduce_debt"
+          ? "خصم من دين الزبون"
+          : "تمت المعالجة";
+
+    setMessage(
+      "returnStatus",
+      `${data?.message || "تم تسجيل المرتجع بنجاح."}\n` +
+      `رقم المرتجع: ${data?.return_id ?? "—"}\n` +
+      `المبلغ: ${money(data?.return_amount ?? total)} د.ع\n` +
+      `التسوية: ${settlementMessage}` +
+      (data?.duplicate_request ? "\nهذا طلب مكرر سبق تسجيله." : "")
+    );
+
+    $("returnNotes").value = "";
+
+    await searchReturnInvoice();
+
+    // إعادة تحميل المنتجات لتحديث المخزون المعروض في قسم البيع
+    await loadProducts();
+
+  } catch (error) {
+    console.error("Process sales return:", error);
+
+    setMessage(
+      "returnStatus",
+      "تعذر تسجيل المرتجع: " + error.message
+    );
+  } finally {
+    button.disabled = false;
+    updateReturnTotal();
+  }
+}
 </script>
 </body>
 </html>
