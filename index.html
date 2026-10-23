@@ -1155,16 +1155,18 @@ if (!invoiceNumber) {
 
 
 
-    const { data, error } = await db.rpc(
-      "create_multi_sale_with_stock",
-      {
-        p_invoice_number: invoiceNumber,
-        p_customer_name: customer ? customer.name : null,
-        p_payment_method: paymentMethod,
-        p_customer_id: customer ? Number(customer.id) : null,
-        p_items: items
-      }
-    );
+    
+const { data, error } = await db.rpc(
+  "create_multi_sale_with_stock",
+  {
+    p_invoice_number: invoiceNumber,
+    p_customer_name: customer ? customer.name : null,
+    p_payment_method: paymentMethod,
+    p_customer_id: customer ? Number(customer.id) : null,
+    p_items: items,
+    p_amount_received: Number($("amountReceived").value) || 0
+  }
+);
 
     if (error) throw error;
 
