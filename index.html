@@ -2512,6 +2512,10 @@ async function processReturn() {
 
   if (!confirmed) return;
 
+    if (returnProcessing) return;
+
+  returnProcessing = true;
+
   const button = $("processReturnButton");
   button.disabled = true;
 
