@@ -2571,6 +2571,7 @@ async function processReturn() {
       "تعذر تسجيل المرتجع: " + error.message
     );
   } finally {
+    returnProcessing = false;
     button.disabled = false;
     updateReturnTotal();
   }
