@@ -584,6 +584,15 @@ async function showApp() {
     "الحساب: " + (currentUser.email || "مستخدم") +
     (isOwner(currentUser) ? " — مسؤول" : "");
 
+console.log("Supabase authenticated user ID:", currentUser.id);
+
+setMessage(
+    "loginStatus",
+    currentUser.id === OWNER_USER_ID
+      ? "تم التحقق من حساب المالك."
+      : "تنبيه: الحساب الحالي ليس حساب المالك."
+);
+
   $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
   $("reportDate").value = todayInBaghdad();
 
