@@ -746,7 +746,7 @@ function updateUnitPrice() {
     p => String(p.id) === String(productId)
   );
 
-$("unitPrice").value = product ? money(product.price) : "";
+$("unitPrice").value = product ? Number(product.price) : "";
   calculateTotal();
 }
 
