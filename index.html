@@ -1083,7 +1083,7 @@ function renderInvoiceItems() {
   container.appendChild(table);
   grandTotalElement.textContent = grandTotal.toLocaleString();
 }
-
+updatePartialPayment();
 
 async function saveSale() {
   const button = $("saveSaleButton");
