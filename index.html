@@ -248,11 +248,28 @@ hr{margin-top:28px}
 <input id="unitPrice" type="number" readonly>
 <div class="total">الإجمالي: <span id="total">0</span></div>
 
+
 <label for="paymentMethod">طريقة الدفع</label>
 <select id="paymentMethod">
-<option value="نقدي">نقدي</option>
-<option value="آجل">آجل</option>
+  <option value="نقدي">نقدي</option>
+  <option value="آجل">آجل</option>
+  <option value="واصل جزئي">واصل جزئي</option>
 </select>
+
+<div id="partialPaymentBox" class="summary hidden">
+  <label for="amountReceived">المبلغ الواصل (د.ع)</label>
+  <input
+    id="amountReceived"
+    type="number"
+    min="1"
+    step="1"
+    placeholder="أدخل المبلغ المستلم"
+  >
+  <p>إجمالي الفاتورة: <strong id="partialTotal">0</strong> د.ع</p>
+  <p>المبلغ الواصل: <strong id="partialReceived">0</strong> د.ع</p>
+  <p>المتبقي على الزبون: <strong id="remainingAmount">0</strong> د.ع</p>
+</div>
+
 
 <button id="saveSaleButton" type="button" onclick="saveSale()">حفظ البيع</button>
 <div id="status" class="status" aria-live="polite"></div>
