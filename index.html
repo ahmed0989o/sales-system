@@ -309,7 +309,49 @@ hr{margin-top:28px}
 </div>
 
 </section>
+<section id="returnsPanel" class="hidden">
+  <hr>
+  <h2>↩️ مرتجعات المبيعات</h2>
 
+  <label for="returnInvoiceNumber">رقم فاتورة البيع</label>
+  <input
+    id="returnInvoiceNumber"
+    type="text"
+    placeholder="أدخل رقم الفاتورة"
+  >
+
+  <button type="button" id="searchReturnInvoiceButton"
+          onclick="searchReturnInvoice()">
+    🔍 البحث عن الفاتورة
+  </button>
+
+  <div id="returnStatus" class="status" aria-live="polite"></div>
+
+  <div id="returnInvoiceInfo" class="summary hidden"></div>
+
+  <div id="returnItems" class="tablewrap"></div>
+
+  <label for="returnNotes">ملاحظات المرتجع</label>
+  <input
+    id="returnNotes"
+    type="text"
+    placeholder="ملاحظات اختيارية"
+  >
+
+  <div class="summary">
+    المبلغ المتوقع للمرتجع:
+    <strong id="returnTotal">0</strong> د.ع
+  </div>
+
+  <button
+    type="button"
+    id="processReturnButton"
+    onclick="processReturn()"
+    disabled
+  >
+    تأكيد المرتجع
+  </button>
+</section>
 <section id="customerPaymentsPanel">
 <hr>
 <h2>💰 تسديد ديون الزبائن</h2>
