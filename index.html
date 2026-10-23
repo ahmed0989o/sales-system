@@ -1283,11 +1283,14 @@ async function printDailyReport() {
 
   window.print();
 }
+
 async function loadDailyReport() {
   if (!db || !currentUser) return;
 
   const date = $("reportDate").value;
-  if (!date) return setMessage("reportStatus", "اختر التاريخ أولًا.");
+  if (!date) {
+    return setMessage("reportStatus", "اختر التاريخ أولًا.");
+  }
 
   setMessage("reportStatus", "جارٍ تحميل التقرير...");
   $("reportDetails").replaceChildren();
@@ -1298,12 +1301,15 @@ async function loadDailyReport() {
 
     const { data: sales, error } = await db
       .from("sales")
-      .select("id,created_at,invoice_number,customer_name,total_amount,payment_method")
+      .select(
+        "id,created_at,invoice_number,customer_name,total_amount,payment_method,amount_received"
+      )
       .gte("created_at", start.toISOString())
       .lt("created_at", end.toISOString())
       .order("created_at", { ascending: false });
 
     if (error) throw error;
+
     const list = sales || [];
     let cost = 0;
     let profit = 0;
@@ -1314,33 +1320,65 @@ async function loadDailyReport() {
         .select("sale_id,quantity,unit_price,unit_cost")
         .in("sale_id", list.map(s => s.id));
 
-      if (detailError) {
-  setMessage(
-    "reportStatus",
-    "خطأ في تفاصيل المبيعات: " + detailError.message
-  );
-  throw detailError;
-}
+      if (detailError) throw detailError;
 
-setMessage(
-  "reportStatus",
-  "عدد تفاصيل المبيعات المستلمة: " + (items || []).length
-);
-      cost = (items || []).reduce(
-        (sum, item) => sum + Number(item.unit_cost || 0) * Number(item.quantity || 0), 0
+      const details = items || [];
+
+      cost = details.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.unit_cost || 0) *
+          Number(item.quantity || 0),
+        0
       );
-      profit = (items || []).reduce(
-        (sum, item) => sum +
-          (Number(item.unit_price || 0) - Number(item.unit_cost || 0)) *
-          Number(item.quantity || 0), 0
+
+      profit = details.reduce(
+        (sum, item) =>
+          sum +
+          (
+            Number(item.unit_price || 0) -
+            Number(item.unit_cost || 0)
+          ) *
+          Number(item.quantity || 0),
+        0
       );
     }
 
-    const total = list.reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
-    const cash = list.filter(s => s.payment_method === "نقدي")
-      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
-    const credit = list.filter(s => s.payment_method === "آجل")
-      .reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+    const total = list.reduce(
+      (sum, s) => sum + Number(s.total_amount || 0),
+      0
+    );
+
+    // النقد المستلم: النقدي كاملًا + المبلغ الواصل من الفواتير الجزئية
+    const cash = list.reduce((sum, s) => {
+      const invoiceTotal = Number(s.total_amount || 0);
+
+      if (s.payment_method === "نقدي") {
+        return sum + invoiceTotal;
+      }
+
+      if (s.payment_method === "واصل جزئي") {
+        return sum + Number(s.amount_received || 0);
+      }
+
+      return sum;
+    }, 0);
+
+    // الدين المتبقي: الآجل كاملًا + المتبقي من الفواتير الجزئية
+    const credit = list.reduce((sum, s) => {
+      const invoiceTotal = Number(s.total_amount || 0);
+
+      if (s.payment_method === "آجل") {
+        return sum + invoiceTotal;
+      }
+
+      if (s.payment_method === "واصل جزئي") {
+        const received = Number(s.amount_received || 0);
+        return sum + Math.max(0, invoiceTotal - received);
+      }
+
+      return sum;
+    }, 0);
 
     $("reportCount").textContent = list.length;
     $("reportTotal").textContent = money(total);
@@ -1350,61 +1388,80 @@ setMessage(
     $("reportProfit").textContent = money(profit);
 
     if (!list.length) {
-      $("reportDetails").textContent = "لا توجد مبيعات في هذا التاريخ.";
+      $("reportDetails").textContent =
+        "لا توجد مبيعات في هذا التاريخ.";
     } else {
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       const header = document.createElement("tr");
 
-      ["رقم الفاتورة", "الزبون", "المبلغ", "الدفع", "الوقت"].forEach(label => {
+      [
+        "رقم الفاتورة",
+        "الزبون",
+        "إجمالي الفاتورة",
+        "المبلغ الواصل",
+        "المتبقي",
+        "طريقة الدفع",
+        "الوقت"
+      ].forEach(label => {
         const th = document.createElement("th");
         th.textContent = label;
         header.appendChild(th);
       });
+
       thead.appendChild(header);
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
+
       list.forEach(s => {
+        const invoiceTotal = Number(s.total_amount || 0);
+
+        const received =
+          s.payment_method === "نقدي"
+            ? invoiceTotal
+            : s.payment_method === "واصل جزئي"
+              ? Number(s.amount_received || 0)
+              : 0;
+
+        const remaining = Math.max(0, invoiceTotal - received);
+
         const row = document.createElement("tr");
+
         [
           s.invoice_number || "",
           s.customer_name || "بدون اسم",
-          money(s.total_amount),
+          money(invoiceTotal),
+          money(received),
+          money(remaining),
           s.payment_method || "",
           new Date(s.created_at).toLocaleTimeString("en-GB", {
-            timeZone: "Asia/Baghdad", hour: "2-digit", minute: "2-digit"
+            timeZone: "Asia/Baghdad",
+            hour: "2-digit",
+            minute: "2-digit"
           })
         ].forEach(value => {
           const td = document.createElement("td");
-          td.textContent = value;
+          td.textContent = String(value);
           row.appendChild(td);
         });
+
         tbody.appendChild(row);
       });
+
       table.appendChild(tbody);
-      $("reportDetails").appendChild(table);
+      $("reportDetails").replaceChildren(table);
     }
 
     setMessage("reportStatus", "تم تحميل التقرير.");
   } catch (error) {
     console.error("Daily report:", error);
-    setMessage("reportStatus", "تعذر تحميل التقرير: " + error.message);
+    setMessage(
+      "reportStatus",
+      "تعذر تحميل التقرير: " + error.message
+    );
   }
 }
-
-$("purchaseQuantity").addEventListener("input", calculatePurchaseTotal);
-$("purchaseUnitCost").addEventListener("input", calculatePurchaseTotal);
-
-function calculatePurchaseTotal() {
-  $("purchaseTotalCost").value = (
-    Number($("purchaseQuantity").value || 0) *
-    Number($("purchaseUnitCost").value || 0)
-  ).toFixed(2);
-}
-
-
-
 async function savePurchase() {
   const button = $("savePurchaseButton");
 
