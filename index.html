@@ -1023,11 +1023,12 @@ function renderInvoiceItems() {
 
   container.replaceChildren();
 
-  if (!invoiceCart.length) {
-    container.textContent = "ما تمت إضافة منتجات للفاتورة بعد";
-    grandTotalElement.textContent = "0";
-    return;
-  }
+ if (!invoiceCart.length) {
+  container.textContent = "ما تمت إضافة منتجات للفاتورة بعد";
+  grandTotalElement.textContent = "0";
+  updatePartialPayment();
+  return;
+}
 
   const table = document.createElement("table");
   table.innerHTML = `
