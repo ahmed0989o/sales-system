@@ -1199,14 +1199,15 @@ if (nextInvoiceError || !nextInvoiceNumber) {
       $("productSearchResults").replaceChildren();
     }
 
-   invoiceCart = [];
+invoiceCart = [];
 renderInvoiceItems();
 
-$("amountReceived").value = "";
+// تصفير المبلغ الواصل وتجهيز الفاتورة الجديدة
+$("amountReceived").value = "0";
 updatePartialPayment();
 
-    await loadProducts();
-    await loadDailyReport();
+await loadProducts();
+await loadDailyReport();
 
   } catch (error) {
     console.error("Save sale:", error);
