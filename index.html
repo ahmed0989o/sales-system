@@ -1440,7 +1440,9 @@ function holdCurrentInvoice() {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     savedAt: new Date().toISOString(),
     customerId: $("customerSelect").value || "",
-    customerName: selectedCustomer?.name || "بدون تحديد زبون",
+   isCashCustomer
+  ? cashCustomerName
+  : (selectedCustomer?.name || "بدون تحديد زبون"),
     paymentMethod: $("paymentMethod").value || "نقدي",
     amountReceived: Number($("amountReceived").value) || 0,
     items: invoiceCart.map(item => ({
