@@ -1615,6 +1615,26 @@ function removeHeldInvoice(id) {
     setMessage("status", "تعذر حذف المسودة: " + error.message);
   }
 }
+  function toggleCashCustomer() {
+  const box = $("cashCustomerBox");
+  const button = $("cashCustomerButton");
+  const nameInput = $("cashCustomerName");
+
+  const activating = box.classList.contains("hidden");
+
+  box.classList.toggle("hidden", !activating);
+
+  if (activating) {
+    $("customerSelect").value = "";
+    nameInput.required = true;
+    button.textContent = "✅ زبون نقدي (مفعّل)";
+    nameInput.focus();
+  } else {
+    nameInput.value = "";
+    nameInput.required = false;
+    button.textContent = "💵 زبون نقدي";
+  }
+}
 function cancelCurrentInvoice() {
   const confirmed = window.confirm(
     "هل تريد إلغاء الفاتورة الحالية؟ سيتم مسح المنتجات غير المحفوظة فقط، ولن تتأثر الفواتير المحفوظة أو المخزون."
