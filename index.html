@@ -178,6 +178,24 @@ hr{margin-top:28px}
 <select id="customerSelect">
 <option value="">بدون تحديد زبون</option>
 </select>
+  <button
+  id="cashCustomerButton"
+  type="button"
+  class="secondary"
+  onclick="toggleCashCustomer()"
+>
+  💵 زبون نقدي
+</button>
+
+<div id="cashCustomerBox" class="hidden">
+  <label for="cashCustomerName">اسم الزبون النقدي</label>
+  <input
+    id="cashCustomerName"
+    type="text"
+    placeholder="اكتب اسم الزبون لهذه الفاتورة"
+    autocomplete="off"
+  >
+</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;">
   <button type="button" class="secondary" onclick="holdCurrentInvoice()">
     ⏸️ تعليق الفاتورة
