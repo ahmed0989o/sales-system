@@ -1324,7 +1324,10 @@ customerName: isCashCustomer ? cashCustomerName : (customer ? customer.name : "�
 
 invoiceCart = [];
 renderInvoiceItems();
-
+$("cashCustomerBox").classList.add("hidden");
+$("cashCustomerName").value = "";
+$("cashCustomerName").required = false;
+$("cashCustomerButton").textContent = "💵 زبون نقدي";
 // تصفير المبلغ الواصل وتجهيز الفاتورة الجديدة
 $("amountReceived").value = "0";
 updatePartialPayment();
