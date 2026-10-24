@@ -1378,6 +1378,84 @@ async function printDailyReport() {
 
   window.print();
 }
+  function getHeldInvoices() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("salesSystemHeldInvoices") || "[]"
+    );
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
+
+function holdCurrentInvoice() {
+  if (!currentUser) {
+    setMessage("status", "سجّل الدخول أولاً.");
+    return;
+  }
+
+  if (!invoiceCart.length) {
+    setMessage("status", "أضف المنتجات قبل تعليق الفاتورة.");
+    return;
+  }
+
+  const selectedCustomer = customers.find(
+    c => String(c.id) === String($("customerSelect").value)
+  );
+
+  const draft = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    savedAt: new Date().toISOString(),
+    customerId: $("customerSelect").value || "",
+    customerName: selectedCustomer?.name || "بدون تحديد زبون",
+    paymentMethod: $("paymentMethod").value || "نقدي",
+    amountReceived: Number($("amountReceived").value) || 0,
+    items: invoiceCart.map(item => ({
+      productId: item.productId,
+      name: String(item.name || ""),
+      price: Number(item.price || 0),
+      quantity: Number(item.quantity || 0)
+    }))
+  };
+
+  try {
+    const held = getHeldInvoices();
+    held.push(draft);
+    localStorage.setItem(
+      "salesSystemHeldInvoices",
+      JSON.stringify(held)
+    );
+  } catch (error) {
+    setMessage("status", "تعذر تعليق الفاتورة على هذا الجهاز.");
+    return;
+  }
+
+  invoiceCart = [];
+  renderInvoiceItems();
+
+  $("invoiceNumber").value = "";
+  $("product").value = "";
+  $("quantity").value = "1";
+  $("unitPrice").value = "";
+  $("total").textContent = "0";
+  $("customerSelect").value = "";
+  $("paymentMethod").value = "نقدي";
+  $("amountReceived").value = "0";
+
+  if ($("productSearch")) $("productSearch").value = "";
+  if ($("productSearchResults")) {
+    $("productSearchResults").replaceChildren();
+  }
+
+  updatePartialPayment();
+  showHeldInvoices();
+
+  setMessage(
+    "status",
+    "تم تعليق الفاتورة كمسودة. لم يتم تسجيل بيع أو خصم مخزون."
+  );
+}
 function cancelCurrentInvoice() {
   const confirmed = window.confirm(
     "هل تريد إلغاء الفاتورة الحالية؟ سيتم مسح المنتجات غير المحفوظة فقط، ولن تتأثر الفواتير المحفوظة أو المخزون."
