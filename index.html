@@ -1009,9 +1009,14 @@ function updatePartialPayment() {
   );
 }
 
-$("paymentMethod").addEventListener("change", updatePartialPayment);
-  $("paymentMethod").addEventListener("change", updatePartialPayment);
-$("amountReceived").addEventListener("input", updatePartialPayment);
+$("customerSelect").addEventListener("change", () => {
+  if (!$("customerSelect").value) return;
+
+  $("cashCustomerBox").classList.add("hidden");
+  $("cashCustomerName").value = "";
+  $("cashCustomerName").required = false;
+  $("cashCustomerButton").textContent = "💵 زبون نقدي";
+});
 
 function searchProducts() {
   const input = $("productSearch");
