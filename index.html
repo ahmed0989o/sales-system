@@ -2607,7 +2607,7 @@ returnProcessing = true;
     updateReturnTotal();
   }
 }
-  function printInvoice() {
+function printInvoice(existingWindow = null) {
   const invoice = lastSavedInvoice;
 
   if (!invoice) {
