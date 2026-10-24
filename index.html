@@ -1456,6 +1456,68 @@ function holdCurrentInvoice() {
     "تم تعليق الفاتورة كمسودة. لم يتم تسجيل بيع أو خصم مخزون."
   );
 }
+  function showHeldInvoices() {
+  const container = $("heldInvoicesList");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const held = getHeldInvoices();
+
+  if (!held.length) {
+    container.textContent = "لا توجد فواتير معلقة حالياً.";
+    return;
+  }
+
+  const heading = document.createElement("h3");
+  heading.textContent = "📂 الفواتير المعلقة";
+  container.appendChild(heading);
+
+  [...held].reverse().forEach(draft => {
+    const card = document.createElement("div");
+    card.className = "summary";
+
+    const total = (draft.items || []).reduce(
+      (sum, item) =>
+        sum + Number(item.price || 0) * Number(item.quantity || 0),
+      0
+    );
+
+    const title = document.createElement("strong");
+    title.textContent =
+      `${draft.customerName || "بدون تحديد زبون"} — ${money(total)} د.ع`;
+    card.appendChild(title);
+
+    const date = document.createElement("p");
+    date.textContent = "وقت التعليق: " +
+      new Date(draft.savedAt).toLocaleString("ar-IQ");
+    card.appendChild(date);
+
+    const items = document.createElement("p");
+    items.textContent = (draft.items || [])
+      .map(item => `${item.name} × ${item.quantity}`)
+      .join("، ");
+    card.appendChild(items);
+
+    const restoreButton = document.createElement("button");
+    restoreButton.type = "button";
+    restoreButton.textContent = "↩️ استرجاع الفاتورة";
+    restoreButton.addEventListener("click", () => {
+      restoreHeldInvoice(draft.id);
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "secondary";
+    deleteButton.textContent = "حذف المسودة";
+    deleteButton.addEventListener("click", () => {
+      removeHeldInvoice(draft.id);
+    });
+
+    card.append(restoreButton, deleteButton);
+    container.appendChild(card);
+  });
+}
 function cancelCurrentInvoice() {
   const confirmed = window.confirm(
     "هل تريد إلغاء الفاتورة الحالية؟ سيتم مسح المنتجات غير المحفوظة فقط، ولن تتأثر الفواتير المحفوظة أو المخزون."
