@@ -1204,7 +1204,7 @@ const customer = isCashCustomer
   : customers.find(c => String(c.id) === String(customerId));
 
 const paymentMethod = $("paymentMethod").value;
-
+const customerPhone = $("invoiceCustomerPhone").value.trim();
 if (isCashCustomer && !cashCustomerName) {
   return setMessage("status", "اكتب اسم الزبون النقدي أولاً.");
 }
