@@ -2606,6 +2606,159 @@ returnProcessing = true;
     updateReturnTotal();
   }
 }
+  function printInvoice() {
+  const invoice = lastSavedInvoice;
+
+  if (!invoice) {
+    alert("احفظ الفاتورة أولاً حتى تتمكن من طباعتها.");
+    return;
+  }
+
+  const printWindow = window.open(
+    "",
+    "_blank",
+    "width=900,height=700"
+  );
+
+  if (!printWindow) {
+    alert("يرجى السماح بالنوافذ المنبثقة حتى تتم طباعة الفاتورة.");
+    return;
+  }
+
+  const escapeHtml = (value) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  const formatMoney = (value) =>
+    Number(value || 0).toLocaleString("de-DE");
+
+  const invoiceDate = new Date(
+    invoice.createdAt || Date.now()
+  ).toLocaleString("ar-IQ");
+
+  const itemsHtml = (invoice.items || []).map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${escapeHtml(item.name)}</td>
+      <td>${formatMoney(item.price)} د.ع</td>
+      <td>${formatMoney(item.quantity)}</td>
+      <td>${formatMoney(
+        Number(item.price || 0) * Number(item.quantity || 0)
+      )} د.ع</td>
+    </tr>
+  `).join("");
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>فاتورة ${escapeHtml(invoice.invoiceNumber)}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          direction: rtl;
+          margin: 30px;
+          color: #222;
+        }
+        .invoice {
+          max-width: 800px;
+          margin: auto;
+        }
+        h1, h2 { text-align: center; }
+        .details {
+          border: 1px solid #ddd;
+          padding: 14px;
+          margin: 20px 0;
+          line-height: 2;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        th, td {
+          border: 1px solid #ccc;
+          padding: 10px 6px;
+          text-align: center;
+        }
+        th { background: #eef5fb; }
+        .totals {
+          margin-top: 24px;
+          line-height: 2.2;
+          font-size: 17px;
+        }
+        .footer {
+          margin-top: 35px;
+          text-align: center;
+          color: #555;
+        }
+        .print-button {
+          display: block;
+          margin: 20px auto;
+          padding: 10px 24px;
+          cursor: pointer;
+        }
+        @media print {
+          .print-button { display: none; }
+          body { margin: 10mm; }
+        }
+      </style>
+    </head>
+    <body>
+      <main class="invoice">
+        <h1>فاتورة بيع</h1>
+        <h2>رقم الفاتورة: ${escapeHtml(invoice.invoiceNumber)}</h2>
+
+        <div class="details">
+          <div>الزبون: ${escapeHtml(invoice.customerName)}</div>
+          <div>التاريخ: ${escapeHtml(invoiceDate)}</div>
+          <div>طريقة الدفع: ${escapeHtml(invoice.paymentMethod)}</div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ت</th>
+              <th>المنتج</th>
+              <th>سعر الوحدة</th>
+              <th>الكمية</th>
+              <th>المجموع</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+
+        <div class="totals">
+          <div><strong>إجمالي الفاتورة:</strong>
+            ${formatMoney(invoice.total)} د.ع</div>
+          <div><strong>المبلغ الواصل:</strong>
+            ${formatMoney(invoice.amountReceived)} د.ع</div>
+          <div><strong>المتبقي على الزبون:</strong>
+            ${formatMoney(invoice.remaining)} د.ع</div>
+        </div>
+
+        <div class="footer">شكراً لتعاملكم معنا</div>
+        <button class="print-button" onclick="window.print()">
+          طباعة الفاتورة
+        </button>
+      </main>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+
+  setTimeout(() => {
+    printWindow.focus();
+    printWindow.print();
+  }, 400);
+}
 </script>
 </body>
 </html>
