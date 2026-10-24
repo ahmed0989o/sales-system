@@ -1705,6 +1705,10 @@ function cancelCurrentInvoice() {
   $("unitPrice").value = "";
   $("total").textContent = "0";
   $("customerSelect").value = "";
+  $("cashCustomerBox").classList.add("hidden");
+$("cashCustomerName").value = "";
+$("cashCustomerName").required = false;
+$("cashCustomerButton").textContent = "💵 زبون نقدي";
   $("paymentMethod").value = "نقدي";
   $("amountReceived").value = "0";
 
