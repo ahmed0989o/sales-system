@@ -1277,7 +1277,8 @@ const { data, error } = await db.rpc(
     p_payment_method: paymentMethod,
     p_customer_id: customer ? Number(customer.id) : null,
     p_items: items,
-    p_amount_received: Number($("amountReceived").value) || 0
+    p_amount_received: Number($("amountReceived").value) || 0,
+p_customer_phone: customerPhone
   }
 );
 
