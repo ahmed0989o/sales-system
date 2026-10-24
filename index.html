@@ -3244,6 +3244,7 @@ function printInvoice(existingWindow = null) {
 
         <div class="details">
           <div>الزبون: ${escapeHtml(invoice.customerName)}</div>
+          <div>📱 هاتف الزبون: ${escapeHtml(invoice.customerPhone || "—")}</div>
           <div>التاريخ: ${escapeHtml(invoiceDate)}</div>
           <div>طريقة الدفع: ${escapeHtml(invoice.paymentMethod)}</div>
         </div>
