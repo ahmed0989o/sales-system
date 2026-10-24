@@ -1904,7 +1904,11 @@ $("cashboxBalance").textContent = money(summary.balance);
 
     movements.forEach(m => {
       const tr = document.createElement("tr");
-      const isExpense = ["purchase_payment", "rent_payment"].includes(m.movement_type);
+     const isExpense = [
+  "purchase_payment",
+  "rent_payment",
+  "other_expense"
+].includes(m.movement_type);
 
       const typeLabels = {
         capital_in: "رأس المال",
