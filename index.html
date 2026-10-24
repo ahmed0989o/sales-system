@@ -1180,11 +1180,26 @@ async function saveSale() {
     return;
   }
 
-  const customerId = $("customerSelect").value;
-  const customer = customers.find(
-    c => String(c.id) === String(customerId)
+ const isCashCustomer = !$("cashCustomerBox").classList.contains("hidden");
+const cashCustomerName = $("cashCustomerName").value.trim();
+
+const customerId = $("customerSelect").value;
+const customer = isCashCustomer
+  ? null
+  : customers.find(c => String(c.id) === String(customerId));
+
+const paymentMethod = $("paymentMethod").value;
+
+if (isCashCustomer && !cashCustomerName) {
+  return setMessage("status", "اكتب اسم الزبون النقدي أولاً.");
+}
+
+if (isCashCustomer && paymentMethod !== "نقدي") {
+  return setMessage(
+    "status",
+    "الزبون النقدي مخصص للبيع النقدي. اختر نقدي أو حدّد زبوناً مسجلاً للدفع الآجل أو الجزئي."
   );
-  const paymentMethod = $("paymentMethod").value;
+}
 
   if (!Array.isArray(invoiceCart) || invoiceCart.length === 0) {
     return setMessage("status", "أضف منتجاً واحداً على الأقل إلى الفاتورة.");
