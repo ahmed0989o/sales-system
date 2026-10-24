@@ -178,6 +178,15 @@ hr{margin-top:28px}
 <select id="customerSelect">
 <option value="">بدون تحديد زبون</option>
 </select>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;">
+  <button type="button" class="secondary" onclick="holdCurrentInvoice()">
+    ⏸️ تعليق الفاتورة
+  </button>
+  <button type="button" class="secondary" onclick="showHeldInvoices()">
+    📂 الفواتير المعلقة
+  </button>
+</div>
+<div id="heldInvoicesList" class="tablewrap"></div>
 <div id="customerStatus" class="status"></div>
 
 
