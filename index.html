@@ -1250,7 +1250,34 @@ if (nextInvoiceError || !nextInvoiceNumber) {
     if ($("productSearchResults")) {
       $("productSearchResults").replaceChildren();
     }
+const savedTotal = Number(data?.total_amount ?? getInvoiceTotal());
 
+const savedReceived = data?.amount_received != null
+  ? Number(data.amount_received)
+  : paymentMethod === "نقدي"
+    ? savedTotal
+    : paymentMethod === "واصل جزئي"
+      ? (Number($("amountReceived").value) || 0)
+      : 0;
+
+lastSavedInvoice = {
+  invoiceNumber,
+  customerName: customer ? customer.name : "بدون تحديد زبون",
+  paymentMethod,
+  total: savedTotal,
+  amountReceived: savedReceived,
+  remaining: Number(
+    data?.remaining_amount ?? Math.max(0, savedTotal - savedReceived)
+  ),
+  createdAt: new Date().toISOString(),
+  items: invoiceCart.map(item => ({
+    name: String(item.name || ""),
+    price: Number(item.price || 0),
+    quantity: Number(item.quantity || 0)
+  }))
+};
+
+$("printInvoiceButton").disabled = false;
 invoiceCart = [];
 renderInvoiceItems();
 
