@@ -949,7 +949,7 @@ function calculateTotal() {
 
 
 let invoiceCart = [];
-
+let lastSavedInvoice = null;
 function getInvoiceTotal() {
   return invoiceCart.reduce(
     (sum, item) => sum + Number(item.price) * Number(item.quantity),
