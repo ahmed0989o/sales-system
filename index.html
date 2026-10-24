@@ -1432,27 +1432,45 @@ function holdCurrentInvoice() {
     return;
   }
 
-  const selectedCustomer = customers.find(
-    c => String(c.id) === String($("customerSelect").value)
-  );
+  const isCashCustomer =
+  !$("cashCustomerBox").classList.contains("hidden");
 
-  const draft = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    savedAt: new Date().toISOString(),
-    customerId: $("customerSelect").value || "",
-   isCashCustomer
-  ? cashCustomerName
-  : (selectedCustomer?.name || "بدون تحديد زبون"),
-    paymentMethod: $("paymentMethod").value || "نقدي",
-    amountReceived: Number($("amountReceived").value) || 0,
-    items: invoiceCart.map(item => ({
-      productId: item.productId,
-      name: String(item.name || ""),
-      price: Number(item.price || 0),
-      quantity: Number(item.quantity || 0)
-    }))
-  };
+const cashCustomerName = $("cashCustomerName").value.trim();
 
+const selectedCustomer = isCashCustomer
+  ? null
+  : customers.find(
+      c => String(c.id) === String($("customerSelect").value)
+    );
+
+if (isCashCustomer && !cashCustomerName) {
+  setMessage("status", "اكتب اسم الزبون النقدي أولاً.");
+  return;
+}
+
+if (isCashCustomer && $("paymentMethod").value !== "نقدي") {
+  setMessage("status", "الزبون النقدي مخصص للبيع النقدي.");
+  return;
+}
+
+const draft = {
+  id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  savedAt: new Date().toISOString(),
+  customerId: isCashCustomer ? "" : ($("customerSelect").value || ""),
+  customerName: isCashCustomer
+    ? cashCustomerName
+    : (selectedCustomer?.name || "بدون تحديد زبون"),
+  isCashCustomer: isCashCustomer,
+  cashCustomerName: isCashCustomer ? cashCustomerName : "",
+  paymentMethod: $("paymentMethod").value || "نقدي",
+  amountReceived: Number($("amountReceived").value) || 0,
+  items: invoiceCart.map(item => ({
+    productId: item.productId,
+    name: String(item.name || ""),
+    price: Number(item.price || 0),
+    quantity: Number(item.quantity || 0)
+  }))
+};
   try {
     const held = getHeldInvoices();
     held.push(draft);
