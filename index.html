@@ -1289,24 +1289,7 @@ p_customer_phone: customerPhone
       `تم حفظ الفاتورة بنجاح. الإجمالي: ${Number(data.total_amount).toLocaleString()} د.ع`
     );
 
-    if (customerPhone) {
-  const { data: phoneUpdate, error: phoneError } = await db
-    .from("sales")
-    .update({ customer_phone: customerPhone })
-    .eq("invoice_number", invoiceNumber)
-    .select("id")
-    .maybeSingle();
-
-  if (phoneError || !phoneUpdate) {
-    console.error("Customer phone save error:", phoneError);
-    setMessage(
-      "status",
-      "تم حفظ الفاتورة، لكن تعذر حفظ رقم الهاتف: " +
-      (phoneError?.message || "لم يتم تحديث سجل الفاتورة.")
-    );
-  }
-}
-$("invoiceNumber").value = "";
+   $("invoiceNumber").value = "";
 
 const { data: nextInvoiceNumber, error: nextInvoiceError } =
   await db.rpc("generate_invoice_number");
