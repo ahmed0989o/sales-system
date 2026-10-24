@@ -2607,6 +2607,43 @@ returnProcessing = true;
     updateReturnTotal();
   }
 }
+  async function saveSaleAndPrint() {
+  const button = $("saveAndPrintSaleButton");
+
+  if (!button || button.disabled) return;
+
+  const printWindow = window.open(
+    "",
+    "_blank",
+    "width=900,height=700"
+  );
+
+  if (!printWindow) {
+    alert("اسمح بالنوافذ المنبثقة حتى يتم الحفظ والطباعة.");
+    return;
+  }
+
+  const previousInvoice = lastSavedInvoice;
+  button.disabled = true;
+
+  try {
+    await saveSale();
+
+    if (
+      lastSavedInvoice &&
+      lastSavedInvoice !== previousInvoice
+    ) {
+      printInvoice(printWindow);
+    } else {
+      printWindow.close();
+    }
+  } catch (error) {
+    printWindow.close();
+    console.error("Save and print sale:", error);
+  } finally {
+    button.disabled = false;
+  }
+}
 function printInvoice(existingWindow = null) {
   const invoice = lastSavedInvoice;
 
