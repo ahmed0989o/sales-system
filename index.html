@@ -1594,10 +1594,23 @@ const draft = {
     quantity: Number(item.quantity || 0)
   }));
 
+if (draft.isCashCustomer) {
+  $("customerSelect").value = "";
+  $("cashCustomerBox").classList.remove("hidden");
+  $("cashCustomerName").value =
+    draft.cashCustomerName || draft.customerName || "";
+  $("cashCustomerName").required = true;
+  $("cashCustomerButton").textContent = "✅ زبون نقدي (مفعّل)";
+} else {
   $("customerSelect").value = customers.some(
     customer => String(customer.id) === String(draft.customerId)
   ) ? String(draft.customerId) : "";
 
+  $("cashCustomerBox").classList.add("hidden");
+  $("cashCustomerName").value = "";
+  $("cashCustomerName").required = false;
+  $("cashCustomerButton").textContent = "💵 زبون نقدي";
+}
   $("paymentMethod").value = draft.paymentMethod || "نقدي";
   $("amountReceived").value = String(draft.amountReceived || 0);
   $("product").value = "";
