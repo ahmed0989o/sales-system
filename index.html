@@ -2615,7 +2615,7 @@ function printInvoice(existingWindow = null) {
     return;
   }
 
-  const printWindow = window.open(
+ const printWindow = existingWindow || window.open(
     "",
     "_blank",
     "width=900,height=700"
