@@ -1017,7 +1017,8 @@ $("customerSelect").addEventListener("change", () => {
   $("cashCustomerName").required = false;
   $("cashCustomerButton").textContent = "💵 زبون نقدي";
 });
-
+$("paymentMethod").addEventListener("change", updatePartialPayment);
+$("amountReceived").addEventListener("input", updatePartialPayment);
 function searchProducts() {
   const input = $("productSearch");
   const results = $("productSearchResults");
