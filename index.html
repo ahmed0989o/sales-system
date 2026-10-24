@@ -1369,6 +1369,104 @@ async function printDailyReport() {
   window.print();
 }
 
+  async function viewSalesInvoices() {
+  const button = $("viewSalesInvoicesButton");
+  const container = $("salesInvoicesList");
+
+  if (!db || !currentUser) {
+    container.textContent = "سجّل الدخول أولاً.";
+    return;
+  }
+
+  button.disabled = true;
+  container.textContent = "جارٍ تحميل فواتير البيع...";
+
+  try {
+    const { data: sales, error } = await db
+      .from("sales")
+      .select(
+        "id,created_at,invoice_number,customer_name,total_amount,payment_method,amount_received"
+      )
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+
+    const invoices = sales || [];
+
+    if (!invoices.length) {
+      container.textContent = "لا توجد فواتير بيع مسجلة.";
+      return;
+    }
+
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const header = document.createElement("tr");
+
+    [
+      "رقم الفاتورة",
+      "الزبون",
+      "التاريخ",
+      "الإجمالي",
+      "الواصل",
+      "المتبقي",
+      "طريقة الدفع"
+    ].forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      header.appendChild(th);
+    });
+
+    thead.appendChild(header);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    invoices.forEach(sale => {
+      const total = Number(sale.total_amount || 0);
+      const received =
+        sale.payment_method === "نقدي"
+          ? total
+          : sale.payment_method === "واصل جزئي"
+            ? Number(sale.amount_received || 0)
+            : 0;
+
+      const remaining = Math.max(0, total - received);
+
+      const date = new Date(sale.created_at).toLocaleString(
+        "en-GB",
+        { timeZone: "Asia/Baghdad" }
+      );
+
+      const row = document.createElement("tr");
+
+      [
+        sale.invoice_number || "",
+        sale.customer_name || "بدون تحديد زبون",
+        date,
+        money(total),
+        money(received),
+        money(remaining),
+        sale.payment_method || ""
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        row.appendChild(td);
+      });
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    container.replaceChildren(table);
+  } catch (error) {
+    console.error("عرض فواتير البيع:", error);
+    container.textContent =
+      "تعذر تحميل الفواتير: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
 async function loadDailyReport() {
   if (!db || !currentUser) return;
 
