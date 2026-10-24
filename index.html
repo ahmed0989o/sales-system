@@ -1308,8 +1308,7 @@ const savedReceived = data?.amount_received != null
 
 lastSavedInvoice = {
   invoiceNumber,
-  customerName: customer ? customer.name : "بدون تحديد زبون",
-  paymentMethod,
+customerName: isCashCustomer ? cashCustomerName : (customer ? customer.name : "بدون تحديد زبون"),  paymentMethod,
   total: savedTotal,
   amountReceived: savedReceived,
   remaining: Number(
