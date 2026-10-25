@@ -1783,20 +1783,20 @@ $("cashCustomerButton").textContent = "💵 زبون نقدي";
     const thead = document.createElement("thead");
     const header = document.createElement("tr");
 
-    [
-      "رقم الفاتورة",
-      "الزبون",
-      "التاريخ",
-      "الإجمالي",
-      "الواصل",
-      "المتبقي",
-     "طريقة الدفع",
-"التفاصيل"
-    ].forEach(label => {
-      const th = document.createElement("th");
-      th.textContent = label;
-      header.appendChild(th);
-    });
+  [
+  "رقم الفاتورة",
+  "الزبون",
+  "التاريخ",
+  "الإجمالي",
+  "الواصل",
+  "المتبقي",
+  "طريقة الدفع",
+  "التفاصيل"
+].forEach(label => {
+  const th = document.createElement("th");
+  th.textContent = label;
+  header.appendChild(th);
+});
 
     thead.appendChild(header);
     table.appendChild(thead);
@@ -1848,7 +1848,8 @@ viewButton.onclick = () => viewSaleDetails(sale.id, sale.invoice_number);
 
 actionCell.appendChild(viewButton);
 row.appendChild(actionCell);
-    });
+tbody.appendChild(row);
+});
 
     table.appendChild(tbody);
     container.replaceChildren(table);
