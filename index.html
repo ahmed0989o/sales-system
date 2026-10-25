@@ -1860,6 +1860,86 @@ row.appendChild(actionCell);
     button.disabled = false;
   }
 }
+  async function viewSaleDetails(saleId, invoiceNumber) {
+  const panel = $("saleDetailsPanel");
+  const content = $("saleDetailsContent");
+
+  $("saleDetailsTitle").textContent =
+    "تفاصيل الفاتورة رقم " + (invoiceNumber || saleId);
+
+  panel.classList.remove("hidden");
+  content.textContent = "جارٍ تحميل التفاصيل...";
+
+  try {
+    const { data, error } = await db
+      .from("sale_details")
+      .select("id,product_id,quantity,unit_price,total,products(name,barcode)")
+      .eq("sale_id", saleId)
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      content.textContent = "لا توجد منتجات في هذه الفاتورة.";
+      return;
+    }
+
+    const table = document.createElement("table");
+    const headers = ["المنتج", "الباركود", "الكمية", "سعر الوحدة", "الإجمالي"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    headers.forEach(label => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    let total = 0;
+
+    data.forEach(item => {
+      const row = document.createElement("tr");
+      const product = Array.isArray(item.products)
+        ? item.products[0]
+        : item.products;
+
+      [
+        product?.name || ("منتج رقم " + item.product_id),
+        product?.barcode || "—",
+        item.quantity,
+        money(item.unit_price),
+        money(item.total)
+      ].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        row.appendChild(td);
+      });
+
+      total += Number(item.total || 0);
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+
+    const summary = document.createElement("p");
+    summary.textContent = "مجموع المنتجات: " + money(total);
+
+    content.replaceChildren(table, summary);
+
+  } catch (error) {
+    console.error("تفاصيل الفاتورة:", error);
+    content.textContent = "تعذر تحميل التفاصيل: " + error.message;
+  }
+}
+
+function closeSaleDetails() {
+  $("saleDetailsPanel").classList.add("hidden");
+  $("saleDetailsContent").replaceChildren();
+}
 async function loadDailyReport() {
   if (!db || !currentUser) return;
 
