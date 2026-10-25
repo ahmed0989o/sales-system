@@ -1836,6 +1836,18 @@ $("cashCustomerButton").textContent = "💵 زبون نقدي";
       });
 
       tbody.appendChild(row);
+      const actionCell = document.createElement("td");
+const viewButton = document.createElement("button");
+
+viewButton.type = "button";
+viewButton.className = "secondary";
+viewButton.textContent = "👁️ عرض";
+viewButton.style.marginTop = "0";
+
+viewButton.onclick = () => viewSaleDetails(sale.id, sale.invoice_number);
+
+actionCell.appendChild(viewButton);
+row.appendChild(actionCell);
     });
 
     table.appendChild(tbody);
