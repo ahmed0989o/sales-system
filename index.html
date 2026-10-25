@@ -311,8 +311,17 @@ hr{margin-top:28px}
   <button id="cancelCurrentInvoiceButton" type="button" class="secondary" onclick="cancelCurrentInvoice()">❌ إلغاء الفاتورة الحالية</button>
   <button id="viewSalesInvoicesButton" type="button" class="secondary" onclick="viewSalesInvoices()">🧾 عرض فواتير البيع</button>
   <div id="salesInvoicesList" class="tablewrap"></div>
-  <div id="saleDetailsPanel" class="summary hidden" aria-live="polite">
-  <button type="button" class="secondary" onclick="closeSaleDetails()">إغلاق التفاصيل</button>
+ <div id="saleDetailsPanel" class="sale-modal hidden" aria-live="polite" onclick="if(event.target === this) closeSaleDetails()">
+  <section class="sale-modal-card" role="dialog" aria-modal="true" aria-labelledby="saleDetailsTitle">
+    <button type="button" class="sale-modal-close" aria-label="إغلاق" title="إغلاق" onclick="closeSaleDetails()">×</button>
+    <h3 id="saleDetailsTitle">تفاصيل الفاتورة</h3>
+    <div id="saleDetailsContent" class="sale-modal-content"></div>
+    <div class="sale-modal-actions">
+      <button type="button" class="secondary" disabled>تعديل</button>
+      <button type="button" class="secondary" onclick="closeSaleDetails()">إلغاء</button>
+    </div>
+  </section>
+</div>  <button type="button" class="secondary" onclick="closeSaleDetails()">إغلاق التفاصيل</button>
   <h3 id="saleDetailsTitle">تفاصيل الفاتورة</h3>
   <div id="saleDetailsContent"></div>
 </div>
