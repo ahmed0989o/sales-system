@@ -749,6 +749,53 @@ async function createEmployee() {
     button.disabled = false;
   }
 }
+  async function loadEmployees() {
+  const status = $("permissionsStatus");
+  const list = $("employeesList");
+
+  status.textContent = "جارٍ تحميل الموظفين...";
+  list.innerHTML = "";
+
+  if (!currentUser || currentUser.id !== OWNER_USER_ID) {
+    status.textContent = "غير مسموح: هذه العملية للمالك فقط.";
+    return;
+  }
+
+  try {
+    const { data, error } = await db.rpc("get_app_employees");
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      status.textContent = "لا يوجد موظفون.";
+      return;
+    }
+
+    list.innerHTML = data.map(employee => `
+      <div class="panel">
+        <strong>${escapeHtml(employee.display_name || "موظف")}</strong>
+        <div>الدور: ${escapeHtml(employee.role_key || "غير محدد")}</div>
+        <div>الحالة: ${employee.is_active ? "نشط" : "معطل"}</div>
+      </div>
+    `).join("");
+
+    status.textContent = "تم تحميل الموظفين.";
+  } catch (error) {
+    console.error("Load employees:", error);
+    status.textContent = "تعذر تحميل الموظفين: " +
+      (error.message || "خطأ غير معروف");
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 async function login() {
   const button = $("loginButton");
   setMessage("loginStatus", "");
