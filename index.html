@@ -2244,7 +2244,18 @@ function closeSaleDetails() {
 }
 async function loadDailyReport() {
   if (!db || !currentUser) return;
+const { data: canViewReport, error: permissionError } =
+  await db.rpc("has_app_permission", {
+    p_permission_key: "reports.daily.view"
+  });
 
+if (permissionError) throw permissionError;
+
+if (canViewReport !== true) {
+  setMessage("reportStatus", "غير مصرح لك بعرض التقرير اليومي.");
+  $("reportDetails").replaceChildren();
+  return;
+}
   const date = $("reportDate").value;
   if (!date) {
     return setMessage("reportStatus", "اختر التاريخ أولًا.");
