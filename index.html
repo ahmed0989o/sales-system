@@ -2485,7 +2485,23 @@ async function savePurchase() {
 
 
 async function loadPurchases() {
-  if (!isOwner(currentUser)) return;
+ if (!currentUser) return;
+
+const { data: canManagePurchases, error: permissionError } =
+  await db.rpc("has_app_permission", {
+    p_permission_key: "purchases.manage"
+  });
+
+if (permissionError) {
+  console.error("Purchase permission:", permissionError);
+  setMessage("purchaseStatus", "تعذر التحقق من صلاحية المشتريات.");
+  return;
+}
+
+if (canManagePurchases !== true) {
+  setMessage("purchaseStatus", "غير مصرح لك بإدارة المشتريات.");
+  return;
+}
 
   setMessage("purchaseStatus", "جارٍ تحميل سجل المشتريات...");
 
