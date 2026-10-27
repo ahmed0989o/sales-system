@@ -106,6 +106,11 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:middle;
   border-radius: 9px;
 }
 
+#loginPanel button {
+  background: #2878bd;
+  border-radius: 9px;
+}
+
 @media (max-width: 600px) {
   body {
     padding: 10px;
@@ -122,10 +127,27 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:middle;
   }
 }
 
+/* إظهار نافذة الدخول وحدها */
+body:has(#loginPanel:not(.hidden)) .container > *:not(#loginPanel) {
+  display: none !important;
+}
+
+body:has(#loginPanel:not(.hidden)) {
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+body:has(#loginPanel:not(.hidden)) .container {
+  min-height: calc(100vh - 28px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 10mm;
+    size: A4 portrait;    margin: 10mm;
   }
 
   html,
