@@ -127,24 +127,15 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:middle;
   }
 }
 
-/* إظهار نافذة الدخول وحدها */
-body:has(#loginPanel:not(.hidden)) .container > *:not(#loginPanel) {
+/* إخفاء جميع أقسام النظام أثناء تسجيل الدخول */
+#loginPanel:not(.hidden) ~ * {
   display: none !important;
 }
 
-body:has(#loginPanel:not(.hidden)) {
-  min-height: 100vh;
-  box-sizing: border-box;
+#loginPanel {
+  position: relative;
+  z-index: 1;
 }
-
-body:has(#loginPanel:not(.hidden)) .container {
-  min-height: calc(100vh - 28px);
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 @media print {
   @page {
     size: A4 portrait;    margin: 10mm;
