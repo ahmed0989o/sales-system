@@ -990,7 +990,18 @@ setMessage(
   try {await Promise.all([loadProducts(), loadCustomers()]);
 await prepareNextInvoiceNumber();
     
-if (isOwner(currentUser)) await loadPurchases();
+const { data: canManagePurchases, error: purchasesPermissionError } =
+  await db.rpc("has_app_permission", {
+    p_permission_key: "purchases.manage"
+  });
+
+if (purchasesPermissionError) throw purchasesPermissionError;
+
+$("purchasePanel").classList.toggle("hidden", canManagePurchases !== true);
+
+if (canManagePurchases === true) {
+  await loadPurchases();
+}
 if (isOwner(currentUser)) await loadCashbox();
 if (isOwner(currentUser)) {
   await loadRentHistory();
