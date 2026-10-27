@@ -786,7 +786,78 @@ async function createEmployee() {
       (error.message || "خطأ غير معروف");
   }
 }
+async function showEmployeePermissions(userId, displayName) {
+  const status = $("permissionsStatus");
+  const list = $("employeesList");
 
+  status.textContent = "جارٍ تحميل الصلاحيات...";
+
+  try {
+    const { data, error } = await db.rpc("get_user_permissions", {
+      p_user_id: userId
+    });
+
+    if (error) throw error;
+
+    list.innerHTML = `
+      <div class="panel">
+        <h3>صلاحيات: ${escapeHtml(displayName)}</h3>
+        <div id="employeePermissions"></div>
+        <button type="button"
+          onclick="loadEmployees()">
+          العودة إلى الموظفين
+        </button>
+      </div>
+    `;
+
+    const container = $("employeePermissions");
+
+    container.innerHTML = (data || []).map(permission => `
+      <label style="display:block; margin:10px 0;">
+        <input
+          type="checkbox"
+          ${permission.is_granted ? "checked" : ""}
+          onchange="changeEmployeePermission(
+            '${userId}',
+            '${escapeHtml(permission.permission_key)}',
+            this.checked
+          )">
+        ${escapeHtml(permission.permission_name)}
+        <small>(${escapeHtml(permission.permission_key)})</small>
+      </label>
+    `).join("");
+
+    status.textContent = "تم تحميل الصلاحيات.";
+  } catch (error) {
+    console.error("Employee permissions:", error);
+    status.textContent = "تعذر تحميل الصلاحيات: " +
+      (error.message || "خطأ غير معروف");
+  }
+}
+
+async function changeEmployeePermission(userId, permissionKey, granted) {
+  const status = $("permissionsStatus");
+
+  try {
+    const { error } = await db.rpc("set_user_permission", {
+      p_user_id: userId,
+      p_permission_key: permissionKey,
+      p_is_granted: granted
+    });
+
+    if (error) throw error;
+
+    status.textContent = granted
+      ? "تم منح الصلاحية."
+      : "تم سحب الصلاحية.";
+  } catch (error) {
+    console.error("Change permission:", error);
+    status.textContent = "تعذر تعديل الصلاحية: " +
+      (error.message || "خطأ غير معروف");
+
+    await showEmployeePermissions(userId, "الموظف");
+  }
+}
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
