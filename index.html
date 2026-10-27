@@ -749,7 +749,7 @@ async function createEmployee() {
     button.disabled = false;
   }
 }
-  async function loadEmployees() {
+ async function loadEmployees() {
   const status = $("permissionsStatus");
   const list = $("employeesList");
 
@@ -776,6 +776,18 @@ async function createEmployee() {
         <strong>${escapeHtml(employee.display_name || "موظف")}</strong>
         <div>الدور: ${escapeHtml(employee.role_key || "غير محدد")}</div>
         <div>الحالة: ${employee.is_active ? "نشط" : "معطل"}</div>
+
+        ${
+          employee.user_id !== OWNER_USER_ID
+            ? `<button type="button"
+                onclick="showEmployeePermissions(
+                  '${employee.user_id}',
+                  '${escapeHtml(employee.display_name || "موظف")}'
+                )">
+                🔐 إدارة الصلاحيات
+              </button>`
+            : ""
+        }
       </div>
     `).join("");
 
@@ -785,8 +797,7 @@ async function createEmployee() {
     status.textContent = "تعذر تحميل الموظفين: " +
       (error.message || "خطأ غير معروف");
   }
-}
-async function showEmployeePermissions(userId, displayName) {
+}async function showEmployeePermissions(userId, displayName) {
   const status = $("permissionsStatus");
   const list = $("employeesList");
 
