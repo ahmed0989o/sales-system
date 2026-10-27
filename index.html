@@ -2534,11 +2534,7 @@ if (canManagePurchases !== true) {
   setMessage("purchaseStatus", "جارٍ تحميل سجل المشتريات...");
 
   try {
-    const { data, error } = await db
-      .from("stock_purchases")
-      .select("id,created_at,product_id,quantity,unit_cost,total_cost")
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const { data, error } = await db.rpc("get_stock_purchases");
 
     if (error) throw error;
     const rows = data || [];
