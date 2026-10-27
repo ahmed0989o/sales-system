@@ -586,7 +586,33 @@ hr{margin-top:28px}
   <div id="rentStatus" class="status" aria-live="polite"></div>
   <div id="rentHistory" class="tablewrap"></div>
 </section>
+<hr>
+<section id="userManagementPanel">
+  <h2>👥 إدارة المستخدمين</h2>
 
+  <label for="newEmployeeName">اسم الموظف</label>
+  <input id="newEmployeeName" type="text" placeholder="اسم الموظف">
+
+  <label for="newEmployeeEmail">البريد الإلكتروني</label>
+  <input id="newEmployeeEmail" type="email" placeholder="البريد الإلكتروني">
+
+  <label for="newEmployeePassword">كلمة المرور</label>
+  <input id="newEmployeePassword" type="password"
+         autocomplete="new-password" placeholder="كلمة مرور الموظف">
+
+  <label for="newEmployeeRole">دور الموظف</label>
+  <select id="newEmployeeRole">
+    <option value="sales">مبيعات</option>
+    <option value="assistant">مساعد</option>
+    <option value="custom">مخصص</option>
+  </select>
+
+  <button type="button" onclick="createEmployee()">
+    إنشاء حساب الموظف
+  </button>
+
+  <div id="employeeStatus" class="status" aria-live="polite"></div>
+</section>
 </section>
 </section>
 </div>
