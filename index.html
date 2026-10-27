@@ -661,7 +661,81 @@ function showLogin(message = "") {
   $("appPanel").classList.add("hidden");
   setMessage("loginStatus", message);
 }
+async function createEmployee() {
+  const status = $("employeeStatus");
+  const button = document.querySelector(
+    '#userManagementPanel button'
+  );
 
+  status.textContent = "";
+
+  if (!currentUser || currentUser.id !== OWNER_USER_ID) {
+    status.textContent = "غير مسموح: هذه العملية للمالك فقط.";
+    return;
+  }
+
+  const displayName = $("newEmployeeName").value.trim();
+  const email = $("newEmployeeEmail").value.trim();
+  const password = $("newEmployeePassword").value;
+  const roleKey = $("newEmployeeRole").value;
+
+  if (!displayName || !email || !password) {
+    status.textContent = "يرجى إكمال جميع الحقول.";
+    return;
+  }
+
+  if (password.length < 8) {
+    status.textContent = "كلمة المرور يجب أن تكون 8 أحرف على الأقل.";
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = "جارٍ إنشاء الحساب...";
+
+  try {
+    const { data: sessionData, error: sessionError } =
+      await db.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    const accessToken = sessionData.session?.access_token;
+
+    if (!accessToken) {
+      throw new Error("انتهت جلسة الدخول. سجّل الدخول مجدداً.");
+    }
+
+    const { data, error } = await db.functions.invoke(
+      "admin-create-user",
+      {
+        body: {
+          display_name: displayName,
+          email,
+          password,
+          role_key: roleKey
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
+
+    if (error) throw error;
+
+    status.textContent =
+      data?.message || "تم إنشاء حساب الموظف بنجاح.";
+
+    $("newEmployeeName").value = "";
+    $("newEmployeeEmail").value = "";
+    $("newEmployeePassword").value = "";
+
+  } catch (error) {
+    console.error("Create employee:", error);
+    status.textContent =
+      "تعذر إنشاء الحساب: " + (error.message || "خطأ غير معروف");
+  } finally {
+    button.disabled = false;
+  }
+}
 async function login() {
   const button = $("loginButton");
   setMessage("loginStatus", "");
