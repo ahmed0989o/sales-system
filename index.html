@@ -2435,9 +2435,23 @@ if (canViewReport !== true) {
 async function savePurchase() {
   const button = $("savePurchaseButton");
 
-  if (!isOwner(currentUser)) {
-    return setMessage("purchaseStatus", "غير مصرح لك.");
-  }
+  if (!currentUser) {
+  return setMessage("purchaseStatus", "يجب تسجيل الدخول أولاً.");
+}
+
+const { data: canManagePurchases, error: permissionError } =
+  await db.rpc("has_app_permission", {
+    p_permission_key: "purchases.manage"
+  });
+
+if (permissionError) {
+  console.error("Purchase permission:", permissionError);
+  return setMessage("purchaseStatus", "تعذر التحقق من صلاحية المشتريات.");
+}
+
+if (canManagePurchases !== true) {
+  return setMessage("purchaseStatus", "غير مصرح لك بإدارة المشتريات.");
+}
 
   const productId = $("purchaseProduct").value;
   const quantity = Number($("purchaseQuantity").value);
