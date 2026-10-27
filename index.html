@@ -980,6 +980,7 @@ setMessage(
 );
 
   $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
+  $("userManagementPanel").classList.toggle("hidden", !isOwner(currentUser));
   $("returnsPanel").classList.toggle("hidden", !isOwner(currentUser));
   $("reportDate").value = todayInBaghdad();
 
