@@ -72,7 +72,55 @@ th,td{border:1px solid #ccc;padding:8px;text-align:center;vertical-align:middle;
 
 .tablewrap{overflow-x:auto}
   .print-only{display:none}
+/* تصميم صفحة تسجيل الدخول */
+#loginPanel {
+  width: 100%;
+  max-width: 440px;
+  margin: clamp(24px, 8vh, 80px) auto;
+  padding: clamp(18px, 4vw, 30px);
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(30, 90, 160, 0.10);
+}
 
+#loginPanel h1 {
+  font-size: clamp(22px, 4vw, 30px);
+  color: #245b91;
+}
+
+#loginPanel p {
+  text-align: center;
+  line-height: 1.8;
+  color: #555;
+}
+
+#loginPanel input,
+#loginPanel button {
+  min-height: 48px;
+}
+
+#loginPanel button {
+  background: #2878bd;
+  border-radius: 9px;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 12px;
+  }
+
+  #loginPanel {
+    margin: 20px auto;
+    padding: 18px;
+    border-radius: 12px;
+  }
+}
 
 @media print {
   @page {
