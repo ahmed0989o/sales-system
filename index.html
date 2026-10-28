@@ -1006,16 +1006,26 @@ async function login() {
   }
 }
 
+
 async function logout() {
   try {
     const { error } = await db.auth.signOut();
     if (error) throw error;
+
     currentUser = null;
+
+    // إخفاء جميع أقسام النظام
+    $("appPanel").classList.add("hidden");
+
+    // إظهار شاشة تسجيل الدخول
+    $("loginPanel").classList.remove("hidden");
+
     showLogin("تم تسجيل الخروج.");
   } catch (error) {
     alert("تعذر تسجيل الخروج: " + error.message);
   }
 }
+
 async function prepareNextInvoiceNumber() {
   const input = $("invoiceNumber");
 
