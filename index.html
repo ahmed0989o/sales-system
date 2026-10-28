@@ -310,10 +310,13 @@ hr{margin-top:28px}
 <input
   id="invoiceCustomerPhone"
   type="tel"
-  placeholder="أدخل رقم هاتف الزبون"
+  placeholder="رقم الهاتف (11 رقم)"
   autocomplete="tel"
-  inputmode="tel"
-style="width: 130px; max-width: 100%; box-sizing: border-box;"
+  inputmode="numeric"
+  maxlength="11"
+  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,11)"
+  style="width: 130px; max-width: 100%; box-sizing: border-box;"
+>
 >  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;">
   <button type="button" class="secondary" onclick="holdCurrentInvoice()">
     ⏸️ تعليق الفاتورة
