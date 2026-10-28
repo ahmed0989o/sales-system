@@ -2811,13 +2811,21 @@ async function saveRentChange() {
   }
 }
 
+
 async function init() {
+  // إخفاء واجهة النظام عند فتح الصفحة
+  $("appPanel").classList.add("hidden");
+
+  // إظهار شاشة تسجيل الدخول
+  $("loginPanel").classList.remove("hidden");
+
   $("reportDate").value = todayInBaghdad();
 
   if (!window.supabase || typeof window.supabase.createClient !== "function") {
     showLogin("تعذر تحميل مكتبة Supabase. تحقق من الإنترنت وافتح الصفحة مجددًا.");
     return;
   }
+
 
   try {
     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
