@@ -1608,6 +1608,12 @@ const customer = isCashCustomer
 
 const paymentMethod = $("paymentMethod").value;
 const customerPhone = $("invoiceCustomerPhone").value.trim();
+  if (customerPhone !== "" && !/^07[0-9]{9}$/.test(customerPhone)) {
+  return setMessage(
+    "status",
+    "رقم الهاتف غير صحيح. أدخل رقماً مكوناً من 11 رقماً يبدأ بـ 07."
+  );
+}
 if (isCashCustomer && !cashCustomerName) {
   return setMessage("status", "اكتب اسم الزبون النقدي أولاً.");
 }
