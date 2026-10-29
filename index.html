@@ -3953,8 +3953,12 @@ function openSalesHistory() {
 
 // فتح التقرير اليومي
 function openDailyReport() {
+  $("mainMenu").classList.add("hidden");
   $("salesMenu").classList.add("hidden");
+  $("returnsPanel").classList.add("hidden");
   $("salesPanel").classList.remove("hidden");
+  $("dailyReportControls").classList.remove("hidden");
+  $("dailyReportPrint").classList.remove("hidden");
   loadDailyReport();
 }
 </script>
