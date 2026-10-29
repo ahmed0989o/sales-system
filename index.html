@@ -3991,6 +3991,15 @@ function openCashbox() {
 
   loadCashbox();
 }
+  // فتح إدارة الإيجار
+function openRent() {
+  if (!isOwner(currentUser)) return;
+
+  showMainMenu();
+  $("mainMenu").classList.add("hidden");
+  $("ownerPanel").classList.remove("hidden");
+  $("cashboxPanel").classList.add("hidden");
+}
 </script>
 </body>
 </html>
