@@ -3927,10 +3927,11 @@ function closeSalesMenu() {
 
 // فتح فاتورة البيع
 function openSalesInvoice() {
+  $("mainMenu").classList.add("hidden");
   $("salesMenu").classList.add("hidden");
+  $("returnsPanel").classList.add("hidden");
   $("salesPanel").classList.remove("hidden");
 }
-
 // فتح المرتجعات
 function openSalesReturns() {
   if (!isOwner(currentUser)) return;
