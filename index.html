@@ -3983,11 +3983,13 @@ function openDailyReport() {
   // فتح حركة الصندوق
 function openCashbox() {
   if (!isOwner(currentUser)) return;
-
+  
   showMainMenu();
   $("mainMenu").classList.add("hidden");
+  $("purchasePanel").classList.add("hidden");
   $("ownerPanel").classList.remove("hidden");
   $("rentPanel").classList.add("hidden");
+  $("cashboxPanel").classList.remove("hidden");
 
   loadCashbox();
 }
