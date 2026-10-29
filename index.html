@@ -3970,6 +3970,27 @@ function openDailyReport() {
   $("dailyReportPrint").classList.remove("hidden");
   loadDailyReport();
 }
+  // فتح التقرير اليومي
+function openDailyReport() {
+  $("mainMenu").classList.add("hidden");
+  $("salesMenu").classList.add("hidden");
+  $("returnsPanel").classList.add("hidden");
+  $("salesPanel").classList.remove("hidden");
+  $("dailyReportControls").classList.remove("hidden");
+  $("dailyReportPrint").classList.remove("hidden");
+  loadDailyReport();
+}
+  // فتح حركة الصندوق
+function openCashbox() {
+  if (!isOwner(currentUser)) return;
+
+  showMainMenu();
+  $("mainMenu").classList.add("hidden");
+  $("ownerPanel").classList.remove("hidden");
+  $("rentPanel").classList.add("hidden");
+
+  loadCashbox();
+}
 </script>
 </body>
 </html>
