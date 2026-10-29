@@ -3905,6 +3905,53 @@ function printInvoice(existingWindow = null) {
     printWindow.print();
   }, 400);
 }
+  // إظهار القائمة الرئيسية
+function showMainMenu() {
+  $("mainMenu").classList.remove("hidden");
+  $("salesMenu").classList.add("hidden");
+  $("salesPanel").classList.add("hidden");
+  $("returnsPanel").classList.add("hidden");
+}
+
+// فتح قائمة المبيعات
+function openSalesMenu() {
+  $("mainMenu").classList.add("hidden");
+  $("salesMenu").classList.remove("hidden");
+}
+
+// العودة من قائمة المبيعات
+function closeSalesMenu() {
+  $("salesMenu").classList.add("hidden");
+  $("mainMenu").classList.remove("hidden");
+}
+
+// فتح فاتورة البيع
+function openSalesInvoice() {
+  $("salesMenu").classList.add("hidden");
+  $("salesPanel").classList.remove("hidden");
+}
+
+// فتح المرتجعات
+function openSalesReturns() {
+  if (!isOwner(currentUser)) return;
+
+  $("salesMenu").classList.add("hidden");
+  $("returnsPanel").classList.remove("hidden");
+}
+
+// فتح سجل المبيعات
+function openSalesHistory() {
+  $("salesMenu").classList.add("hidden");
+  $("salesPanel").classList.remove("hidden");
+  viewSalesInvoices();
+}
+
+// فتح التقرير اليومي
+function openDailyReport() {
+  $("salesMenu").classList.add("hidden");
+  $("salesPanel").classList.remove("hidden");
+  loadDailyReport();
+}
 </script>
 </body>
 </html>
