@@ -273,6 +273,22 @@ hr{margin-top:28px}
 <span id="userInfo"></span>
 <button type="button" class="secondary" onclick="logout()">تسجيل الخروج</button>
 </div>
+  <!-- القائمة الرئيسية -->
+<div id="mainMenu">
+  <h2>القائمة الرئيسية</h2>
+  <button type="button" onclick="openSalesMenu()">🧾 المبيعات</button>
+</div>
+
+<!-- نافذة خيارات المبيعات -->
+<div id="salesMenu" class="hidden">
+  <button type="button" class="secondary" onclick="closeSalesMenu()">×</button>
+  <h2>🧾 المبيعات</h2>
+
+  <button type="button" onclick="openSalesInvoice()">فاتورة البيع</button>
+  <button type="button" onclick="openSalesReturns()">مرتجعات المبيعات</button>
+  <button type="button" onclick="openSalesHistory()">سجل المبيعات</button>
+  <button type="button" onclick="openDailyReport()">التقرير اليومي</button>
+</div>
 
 <section id="salesPanel">
 
