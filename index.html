@@ -275,96 +275,127 @@ hr{margin-top:28px}
 </div>
 
 <section id="salesPanel">
+
 <h1>🧾 فاتورة بيع</h1>
-<div style="width:160px;margin-right:auto;margin-left:0;text-align:center;margin-top:-15px;">
-  <label for="invoiceNumber" style="display:block;width:160px;text-align:center;">
-    رقم الفاتورة
-  </label>
-  <input
-    id="invoiceNumber"
-    type="text"
-    style="width:160px;max-width:100%;box-sizing:border-box;text-align:center;"
-    readonly
-  >
+
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;text-align:center;direction:rtl;">
+
+  <!-- العمود الأول: الزبائن -->
+  <div style="min-width:0;">
+    <label for="customerSelect" style="display:block;text-align:center;margin-bottom:5px;">
+      زبون آجل
+    </label>
+    <select id="customerSelect"
+      style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
+      <option value="">بدون تحديد زبون</option>
+    </select>
+
+    <button
+      id="cashCustomerButton"
+      type="button"
+      class="secondary"
+      onclick="toggleCashCustomer()"
+      style="width:100%;padding:8px 2px;font-size:12px;margin-top:8px;"
+    >
+      💵 زبون نقدي
+    </button>
+
+    <div id="cashCustomerBox" class="hidden">
+      <label for="cashCustomerName">اسم الزبون النقدي</label>
+      <input
+        id="cashCustomerName"
+        type="text"
+        placeholder="اكتب اسم الزبون لهذه الفاتورة"
+        autocomplete="off"
+        style="width:100%;box-sizing:border-box;"
+      >
+    </div>
+  </div>
+
+  <!-- العمود الثاني: الهاتف والباركود -->
+  <div style="min-width:0;">
+    <label for="invoiceCustomerPhone" style="display:block;text-align:center;margin-bottom:5px;">
+      📱 رقم الهاتف
+    </label>
+    <input
+      id="invoiceCustomerPhone"
+      type="tel"
+      placeholder=""
+      autocomplete="tel"
+      inputmode="numeric"
+      maxlength="11"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,11)"
+      style="width:100%;box-sizing:border-box;text-align:center;"
+    >
+
+    <label for="barcodeInput" style="display:block;text-align:center;margin-top:8px;">
+      ▥ الباركود
+    </label>
+    <input
+      id="barcodeInput"
+      type="text"
+      placeholder="امسح الباركود"
+      autocomplete="off"
+      inputmode="none"
+      style="width:100%;box-sizing:border-box;text-align:center;font-size:11px;"
+    >
+  </div>
+
+  <!-- العمود الثالث: رقم الفاتورة والكاميرا -->
+  <div style="min-width:0;">
+    <label for="invoiceNumber" style="display:block;text-align:center;margin-bottom:5px;">
+      رقم الفاتورة
+    </label>
+    <input
+      id="invoiceNumber"
+      type="text"
+      style="width:100%;box-sizing:border-box;text-align:center;"
+      readonly
+    >
+
+    <button
+      type="button"
+      id="cameraBarcodeButton"
+      class="secondary"
+      onclick="startBarcodeCamera()"
+      style="width:100%;padding:8px 2px;font-size:12px;margin-top:8px;"
+    >
+      📷 الكاميرا
+    </button>
+  </div>
+
+  <!-- العمود الرابع: الفواتير المعلقة -->
+  <div style="min-width:0;">
+    <div style="height:38px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">
+      تعليق الفاتورة
+    </div>
+    <button
+      type="button"
+      class="secondary"
+      onclick="holdCurrentInvoice()"
+      style="width:100%;padding:8px 2px;font-size:12px;"
+    >
+      ⏸️ تعليق
+    </button>
+
+    <div style="height:38px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">
+      الفواتير المعلقة
+    </div>
+    <button
+      type="button"
+      class="secondary"
+      onclick="showHeldInvoices()"
+      style="width:100%;padding:8px 2px;font-size:12px;"
+    >
+      📂 عرض
+    </button>
+  </div>
+
 </div>
 
-<div style="width:180px;max-width:100%;margin:-15px auto 0;text-align:center;">
-  <label for="customerSelect" style="display:block;text-align:center;margin-bottom:5px;">
-  زبون آجل
-  </label>
-<select id="customerSelect"
-  style="width:180px;max-width:100%;padding:9px 6px;font-size:13px;box-sizing:border-box;text-align:center;">
-  <option value="">بدون تحديد زبون</option>
-</select>
-</div>
-  <button
-  id="cashCustomerButton"
-  type="button"
-  class="secondary"
-  onclick="toggleCashCustomer()"
-    style="width:130px;padding:6px 8px;font-size:13px;margin-top:-15px;"
->
-  💵 زبون نقدي
-</button>
-
-<div id="cashCustomerBox" class="hidden">
-  <label for="cashCustomerName">اسم الزبون النقدي</label>
-  <input
-    id="cashCustomerName"
-    type="text"
-    placeholder="اكتب اسم الزبون لهذه الفاتورة"
-    autocomplete="off"
-  >
-</div>
-<label for="invoiceCustomerPhone"
-       style="display:block;width:130px;text-align:center;">
-  <span style="font-size:18px;">&#128241;</span>
-  رقم هاتف الزبون
-</label>
-
-<input
-  id="invoiceCustomerPhone"
-  type="tel"
-  placeholder=""
-  autocomplete="tel"
-  inputmode="numeric"
-  maxlength="11"
-  oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,11)"
-  style="width: 130px; max-width: 100%; box-sizing: border-box; text-align: center;"
->
-<div style="display:flex;justify-content:center;gap:8px;margin:10px 0;">
-  <button type="button" class="secondary"
-    style="width:140px;max-width:48%;padding:7px 5px;font-size:13px;"
-    onclick="holdCurrentInvoice()">
-    ⏸️ تعليق الفاتورة
-  </button>
-
-  <button type="button" class="secondary"
-    style="width:140px;max-width:48%;padding:7px 5px;font-size:13px;"
-    onclick="showHeldInvoices()">
-    📂 الفواتير المعلقة
-  </button>
-</div>
 <div id="heldInvoicesList" class="tablewrap"></div>
 <div id="customerStatus" class="status"></div>
 
-
-<label for="barcodeInput">باركود المنتج</label>
-<input
-  id="barcodeInput"
-  type="text"
-  placeholder="امسح الباركود هنا"
-  autocomplete="off"
-  inputmode="none"
->
-<button
-  type="button"
-  id="cameraBarcodeButton"
-  class="secondary"
-  onclick="startBarcodeCamera()"
->
-  📷 مسح بالكاميرا
-</button>
 <div id="barcodeStatus" class="status" aria-live="polite"></div>
 
 
