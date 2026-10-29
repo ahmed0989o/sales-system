@@ -447,13 +447,42 @@ hr{margin-top:28px}
 <input id="unitPrice" type="number" readonly>
 <div class="total">الإجمالي: <span id="total">0</span></div>
 
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:start;text-align:center;direction:rtl;">
 
-<label for="paymentMethod">طريقة الدفع</label>
-<select id="paymentMethod">
-  <option value="نقدي">نقدي</option>
-  <option value="آجل">آجل</option>
-  <option value="واصل جزئي">واصل جزئي</option>
-</select>
+  <div>
+    <label for="paymentMethod">طريقة الدفع</label>
+    <select id="paymentMethod" style="width:100%;font-size:12px;padding:7px 2px;">
+      <option value="نقدي">نقدي</option>
+      <option value="آجل">آجل</option>
+      <option value="واصل جزئي">واصل جزئي</option>
+    </select>
+  </div>
+
+  <div>
+    <button id="saveSaleButton" type="button" onclick="saveSale()" style="width:100%;padding:8px 2px;font-size:12px;">
+      حفظ البيع
+    </button>
+  </div>
+
+  <div>
+    <button id="cancelCurrentInvoiceButton" type="button" class="secondary" onclick="cancelCurrentInvoice()" style="width:100%;padding:8px 2px;font-size:12px;">
+      ❌ إلغاء الفاتورة الحالية
+    </button>
+  </div>
+
+  <div>
+    <button id="saveAndPrintSaleButton" type="button" class="secondary" onclick="saveSaleAndPrint()" style="width:100%;padding:8px 2px;font-size:12px;">
+      💾🖨️ حفظ وطباعة الفاتورة
+    </button>
+  </div>
+
+  <div>
+    <button id="viewSalesInvoicesButton" type="button" class="secondary" onclick="viewSalesInvoices()" style="width:100%;padding:8px 2px;font-size:12px;">
+      🧾 عرض فواتير البيع
+    </button>
+  </div>
+
+</div>
 
 <div id="partialPaymentBox" class="summary hidden">
   <label for="amountReceived">المبلغ الواصل (د.ع)</label>
