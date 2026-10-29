@@ -1137,6 +1137,7 @@ async function showApp() {
 
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
+  showMainMenu();
   $("userInfo").textContent =
     "الحساب: " + (currentUser.email || "مستخدم") +
     (isOwner(currentUser) ? " — مسؤول" : "");
