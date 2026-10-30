@@ -2254,7 +2254,7 @@ $("cashCustomerButton").textContent = "💵 زبون نقدي";
     return;
   }
 
-  button.disabled = true;
+ if (button) button.disabled = true;
   container.textContent = "جارٍ تحميل فواتير البيع...";
 
   try {
