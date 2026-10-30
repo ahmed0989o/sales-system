@@ -2355,7 +2355,7 @@ tbody.appendChild(row);
     container.textContent =
       "تعذر تحميل الفواتير: " + error.message;
   } finally {
-    button.disabled = false;
+if (button) button.disabled = false;
   }
 }
   async function viewSaleDetails(saleId, invoiceNumber) {
