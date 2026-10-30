@@ -3981,16 +3981,22 @@ function openDailyReport() {
   loadDailyReport();
 }
   // فتح حركة الصندوق
-  function openPurchases() {
-  $("mainMenu").classList.add("hidden");
+  async function openPurchases() {
+  const { data: allowed, error } = await db.rpc("has_app_permission", {
+    p_permission_key: "purchases.manage"
+  });
 
-  $("purchasePanel").classList.remove("hidden");
-  $("ownerPanel").classList.add("hidden");
-  $("salesPanel").classList.add("hidden");
-  $("returnsPanel").classList.add("hidden");
-  $("customerPaymentsPanel").classList.add("hidden");
-  $("userManagementPanel").classList.add("hidden");
+  if (error || allowed !== true) {
+    alert("ليس لديك صلاحية إدارة المشتريات");
+    return;
   }
+
+  showMainMenu();
+  $("mainMenu").classList.add("hidden");
+  $("purchasePanel").classList.remove("hidden");
+
+  await loadPurchases();
+}
 function openCashbox() {
   if (!isOwner(currentUser)) return;
   
