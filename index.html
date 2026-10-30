@@ -4013,10 +4013,10 @@ function openSalesInvoice() {
 function openSalesReturns() {
   if (!isOwner(currentUser)) return;
 
+  $("mainMenu").classList.remove("hidden");
   $("salesMenu").classList.add("hidden");
   $("returnsPanel").classList.remove("hidden");
 }
-
 // فتح سجل المبيعات
 function openSalesHistory() {
   console.log("تم تشغيل openSalesHistory");
