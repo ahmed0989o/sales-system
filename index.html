@@ -2264,9 +2264,11 @@ console.log("تم استدعاء viewSalesInvoices");
         "id,created_at,invoice_number,customer_name,total_amount,payment_method,amount_received"
       )
       .order("created_at", { ascending: false })
-      .limit(100);
+     .limit(100);
 
-    if (error) throw error;
+console.log("نتيجة تحميل الفواتير:", { sales, error });
+
+if (error) throw error;
 
     const invoices = sales || [];
 
