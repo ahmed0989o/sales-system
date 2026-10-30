@@ -3981,6 +3981,16 @@ function openDailyReport() {
   loadDailyReport();
 }
   // فتح حركة الصندوق
+  function openPurchases() {
+  $("mainMenu").classList.add("hidden");
+
+  $("purchasePanel").classList.remove("hidden");
+  $("ownerPanel").classList.add("hidden");
+  $("salesPanel").classList.add("hidden");
+  $("returnsPanel").classList.add("hidden");
+  $("customerPaymentsPanel").classList.add("hidden");
+  $("userManagementPanel").classList.add("hidden");
+  }
 function openCashbox() {
   if (!isOwner(currentUser)) return;
   
