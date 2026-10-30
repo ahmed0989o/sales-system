@@ -327,7 +327,11 @@ hr{margin-top:28px}
 </div>
 
 <section id="salesPanel" class="hidden">
-<div id="salesInvoiceForm">
+
+  <div class="section-window-controls">
+    <button type="button" onclick="minimizeSection('salesPanel','المبيعات')" title="تصغير">−</button>
+    <button type="button" onclick="closeSection('salesPanel')" title="إغلاق">×</button>
+  </div><div id="salesInvoiceForm">
 <h1>🧾 فاتورة بيع</h1>
 
 <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;text-align:center;direction:rtl;">
