@@ -1154,9 +1154,9 @@ setMessage(
       : "تنبيه: الحساب الحالي ليس حساب المالك."
 );
 
-  $("ownerPanel").classList.toggle("hidden", !isOwner(currentUser));
-  $("userManagementPanel").classList.toggle("hidden", !isOwner(currentUser));
-  $("returnsPanel").classList.toggle("hidden", !isOwner(currentUser));
+  $("ownerPanel").classList.add("hidden");
+$("userManagementPanel").classList.add("hidden");
+$("returnsPanel").classList.add("hidden");
   $("reportDate").value = todayInBaghdad();
 
   try {await Promise.all([loadProducts(), loadCustomers()]);
