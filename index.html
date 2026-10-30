@@ -4040,9 +4040,8 @@ function openDailyReport() {
 }
   // فتح التقرير اليومي
 function openDailyReport() {
-  $("mainMenu").classList.add("hidden");
+  $("mainMenu").classList.remove("hidden");
   $("salesMenu").classList.add("hidden");
-  $("returnsPanel").classList.add("hidden");
   $("salesPanel").classList.remove("hidden");
   $("salesInvoiceForm").classList.add("hidden");
   $("dailyReportControls").classList.remove("hidden");
