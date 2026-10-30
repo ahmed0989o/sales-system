@@ -2352,6 +2352,7 @@ tbody.appendChild(row);
 
     table.appendChild(tbody);
     container.replaceChildren(table);
+    console.log("تم عرض جدول الفواتير داخل الصفحة");
   } catch (error) {
     console.error("عرض فواتير البيع:", error);
     container.textContent =
