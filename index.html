@@ -2256,7 +2256,7 @@ $("cashCustomerButton").textContent = "💵 زبون نقدي";
 
  if (button) button.disabled = true;
   container.textContent = "جارٍ تحميل فواتير البيع...";
-
+console.log("تم استدعاء viewSalesInvoices");
   try {
     const { data: sales, error } = await db
       .from("sales")
