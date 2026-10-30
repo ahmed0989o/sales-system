@@ -3993,6 +3993,7 @@ function openDailyReport() {
 
   showMainMenu();
   $("mainMenu").classList.add("hidden");
+    $("ownerPanel").classList.add("hidden");
   $("purchasePanel").classList.remove("hidden");
 
   await loadPurchases();
