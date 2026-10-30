@@ -4077,11 +4077,8 @@ function openCashbox() {
 function openRent() {
   if (!isOwner(currentUser)) return;
 
-  showMainMenu();
-  $("mainMenu").classList.add("hidden");
+  $("mainMenu").classList.remove("hidden");
   $("ownerPanel").classList.remove("hidden");
-  $("purchasePanel").classList.add("hidden");
-  $("cashboxPanel").classList.add("hidden");
   $("rentPanel").classList.remove("hidden");
 }
   // إدارة النوافذ: تصغير وإغلاق واستعادة
