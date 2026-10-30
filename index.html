@@ -4067,6 +4067,39 @@ function openRent() {
   $("cashboxPanel").classList.add("hidden");
   $("rentPanel").classList.remove("hidden");
 }
+  // إدارة النوافذ: تصغير وإغلاق واستعادة
+function minimizeSection(sectionId, title) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  section.classList.add("hidden");
+
+  const container = document.getElementById("minimizedSections");
+  if (document.getElementById("restore-" + sectionId)) return;
+
+  const button = document.createElement("button");
+  button.id = "restore-" + sectionId;
+  button.type = "button";
+  button.textContent = "استعادة " + title;
+  button.onclick = function () {
+    section.classList.remove("hidden");
+    button.remove();
+  };
+
+  container.appendChild(button);
+}
+
+function closeSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+
+  section.classList.add("hidden");
+
+  const restoreButton = document.getElementById("restore-" + sectionId);
+  if (restoreButton) restoreButton.remove();
+
+  document.getElementById("mainMenu").classList.remove("hidden");
+}
 </script>
 </body>
 </html>
