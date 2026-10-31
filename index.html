@@ -4171,6 +4171,8 @@ floatingWindowIds.forEach(id => {
   const win = document.getElementById(id);
   if (!win) return;
 
+  win.dataset.positionAssigned = "false";
+
   win.addEventListener("pointerdown", function () {
     highestWindowZ++;
     win.style.zIndex = highestWindowZ;
