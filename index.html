@@ -430,10 +430,16 @@ hr{margin-top:28px}
   <p>الاسم: <strong id="creditCustomerName">—</strong></p>
   <p>الهاتف: <strong id="creditCustomerPhone">—</strong></p>
   <p>إجمالي المبيعات: <strong id="creditCustomerSales">—</strong> د.ع</p>
-  <p>إجمالي التسديدات: <strong id="creditCustomerPayments">—</strong> د.ع</p>
-    <p>الدين المتبقي: <strong id="creditCustomerDebt">—</strong> د.ع</p>
+ <p>إجمالي التسديدات: <strong id="creditCustomerPayments">—</strong> د.ع</p>
+<p>الدين المتبقي: <strong id="creditCustomerDebt">—</strong> د.ع</p>
 
-  <hr>
+<button type="button"
+        onclick="openCustomerFullAccount()"
+        style="width:100%;margin:10px 0;padding:12px;">
+  📋 عرض الحساب الكامل
+</button>
+
+<hr>
 
   <h4>🧾 فواتير الزبون</h4>
   <div id="creditCustomerInvoices"></div>
