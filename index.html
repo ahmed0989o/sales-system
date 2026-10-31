@@ -4299,11 +4299,8 @@ document.querySelectorAll(
 const newLeft = startLeft + e.clientX - startX;
 const newTop = startTop + e.clientY - startY;
 
-const maxLeft = window.innerWidth - rect.width;
-const maxTop = window.innerHeight - rect.height;
-
-win.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + "px";
-win.style.top = Math.max(0, Math.min(newTop, maxTop)) + "px";
+win.style.left = newLeft + "px";
+win.style.top = newTop + "px";
   });
 
  win.addEventListener("pointerup", function () {
