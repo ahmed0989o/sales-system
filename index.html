@@ -4157,6 +4157,19 @@ function closeSection(sectionId) {
   // إدارة ترتيب النوافذ العائمة
 let highestWindowZ = 1000;
 let windowPositionIndex = 0;
+  // توزيع النوافذ في أماكن مختلفة
+function positionFloatingWindow(win) {
+  if (!win || win.dataset.positionAssigned === "true") return;
+
+  const offset = (windowPositionIndex % 7) * 28;
+
+  win.style.top = (80 + offset) + "px";
+  win.style.right = (30 + offset) + "px";
+  win.style.left = "auto";
+
+  win.dataset.positionAssigned = "true";
+  windowPositionIndex++;
+}
 const floatingWindowIds = [
   "salesPanel",
   "returnsPanel",
