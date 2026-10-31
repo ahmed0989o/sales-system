@@ -4201,6 +4201,31 @@ document.querySelectorAll(
     dragging = false;
   });
 });
+  // تكبير النافذة واستعادة حجمها السابق
+function toggleMaximizeSection(sectionId) {
+  const win = document.getElementById(sectionId);
+  if (!win) return;
+
+  if (win.classList.contains("maximized")) {
+    win.classList.remove("maximized");
+
+    win.style.top = win.dataset.oldTop;
+    win.style.left = win.dataset.oldLeft;
+    win.style.width = win.dataset.oldWidth;
+    win.style.height = win.dataset.oldHeight;
+    win.style.right = win.dataset.oldRight;
+  } else {
+    const rect = win.getBoundingClientRect();
+
+    win.dataset.oldTop = rect.top + "px";
+    win.dataset.oldLeft = rect.left + "px";
+    win.dataset.oldWidth = rect.width + "px";
+    win.dataset.oldHeight = rect.height + "px";
+    win.dataset.oldRight = win.style.right || "auto";
+
+    win.classList.add("maximized");
+  }
+}
 </script>
 </body>
 </html>
