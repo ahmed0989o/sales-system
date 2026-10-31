@@ -1099,9 +1099,8 @@ function updateCreditCustomerDetails() {
   $("customerFullAccountPage").classList.add("hidden");
 }
   async function loadCustomerAccount(customerId) {
-  const invoicesBox = $("creditCustomerInvoices");
-  const paymentsBox = $("creditCustomerPaymentHistory");
-
+ const invoicesBox = $("customerFullAccountInvoices");
+const paymentsBox = $("customerFullAccountPayments");
   invoicesBox.textContent = "جارٍ تحميل الفواتير...";
   paymentsBox.textContent = "جارٍ تحميل التسديدات...";
 
