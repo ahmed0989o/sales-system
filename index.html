@@ -400,9 +400,32 @@ hr{margin-top:28px}
 </button>
 
 <div id="creditCustomerDetails" class="hidden"
-     style="margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:8px;text-align:right;">
+     style="
+       position:fixed;
+       top:50%;
+       left:50%;
+       transform:translate(-50%,-50%);
+       width:min(420px,90vw);
+       max-height:75vh;
+       overflow-y:auto;
+       background:#fff;
+       padding:18px;
+       border:1px solid #aaa;
+       border-radius:12px;
+       box-shadow:0 8px 30px rgba(0,0,0,.3);
+       z-index:3000;
+       text-align:right;
+     ">
 
-  <h4>👤 ملف الزبون</h4>
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h3>👤 ملف الزبون</h3>
+    <button type="button"
+      onclick="$('creditCustomerDetails').classList.add('hidden')">
+      ✕
+    </button>
+  </div>
+
+  <hr>
 
   <p>الاسم: <strong id="creditCustomerName">—</strong></p>
   <p>الهاتف: <strong id="creditCustomerPhone">—</strong></p>
@@ -410,12 +433,13 @@ hr{margin-top:28px}
   <p>إجمالي التسديدات: <strong id="creditCustomerPayments">—</strong> د.ع</p>
   <p>الدين المتبقي: <strong id="creditCustomerDebt">—</strong> د.ع</p>
 
+  <hr>
+
   <button type="button" onclick="openCustomerDebtPayment()">
     💰 تسديد جديد
   </button>
 
-</div>
-    <button
+</div>    <button
       id="cashCustomerButton"
       type="button"
       class="secondary"
