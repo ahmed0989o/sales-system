@@ -389,7 +389,16 @@ hr{margin-top:28px}
       style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
       <option value="">بدون تحديد زبون</option>
     </select>
-
+<div id="creditCustomerDetails" class="hidden"
+     style="margin-top:8px;padding:10px;border:1px solid #ccc;border-radius:8px;">
+  <h4>👤 تفاصيل الزبون</h4>
+  <p>الاسم: <strong id="creditCustomerName">—</strong></p>
+  <p>الهاتف: <strong id="creditCustomerPhone">—</strong></p>
+  <p>الدين المتبقي: <strong id="creditCustomerDebt">—</strong> د.ع</p>
+  <button type="button" onclick="openCustomerDebtPayment()">
+    💰 تسديد دين الزبون
+  </button>
+</div>
     <button
       id="cashCustomerButton"
       type="button"
