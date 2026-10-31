@@ -1016,6 +1016,194 @@ function updateCreditCustomerDetails() {
 
   loadCustomerAccount(customerId);
 }
+  async function loadCustomerAccount(customerId) {
+  const invoicesBox = $("creditCustomerInvoices");
+  const paymentsBox = $("creditCustomerPaymentHistory");
+
+  invoicesBox.textContent = "جارٍ تحميل الفواتير...";
+  paymentsBox.textContent = "جارٍ تحميل التسديدات...";
+
+  try {
+    // تحميل فواتير الزبون
+    const { data: sales, error: salesError } = await db
+      .from("sales")
+      .select(`
+        id,
+        invoice_number,
+        created_at,
+        total_amount,
+        payment_method,
+        amount_received
+      `)
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+
+    if (salesError) throw salesError;
+
+    // تحميل تسديدات الزبون
+    const { data: payments, error: paymentsError } = await db
+      .from("customer_payments")
+      .select("id, amount, payment_date, notes")
+      .eq("customer_id", customerId)
+      .order("payment_date", { ascending: false });
+
+    if (paymentsError) throw paymentsError;
+
+    const invoiceRows = sales || [];
+    const paymentRows = payments || [];
+
+    // حساب إجمالي المبيعات والتسديدات
+    const totalSales = invoiceRows.reduce(
+      (sum, sale) => sum + Number(sale.total_amount || 0),
+      0
+    );
+
+    const invoiceReceived = invoiceRows.reduce(
+      (sum, sale) => sum + Number(sale.amount_received || 0),
+      0
+    );
+
+    const laterPayments = paymentRows.reduce(
+      (sum, payment) => sum + Number(payment.amount || 0),
+      0
+    );
+
+    $("creditCustomerSales").textContent = money(totalSales);
+    $("creditCustomerPayments").textContent =
+      money(invoiceReceived + laterPayments);
+
+    // تحميل تفاصيل المنتجات
+    const saleIds = invoiceRows.map(sale => sale.id);
+    let details = [];
+
+    if (saleIds.length) {
+      const { data, error } = await db
+        .from("sale_details")
+        .select("sale_id, product_id, quantity, unit_price, total")
+        .in("sale_id", saleIds);
+
+      if (error) throw error;
+      details = data || [];
+    }
+
+    const productIds = [
+      ...new Set(details.map(item => item.product_id))
+    ];
+
+    let productNames = new Map();
+
+    if (productIds.length) {
+      const { data, error } = await db
+        .from("products")
+        .select("id, name")
+        .in("id", productIds);
+
+      if (error) throw error;
+
+      (data || []).forEach(product => {
+        productNames.set(String(product.id), product.name);
+      });
+    }
+
+    // عرض الفواتير وتفاصيل المنتجات
+    if (!invoiceRows.length) {
+      invoicesBox.textContent = "لا توجد فواتير لهذا الزبون.";
+    } else {
+      invoicesBox.innerHTML = "";
+
+      invoiceRows.forEach(sale => {
+        const box = document.createElement("div");
+        box.style.cssText =
+          "border:1px solid #ddd;border-radius:8px;padding:8px;margin:8px 0;";
+
+        const heading = document.createElement("strong");
+        heading.textContent =
+          `فاتورة رقم ${sale.invoice_number || sale.id}`;
+        box.appendChild(heading);
+
+        const date = document.createElement("p");
+        date.textContent =
+          "التاريخ: " +
+          new Date(sale.created_at).toLocaleString("ar-IQ");
+        box.appendChild(date);
+
+        const method = document.createElement("p");
+        method.textContent =
+          "طريقة الدفع: " + (sale.payment_method || "—");
+        box.appendChild(method);
+
+        const total = document.createElement("p");
+        total.textContent =
+          "الإجمالي: " + money(sale.total_amount) + " د.ع";
+        box.appendChild(total);
+
+        const received = document.createElement("p");
+        received.textContent =
+          "الواصل عند البيع: " + money(sale.amount_received) + " د.ع";
+        box.appendChild(received);
+
+        const items = details.filter(
+          item => String(item.sale_id) === String(sale.id)
+        );
+
+        items.forEach(item => {
+          const line = document.createElement("p");
+          line.style.cssText =
+            "font-size:13px;margin:4px 0;";
+          line.textContent =
+            `${productNames.get(String(item.product_id)) || "منتج"} — ` +
+            `الكمية: ${item.quantity} — ` +
+            `السعر: ${money(item.unit_price)} — ` +
+            `الإجمالي: ${money(item.total)} د.ع`;
+
+          box.appendChild(line);
+        });
+
+        invoicesBox.appendChild(box);
+      });
+    }
+
+    // عرض سجل التسديدات
+    if (!paymentRows.length) {
+      paymentsBox.textContent = "لا توجد تسديدات مسجلة.";
+    } else {
+      paymentsBox.innerHTML = "";
+
+      paymentRows.forEach(payment => {
+        const row = document.createElement("div");
+        row.style.cssText =
+          "border:1px solid #ddd;border-radius:8px;padding:8px;margin:6px 0;";
+
+        const amount = document.createElement("strong");
+        amount.textContent = money(payment.amount) + " د.ع";
+        row.appendChild(amount);
+
+        const date = document.createElement("p");
+        date.textContent =
+          "التاريخ: " +
+          new Date(payment.payment_date).toLocaleString("ar-IQ");
+        row.appendChild(date);
+
+        if (payment.notes) {
+          const notes = document.createElement("p");
+          notes.textContent = "ملاحظات: " + payment.notes;
+          row.appendChild(notes);
+        }
+
+        paymentsBox.appendChild(row);
+      });
+    }
+
+  } catch (error) {
+    console.error("Customer account:", error);
+
+    invoicesBox.textContent =
+      "تعذر تحميل الفواتير: " + error.message;
+
+    paymentsBox.textContent =
+      "تعذر تحميل سجل التسديدات.";
+  }
+}
   function toggleCreditCustomerDetails() {
   const customerId = $("customerSelect").value;
 
