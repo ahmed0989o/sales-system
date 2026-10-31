@@ -4240,7 +4240,6 @@ floatingWindowIds.forEach(id => {
 
   restoreWindowState(win);
 
-  win.dataset.positionAssigned = "false";
 
    win.addEventListener("transitionend", function () {
     if (!win.classList.contains("hidden")) {
