@@ -2017,7 +2017,19 @@ await loadDailyReport();
   }
 }
 
+function openCustomerDebtPayment() {
+  const customerId = $("customerSelect").value;
 
+  if (!customerId) return;
+
+  $("paymentCustomer").value = customerId;
+  $("paymentAmount").value = "";
+
+  $("customerPaymentsPanel").classList.remove("hidden");
+
+  highestWindowZ++;
+  $("customerPaymentsPanel").style.zIndex = highestWindowZ;
+}
 async function saveCustomerPayment() {
   const button = $("savePaymentButton");
   const customerId = $("paymentCustomer").value;
