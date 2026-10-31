@@ -981,6 +981,18 @@ function updateCreditCustomerDetails() {
 
   card.classList.remove("hidden");
 }
+  function toggleCreditCustomerDetails() {
+  const customerId = $("customerSelect").value;
+
+  if (!customerId) {
+    alert("يرجى اختيار الزبون أولاً.");
+    return;
+  }
+
+  updateCreditCustomerDetails();
+
+  $("creditCustomerDetails").classList.toggle("hidden");
+}
 function setMessage(id, message) {
   $(id).textContent = message || "";
 }
