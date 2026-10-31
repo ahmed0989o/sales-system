@@ -1013,6 +1013,8 @@ function updateCreditCustomerDetails() {
   $("creditCustomerPhone").textContent = customer.phone || "غير متوفر";
   $("creditCustomerDebt").textContent =
     debt === undefined ? "غير متاح" : money(debt);
+
+  loadCustomerAccount(customerId);
 }
   function toggleCreditCustomerDetails() {
   const customerId = $("customerSelect").value;
