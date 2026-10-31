@@ -4130,6 +4130,28 @@ function closeSection(sectionId) {
 
   document.getElementById("mainMenu").classList.remove("hidden");
 }
+  // إدارة ترتيب النوافذ العائمة
+let highestWindowZ = 1000;
+
+const floatingWindowIds = [
+  "salesPanel",
+  "returnsPanel",
+  "customerPaymentsPanel",
+  "purchasePanel",
+  "cashboxPanel",
+  "rentPanel",
+  "userManagementPanel"
+];
+
+floatingWindowIds.forEach(id => {
+  const win = document.getElementById(id);
+  if (!win) return;
+
+  win.addEventListener("pointerdown", function () {
+    highestWindowZ++;
+    win.style.zIndex = highestWindowZ;
+  });
+});
 </script>
 </body>
 </html>
