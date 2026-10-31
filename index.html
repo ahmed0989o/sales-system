@@ -4243,8 +4243,7 @@ floatingWindowIds.forEach(id => {
 document.querySelectorAll(
   "#salesPanel, #returnsPanel, #customerPaymentsPanel, #purchasePanel, #cashboxPanel, #rentPanel, #userManagementPanel"
 ).forEach(win => {
-  const handle = win.querySelector(".section-window-controls");
-  if (!handle) return;
+ const handle = win;
 
   let dragging = false;
   let startX = 0;
