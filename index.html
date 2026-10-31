@@ -4186,10 +4186,10 @@ floatingWindowIds.forEach(id => {
 
   win.dataset.positionAssigned = "false";
 
-  win.addEventListener("pointerdown", function () {
-    highestWindowZ++;
-    win.style.zIndex = highestWindowZ;
-  });
+ win.addEventListener("transitionend", function () {
+  if (!win.classList.contains("hidden")) {
+    positionFloatingWindow(win);
+  }
 });
   // تحريك النوافذ العائمة
 document.querySelectorAll(
