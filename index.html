@@ -1381,13 +1381,13 @@ async function loadCustomers() {
     customers = result.data || [];
 
     // تحميل أرصدة الزبائن من دالة Supabase
-    let balancesByCustomer = new Map();
+   window.balancesByCustomer = new Map();
 
     const balanceResult = await db.rpc("get_customer_balances");
 
     if (!balanceResult.error) {
       (balanceResult.data || []).forEach(row => {
-        balancesByCustomer.set(
+       window.balancesByCustomer.set(
           String(row.customer_id),
           Number(row.remaining_debt || 0)
         );
