@@ -4233,10 +4233,19 @@ floatingWindowIds.forEach(id => {
     }
   });
 
-  win.addEventListener("pointerdown", function () {
+    win.addEventListener("pointerdown", function () {
     highestWindowZ++;
     win.style.zIndex = highestWindowZ;
   });
+
+  // مراقبة تغيير حجم النافذة وحفظ الحجم تلقائياً
+  const resizeObserver = new ResizeObserver(function () {
+    if (!win.classList.contains("hidden")) {
+      saveWindowState(win);
+    }
+  });
+
+  resizeObserver.observe(win);
 });
 
 // تحريك النوافذ العائمة
