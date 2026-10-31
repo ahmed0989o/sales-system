@@ -4054,7 +4054,16 @@ function closeSalesMenu() {
 function openSalesInvoice() {
   $("mainMenu").classList.remove("hidden");
   $("salesMenu").classList.add("hidden");
-  $("salesPanel").classList.remove("hidden");
+
+  const win = $("salesPanel");
+
+  if (!win.classList.contains("hidden")) {
+    highestWindowZ++;
+    win.style.zIndex = highestWindowZ;
+  } else {
+    win.classList.remove("hidden");
+  }
+
   $("salesInvoiceForm").classList.remove("hidden");
 }
 // فتح المرتجعات
