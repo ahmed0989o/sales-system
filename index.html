@@ -4072,7 +4072,15 @@ function openSalesReturns() {
 
   $("mainMenu").classList.remove("hidden");
   $("salesMenu").classList.add("hidden");
-  $("returnsPanel").classList.remove("hidden");
+
+  const win = $("returnsPanel");
+
+  if (!win.classList.contains("hidden")) {
+    highestWindowZ++;
+    win.style.zIndex = highestWindowZ;
+  } else {
+    win.classList.remove("hidden");
+  }
 }
 // فتح سجل المبيعات
 function openSalesHistory() {
