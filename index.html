@@ -352,7 +352,6 @@ hr{margin-top:28px}
   <button type="button" onclick="openPurchases()">🛒 المشتريات</button>
   <button type="button" onclick="openCashbox()">💰 حركة الصندوق</button>
   <button type="button" onclick="openRent()">🏠 إدارة الإيجار</button>
-  <button type="button" onclick="resetAllWindows()">🔄 إعادة ترتيب النوافذ</button>
 </div>
 
 <div id="minimizedSections" class="minimized-sections"></div>
@@ -4172,26 +4171,6 @@ function positionFloatingWindow(win) {
   windowPositionIndex++;
 }
   // إعادة ترتيب جميع النوافذ العائمة
-function resetAllWindows() {
-  windowPositionIndex = 0;
-
-  floatingWindowIds.forEach(id => {
-    const win = document.getElementById(id);
-    if (!win) return;
-
-    const offset = (windowPositionIndex % 7) * 28;
-
-    win.style.top = (80 + offset) + "px";
-    win.style.right = (30 + offset) + "px";
-    win.style.left = "auto";
-
-    win.dataset.positionAssigned = "true";
-
-    saveWindowState(win);
-
-    windowPositionIndex++;
-  });
-}
   // حفظ واستعادة مواقع وأحجام النوافذ
 function saveWindowState(win) {
   if (!win) return;
