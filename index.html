@@ -1050,7 +1050,7 @@ function updateCreditCustomerDetails() {
 
   loadCustomerAccount(customerId);
 }
-  async function openCustomerFullAccount() {
+ async function openCustomerFullAccount() {
   const customerId = $("customerSelect").value;
 
   if (!customerId) {
@@ -1069,15 +1069,15 @@ function updateCreditCustomerDetails() {
 
   const page = $("customerFullAccountPage");
 
+  page.classList.remove("hidden");
+
   $("customerFullAccountInfo").innerHTML = `
     <h3>${customer.name || "—"}</h3>
     <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
-    <p>إجمالي المبيعات: ${$("creditCustomerSales").textContent} د.ع</p>
-    <p>إجمالي التسديدات: ${$("creditCustomerPayments").textContent} د.ع</p>
+    <p>إجمالي المبيعات: جارٍ الحساب...</p>
+    <p>إجمالي التسديدات: جارٍ الحساب...</p>
     <p>الدين المتبقي: ${$("creditCustomerDebt").textContent} د.ع</p>
   `;
-
-  page.classList.remove("hidden");
 
   $("customerFullAccountInvoices").textContent =
     "جارٍ تحميل الفواتير...";
@@ -1087,11 +1087,13 @@ function updateCreditCustomerDetails() {
 
   await loadCustomerAccount(customerId);
 
-  $("customerFullAccountInvoices").innerHTML =
-    $("creditCustomerInvoices").innerHTML;
-
-  $("customerFullAccountPayments").innerHTML =
-    $("creditCustomerPaymentHistory").innerHTML;
+  $("customerFullAccountInfo").innerHTML = `
+    <h3>${customer.name || "—"}</h3>
+    <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
+    <p>إجمالي المبيعات: ${$("creditCustomerSales").textContent} د.ع</p>
+    <p>إجمالي التسديدات: ${$("creditCustomerPayments").textContent} د.ع</p>
+    <p>الدين المتبقي: ${$("creditCustomerDebt").textContent} د.ع</p>
+  `;
 }
   function closeCustomerFullAccount() {
   $("customerFullAccountPage").classList.add("hidden");
