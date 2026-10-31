@@ -4333,6 +4333,29 @@ function toggleMaximizeSection(sectionId) {
     saveWindowState(win);
   }
 }
+  // إعادة ضبط نافذة واحدة
+function resetSingleWindow(sectionId) {
+  const win = document.getElementById(sectionId);
+  if (!win) return;
+
+  win.classList.remove("maximized");
+
+  win.style.top = "80px";
+  win.style.left = "auto";
+  win.style.right = "30px";
+  win.style.width = "min(760px, calc(100vw - 40px))";
+  win.style.height = "75vh";
+
+  delete win.dataset.oldTop;
+  delete win.dataset.oldLeft;
+  delete win.dataset.oldWidth;
+  delete win.dataset.oldHeight;
+  delete win.dataset.oldRight;
+
+  win.dataset.positionAssigned = "true";
+
+  saveWindowState(win);
+}
 </script>
 </body>
 </html>
