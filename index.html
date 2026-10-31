@@ -1058,6 +1058,49 @@ function updateCreditCustomerDetails() {
 
   loadCustomerAccount(customerId);
 }
+  async function openCustomerFullAccount() {
+  const customerId = $("customerSelect").value;
+
+  if (!customerId) {
+    alert("يرجى اختيار الزبون أولاً");
+    return;
+  }
+
+  const customer = customers.find(
+    c => String(c.id) === String(customerId)
+  );
+
+  if (!customer) {
+    alert("لم يتم العثور على بيانات الزبون");
+    return;
+  }
+
+  const page = $("customerFullAccountPage");
+
+  $("customerFullAccountInfo").innerHTML = `
+    <h3>${customer.name || "—"}</h3>
+    <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
+    <p>إجمالي المبيعات: ${$("creditCustomerSales").textContent} د.ع</p>
+    <p>إجمالي التسديدات: ${$("creditCustomerPayments").textContent} د.ع</p>
+    <p>الدين المتبقي: ${$("creditCustomerDebt").textContent} د.ع</p>
+  `;
+
+  page.classList.remove("hidden");
+
+  $("customerFullAccountInvoices").textContent =
+    "جارٍ تحميل الفواتير...";
+
+  $("customerFullAccountPayments").textContent =
+    "جارٍ تحميل التسديدات...";
+
+  await loadCustomerAccount(customerId);
+
+  $("customerFullAccountInvoices").innerHTML =
+    $("creditCustomerInvoices").innerHTML;
+
+  $("customerFullAccountPayments").innerHTML =
+    $("creditCustomerPaymentHistory").innerHTML;
+}
   async function loadCustomerAccount(customerId) {
   const invoicesBox = $("creditCustomerInvoices");
   const paymentsBox = $("creditCustomerPaymentHistory");
