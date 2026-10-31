@@ -939,7 +939,32 @@ let appLoading = false;
 
 const $ = id => document.getElementById(id);
 const money = value => Number(value || 0).toLocaleString("de-DE");
+function updateCreditCustomerDetails() {
+  const customerId = $("customerSelect").value;
+  const isCredit = $("paymentMethod").value === "آجل";
+  const card = $("creditCustomerDetails");
 
+  if (!isCredit || !customerId) {
+    card.classList.add("hidden");
+    return;
+  }
+
+  const customer = customers.find(c => String(c.id) === String(customerId));
+
+  if (!customer) {
+    card.classList.add("hidden");
+    return;
+  }
+
+  const debt = window.balancesByCustomer?.get(String(customerId));
+
+  $("creditCustomerName").textContent = customer.name || "—";
+  $("creditCustomerPhone").textContent = customer.phone || "غير متوفر";
+  $("creditCustomerDebt").textContent =
+    debt === undefined ? "غير متاح" : money(debt);
+
+  card.classList.remove("hidden");
+}
 function setMessage(id, message) {
   $(id).textContent = message || "";
 }
