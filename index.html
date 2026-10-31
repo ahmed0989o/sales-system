@@ -4170,6 +4170,45 @@ function positionFloatingWindow(win) {
   win.dataset.positionAssigned = "true";
   windowPositionIndex++;
 }
+  // حفظ واستعادة مواقع وأحجام النوافذ
+function saveWindowState(win) {
+  if (!win) return;
+
+  const rect = win.getBoundingClientRect();
+
+  const state = {
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height
+  };
+
+  localStorage.setItem(
+    "windowState-" + win.id,
+    JSON.stringify(state)
+  );
+}
+
+function restoreWindowState(win) {
+  if (!win) return;
+
+  const saved = localStorage.getItem("windowState-" + win.id);
+  if (!saved) return;
+
+  try {
+    const state = JSON.parse(saved);
+
+    win.style.top = state.top + "px";
+    win.style.left = state.left + "px";
+    win.style.right = "auto";
+    win.style.width = state.width + "px";
+    win.style.height = state.height + "px";
+
+    win.dataset.positionAssigned = "true";
+  } catch (error) {
+    console.error("تعذر استعادة إعدادات النافذة:", error);
+  }
+}
 const floatingWindowIds = [
   "salesPanel",
   "returnsPanel",
