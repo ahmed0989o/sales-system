@@ -1276,7 +1276,7 @@ if (paymentsError) throw paymentsError;
 
   } catch (error) {
     console.error("Customer account:", error);
-
+    alert("خطأ تحميل حساب الزبون: " + error.message);
     invoicesBox.textContent =
       "تعذر تحميل الفواتير: " + error.message;
 
