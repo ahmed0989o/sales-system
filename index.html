@@ -1197,11 +1197,19 @@ if (paymentsError) throw paymentsError;
         box.style.cssText =
           "border:1px solid #ddd;border-radius:8px;padding:8px;margin:8px 0;";
 
-        const heading = document.createElement("strong");
-        heading.textContent =
-          `فاتورة رقم ${sale.invoice_number || sale.id}`;
-        box.appendChild(heading);
+        const heading = document.createElement("button");
+heading.type = "button";
+heading.textContent =
+  `🧾 فاتورة رقم ${sale.invoice_number || sale.id}`;
 
+heading.style.cssText =
+  "width:100%;text-align:right;padding:10px;font-weight:bold;cursor:pointer;";
+
+heading.onclick = function() {
+  openCustomerInvoiceDetails(sale.id);
+};
+
+box.appendChild(heading);
         const date = document.createElement("p");
         date.textContent =
           "التاريخ: " +
