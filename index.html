@@ -1671,7 +1671,12 @@ $("customerSelect").addEventListener("change", () => {
   $("cashCustomerName").required = false;
   $("cashCustomerButton").textContent = "💵 زبون نقدي";
 });
-$("paymentMethod").addEventListener("change", updatePartialPayment);
+$("customerSelect").addEventListener("change", updateCreditCustomerDetails);
+
+$("paymentMethod").addEventListener("change", () => {
+  updatePartialPayment();
+  updateCreditCustomerDetails();
+});
 $("amountReceived").addEventListener("input", updatePartialPayment);
 function searchProducts() {
   const input = $("productSearch");
