@@ -4280,8 +4280,16 @@ document.querySelectorAll(
  win.addEventListener("pointermove", function (e) {
     if (!dragging) return;
 
-    win.style.left = (startLeft + e.clientX - startX) + "px";
-    win.style.top = (startTop + e.clientY - startY) + "px";
+   const rect = win.getBoundingClientRect();
+
+const newLeft = startLeft + e.clientX - startX;
+const newTop = startTop + e.clientY - startY;
+
+const maxLeft = window.innerWidth - rect.width;
+const maxTop = window.innerHeight - rect.height;
+
+win.style.left = Math.max(0, Math.min(newLeft, maxLeft)) + "px";
+win.style.top = Math.max(0, Math.min(newTop, maxTop)) + "px";
   });
 
  win.addEventListener("pointerup", function () {
