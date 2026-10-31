@@ -4300,6 +4300,8 @@ function toggleMaximizeSection(sectionId) {
     win.style.width = win.dataset.oldWidth;
     win.style.height = win.dataset.oldHeight;
     win.style.right = win.dataset.oldRight;
+
+    saveWindowState(win);
   } else {
     const rect = win.getBoundingClientRect();
 
@@ -4310,6 +4312,8 @@ function toggleMaximizeSection(sectionId) {
     win.dataset.oldRight = win.style.right || "auto";
 
     win.classList.add("maximized");
+
+    saveWindowState(win);
   }
 }
 </script>
