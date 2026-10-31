@@ -2324,6 +2324,16 @@ setMessage("paymentStatus", "تم تسجيل الدفعة بنجاح.");
 
 await loadCustomers();
 
+const selectedCustomerId = $("customerSelect").value;
+
+if (
+  selectedCustomerId &&
+  String(selectedCustomerId) === String(customerId) &&
+  !$("creditCustomerDetails").classList.contains("hidden")
+) {
+  updateCreditCustomerDetails();
+}
+
   } catch (error) {
     console.error("Customer payment:", error);
     setMessage("paymentStatus", "تعذر تسجيل الدفعة: " + error.message);
