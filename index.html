@@ -4265,7 +4265,7 @@ document.querySelectorAll(
     win.style.left = startLeft + "px";
     win.style.top = startTop + "px";
 
-    handle.setPointerCapture(e.pointerId);
+   win.setPointerCapture(e.pointerId);
   });
 
   handle.addEventListener("pointermove", function (e) {
