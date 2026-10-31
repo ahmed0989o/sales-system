@@ -4186,12 +4186,19 @@ floatingWindowIds.forEach(id => {
 
   win.dataset.positionAssigned = "false";
 
- win.addEventListener("transitionend", function () {
-  if (!win.classList.contains("hidden")) {
-    positionFloatingWindow(win);
-  }
+   win.addEventListener("transitionend", function () {
+    if (!win.classList.contains("hidden")) {
+      positionFloatingWindow(win);
+    }
+  });
+
+  win.addEventListener("pointerdown", function () {
+    highestWindowZ++;
+    win.style.zIndex = highestWindowZ;
+  });
 });
-  // تحريك النوافذ العائمة
+
+// تحريك النوافذ العائمة
 document.querySelectorAll(
   "#salesPanel, #returnsPanel, #customerPaymentsPanel, #purchasePanel, #cashboxPanel, #rentPanel, #userManagementPanel"
 ).forEach(win => {
