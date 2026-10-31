@@ -4128,6 +4128,12 @@ function openRent() {
   $("ownerPanel").classList.remove("hidden");
   $("rentPanel").classList.remove("hidden");
 }
+  function openUserManagement() {
+  if (!isOwner(currentUser)) return;
+
+  $("mainMenu").classList.remove("hidden");
+  $("userManagementPanel").classList.remove("hidden");
+}
   // إدارة النوافذ: تصغير وإغلاق واستعادة
 function minimizeSection(sectionId, title) {
   const section = document.getElementById(sectionId);
