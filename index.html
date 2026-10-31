@@ -1041,14 +1041,12 @@ function updateCreditCustomerDetails() {
     if (salesError) throw salesError;
 
     // تحميل تسديدات الزبون
-    const { data: payments, error: paymentsError } = await db
-      .from("customer_payments")
-      .select("id, amount, payment_date, notes")
-      .eq("customer_id", customerId)
-      .order("payment_date", { ascending: false });
+   const { data: payments, error: paymentsError } = await db.rpc(
+  "get_customer_payment_history",
+  { p_customer_id: Number(customerId) }
+);
 
-    if (paymentsError) throw paymentsError;
-
+if (paymentsError) throw paymentsError;
     const invoiceRows = sales || [];
     const paymentRows = payments || [];
 
