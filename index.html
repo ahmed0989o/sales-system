@@ -4279,10 +4279,12 @@ document.querySelectorAll(
 
   handle.addEventListener("pointerup", function () {
     dragging = false;
+    saveWindowState(win);
   });
 
   handle.addEventListener("pointercancel", function () {
     dragging = false;
+    saveWindowState(win);
   });
 });
   // تكبير النافذة واستعادة حجمها السابق
