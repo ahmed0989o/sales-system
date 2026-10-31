@@ -4268,19 +4268,19 @@ document.querySelectorAll(
    win.setPointerCapture(e.pointerId);
   });
 
-  handle.addEventListener("pointermove", function (e) {
+ win.addEventListener("pointermove", function (e) {
     if (!dragging) return;
 
     win.style.left = (startLeft + e.clientX - startX) + "px";
     win.style.top = (startTop + e.clientY - startY) + "px";
   });
 
-  handle.addEventListener("pointerup", function () {
+ win.addEventListener("pointerup", function () {
     dragging = false;
     saveWindowState(win);
   });
 
-  handle.addEventListener("pointercancel", function () {
+ win.addEventListener("pointercancel", function () {
     dragging = false;
     saveWindowState(win);
   });
