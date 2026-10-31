@@ -1318,6 +1318,81 @@ box.appendChild(heading);
       "تعذر تحميل سجل التسديدات.";
   }
 }
+  async function openCustomerInvoiceDetails(saleId) {
+  const content = $("customerInvoiceDetailsContent");
+
+  content.textContent = "جارٍ تحميل تفاصيل الفاتورة...";
+
+  $("customerInvoiceDetailsPage").classList.remove("hidden");
+
+  const { data: sale, error: saleError } = await db
+    .from("sales")
+    .select("id, invoice_number, created_at, total_amount, payment_method, amount_received, customer_name")
+    .eq("id", saleId)
+    .single();
+
+  if (saleError) {
+    content.textContent = "تعذر تحميل الفاتورة: " + saleError.message;
+    return;
+  }
+
+  const { data: details, error: detailsError } = await db
+    .from("sale_details")
+    .select("product_id, quantity, unit_price, total")
+    .eq("sale_id", saleId);
+
+  if (detailsError) {
+    content.textContent = "تعذر تحميل المنتجات: " + detailsError.message;
+    return;
+  }
+
+  const productIds = [...new Set((details || []).map(item => item.product_id))];
+  let productNames = new Map();
+
+  if (productIds.length) {
+    const { data: products, error: productsError } = await db
+      .from("products")
+      .select("id, name")
+      .in("id", productIds);
+
+    if (productsError) {
+      content.textContent = "تعذر تحميل أسماء المنتجات: " + productsError.message;
+      return;
+    }
+
+    (products || []).forEach(product => {
+      productNames.set(String(product.id), product.name);
+    });
+  }
+
+  content.innerHTML = "";
+
+  const info = document.createElement("div");
+  info.innerHTML = `
+    <h3>فاتورة رقم ${sale.invoice_number || sale.id}</h3>
+    <p>الزبون: ${sale.customer_name || "—"}</p>
+    <p>التاريخ: ${new Date(sale.created_at).toLocaleString("ar-IQ")}</p>
+    <p>طريقة الدفع: ${sale.payment_method || "—"}</p>
+    <p>إجمالي الفاتورة: ${money(sale.total_amount)} د.ع</p>
+    <p>المبلغ الواصل: ${money(sale.amount_received)} د.ع</p>
+    <h3>المنتجات</h3>
+  `;
+  content.appendChild(info);
+
+  (details || []).forEach(item => {
+    const row = document.createElement("div");
+    row.style.cssText =
+      "background:white;border:1px solid #ddd;border-radius:8px;padding:12px;margin:8px 0;";
+
+    row.textContent =
+      `${productNames.get(String(item.product_id)) || "منتج"} — ` +
+      `الكمية: ${item.quantity} — ` +
+      `سعر الوحدة: ${money(item.unit_price)} — ` +
+      `الإجمالي: ${money(item.total)} د.ع`;
+
+    content.appendChild(row);
+  });
+}
   function toggleCreditCustomerDetails() {
   const customerId = $("customerSelect").value;
 
