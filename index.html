@@ -1378,7 +1378,26 @@ box.appendChild(heading);
     <h3>المنتجات</h3>
   `;
   content.appendChild(info);
+const actions = document.createElement("div");
 
+actions.style.cssText =
+  "display:flex;gap:10px;flex-wrap:wrap;margin:15px 0;";
+
+actions.innerHTML = `
+  <button type="button" onclick="editCustomerInvoice(${sale.id})">
+    ✏️ تعديل الفاتورة
+  </button>
+
+  <button type="button" onclick="deleteCustomerInvoice(${sale.id})">
+    🗑️ حذف الفاتورة
+  </button>
+
+  <button type="button" onclick="printCustomerInvoice(${sale.id})">
+    🖨️ طباعة الفاتورة
+  </button>
+`;
+
+content.appendChild(actions);
   (details || []).forEach(item => {
     const row = document.createElement("div");
     row.style.cssText =
