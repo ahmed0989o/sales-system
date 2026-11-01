@@ -1513,60 +1513,61 @@ content.appendChild(actions);
 
   const itemsContainer = $("editInvoiceItems");
 
-  function addProductRow(productId, quantity, unitPrice) {
-    const product = productMap.get(String(productId));
+  function addProductRow(productId, quantity, unitPrice, saleDetailId = null) {
+  const product = productMap.get(String(productId));
 
-    if (!product) return;
+  if (!product) return;
 
-    const row = document.createElement("div");
+  const row = document.createElement("div");
 
-    row.dataset.productId = product.id;
+  row.dataset.productId = product.id;
+  row.dataset.saleDetailId = saleDetailId || "";
 
-    row.style.cssText =
-      "border:1px solid #ddd;border-radius:8px;padding:10px;margin:8px 0;";
+  row.style.cssText =
+    "border:1px solid #ddd;border-radius:8px;padding:10px;margin:8px 0;";
 
-    const name = document.createElement("strong");
-    name.textContent = product.name;
+  const name = document.createElement("strong");
+  name.textContent = product.name;
 
-    const quantityInput = document.createElement("input");
-    quantityInput.type = "number";
-    quantityInput.min = "1";
-    quantityInput.value = quantity;
-    quantityInput.placeholder = "الكمية";
-    quantityInput.style.cssText =
-      "width:100%;padding:8px;margin-top:8px;";
+  const quantityInput = document.createElement("input");
+  quantityInput.type = "number";
+  quantityInput.min = "1";
+  quantityInput.step = "1";
+  quantityInput.value = quantity;
+  quantityInput.placeholder = "الكمية";
+  quantityInput.style.cssText =
+    "width:100%;padding:8px;margin-top:8px;";
 
-    const priceInput = document.createElement("input");
-    priceInput.type = "number";
-    priceInput.min = "0";
-    priceInput.step = "any";
-    priceInput.value = unitPrice;
-    priceInput.placeholder = "سعر الوحدة";
-    priceInput.style.cssText =
-      "width:100%;padding:8px;margin-top:8px;";
+  const priceInput = document.createElement("input");
+  priceInput.type = "number";
+  priceInput.min = "0";
+  priceInput.step = "any";
+  priceInput.value = unitPrice;
+  priceInput.placeholder = "سعر الوحدة";
+  priceInput.style.cssText =
+    "width:100%;padding:8px;margin-top:8px;";
 
-    const removeButton = document.createElement("button");
-    removeButton.type = "button";
-    removeButton.textContent = "🗑️ حذف المنتج";
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.textContent = "🗑️ حذف المنتج";
 
-    removeButton.onclick = () => {
-      row.remove();
-      updateTotal();
-    };
+  removeButton.onclick = () => {
+    row.remove();
+    updateTotal();
+  };
 
-    quantityInput.oninput = updateTotal;
-    priceInput.oninput = updateTotal;
+  quantityInput.oninput = updateTotal;
+  priceInput.oninput = updateTotal;
 
-    row.append(
-      name,
-      quantityInput,
-      priceInput,
-      removeButton
-    );
+  row.append(
+    name,
+    quantityInput,
+    priceInput,
+    removeButton
+  );
 
-    itemsContainer.appendChild(row);
-  }
-
+  itemsContainer.appendChild(row);
+}
   (details || []).forEach(item => {
     addProductRow(
       item.product_id,
