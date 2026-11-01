@@ -1632,7 +1632,10 @@ $("editInvoiceCustomerPhone").addEventListener("input", function () {
     updateTotal();
   };
 
- $("editSaveInvoiceButton").onclick = () => {
+$("editSaveInvoiceButton").onclick = async () => {
+  const message = $("editInvoiceMessage");
+  const button = $("editSaveInvoiceButton");
+
   const items = [...itemsContainer.querySelectorAll("[data-product-id]")].map(row => ({
     product_id: Number(row.dataset.productId),
     sale_detail_id: row.dataset.saleDetailId
@@ -1642,10 +1645,76 @@ $("editInvoiceCustomerPhone").addEventListener("input", function () {
     unit_price: Number(row.children[2].value)
   }));
 
-  console.log("بيانات البنود المعدلة:", items);
-  alert("تم تجهيز بيانات البنود. لم يتم حفظ أي تغيير بعد.");
-};
+  if (items.length === 0) {
+    message.textContent = "أضف منتجاً واحداً على الأقل.";
+    return;
+  }
 
+  const productIds = items.map(x => x.product_id);
+
+  if (new Set(productIds).size !== productIds.length) {
+    message.textContent = "لا يمكن تكرار المنتج نفسه.";
+    return;
+  }
+
+  if (items.some(x =>
+    !Number.isInteger(x.product_id) ||
+    !Number.isInteger(x.quantity) ||
+    x.quantity <= 0 ||
+    !Number.isFinite(x.unit_price) ||
+    x.unit_price < 0
+  )) {
+    message.textContent = "تحقق من الكميات والأسعار.";
+    return;
+  }
+
+  const invoiceNumber = $("editInvoiceNumber").value.trim();
+  const customerName = $("editInvoiceCustomerName").value.trim();
+  const customerPhone = $("editInvoiceCustomerPhone").value.trim();
+  const paymentMethod = $("editInvoicePayment").value;
+  const amountReceived = Number($("editInvoiceReceived").value);
+
+  if (!invoiceNumber || !customerName) {
+    message.textContent = "رقم الفاتورة واسم الزبون مطلوبان.";
+    return;
+  }
+
+  if (!Number.isFinite(amountReceived) || amountReceived < 0) {
+    message.textContent = "المبلغ الواصل غير صحيح.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "جارٍ حفظ التعديلات...";
+
+  try {
+    const { data, error } = await db.rpc("update_customer_invoice", {
+      p_sale_id: saleId,
+      p_invoice_number: invoiceNumber,
+      p_customer_name: customerName,
+      p_customer_phone: customerPhone || null,
+      p_payment_method: paymentMethod,
+      p_amount_received: amountReceived,
+      p_items: items
+    });
+
+    if (error) throw error;
+
+    message.textContent =
+      "تم تعديل الفاتورة بنجاح. الإجمالي: " +
+      money(data.total_amount) + " د.ع";
+
+    await openCustomerInvoiceDetails(saleId);
+
+  } catch (error) {
+    console.error("Invoice update error:", error);
+    message.textContent =
+      "تعذر تعديل الفاتورة: " + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "💾 حفظ التعديلات";
+  }
+};
   $("editCancelInvoiceButton").onclick = () => {
     openCustomerInvoiceDetails(saleId);
   };
