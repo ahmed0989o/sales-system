@@ -1429,7 +1429,7 @@ content.appendChild(actions);
 
     alert("تم حذف الفاتورة وإعادة الكمية إلى المخزون بنجاح.");
 
-    await loadCustomerInvoices();
+   await loadCustomerAccount(currentCustomerId);
 
   } catch (error) {
     console.error("Delete invoice error:", error);
