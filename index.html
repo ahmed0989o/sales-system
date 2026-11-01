@@ -1568,13 +1568,14 @@ content.appendChild(actions);
 
   itemsContainer.appendChild(row);
 }
-  (details || []).forEach(item => {
-    addProductRow(
-      item.product_id,
-      item.quantity,
-      item.unit_price
-    );
-  });
+ (details || []).forEach(item => {
+  addProductRow(
+    item.product_id,
+    item.quantity,
+    item.unit_price,
+    item.id
+  );
+});
 
   function updateTotal() {
     let total = 0;
