@@ -1412,6 +1412,30 @@ content.appendChild(actions);
     content.appendChild(row);
   });
 }
+  async function deleteCustomerInvoice(saleId) {
+  const confirmed = confirm(
+    "هل أنت متأكد من حذف هذه الفاتورة؟ سيتم إرجاع الكمية إلى المخزون."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const { data, error } = await db.rpc(
+      "delete_customer_invoice",
+      { p_sale_id: saleId }
+    );
+
+    if (error) throw error;
+
+    alert("تم حذف الفاتورة وإعادة الكمية إلى المخزون بنجاح.");
+
+    await loadCustomerInvoices();
+
+  } catch (error) {
+    console.error("Delete invoice error:", error);
+    alert("تعذر حذف الفاتورة: " + error.message);
+  }
+}
   async function editCustomerInvoice(saleId) {
   const content = $("customerInvoiceDetailsContent");
 
