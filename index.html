@@ -1632,9 +1632,19 @@ $("editInvoiceCustomerPhone").addEventListener("input", function () {
     updateTotal();
   };
 
-  $("editSaveInvoiceButton").onclick = () => {
-    alert("سنربط زر الحفظ بدالة قاعدة البيانات بعد مراجعة النموذج.");
-  };
+ $("editSaveInvoiceButton").onclick = () => {
+  const items = [...itemsContainer.querySelectorAll("[data-product-id]")].map(row => ({
+    product_id: Number(row.dataset.productId),
+    sale_detail_id: row.dataset.saleDetailId
+      ? Number(row.dataset.saleDetailId)
+      : null,
+    quantity: Number(row.children[1].value),
+    unit_price: Number(row.children[2].value)
+  }));
+
+  console.log("بيانات البنود المعدلة:", items);
+  alert("تم تجهيز بيانات البنود. لم يتم حفظ أي تغيير بعد.");
+};
 
   $("editCancelInvoiceButton").onclick = () => {
     openCustomerInvoiceDetails(saleId);
