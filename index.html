@@ -1338,7 +1338,7 @@ box.appendChild(heading);
 
   const { data: details, error: detailsError } = await db
     .from("sale_details")
-    .select("product_id, quantity, unit_price, total")
+   .select("id, product_id, quantity, unit_price, total")
     .eq("sale_id", saleId);
 
   if (detailsError) {
