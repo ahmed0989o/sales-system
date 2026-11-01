@@ -1412,6 +1412,225 @@ content.appendChild(actions);
     content.appendChild(row);
   });
 }
+  async function editCustomerInvoice(saleId) {
+  const content = $("customerInvoiceDetailsContent");
+
+  content.textContent = "جارٍ تجهيز نموذج تعديل الفاتورة...";
+
+  const { data: sale, error: saleError } = await db
+    .from("sales")
+    .select("*")
+    .eq("id", saleId)
+    .single();
+
+  if (saleError) {
+    content.textContent = "تعذر تحميل الفاتورة: " + saleError.message;
+    return;
+  }
+
+  const { data: details, error: detailsError } = await db
+    .from("sale_details")
+    .select("id, product_id, quantity, unit_price, total")
+    .eq("sale_id", saleId);
+
+  if (detailsError) {
+    content.textContent = "تعذر تحميل المنتجات: " + detailsError.message;
+    return;
+  }
+
+  const productIds = [...new Set((details || []).map(x => x.product_id))];
+
+  const { data: products, error: productsError } = await db
+    .from("products")
+    .select("id, name, price")
+    .order("name");
+
+  if (productsError) {
+    content.textContent = "تعذر تحميل المنتجات: " + productsError.message;
+    return;
+  }
+
+  const productMap = new Map(
+    (products || []).map(p => [String(p.id), p])
+  );
+
+  content.innerHTML = "";
+
+  const heading = document.createElement("h3");
+  heading.textContent = "✏️ تعديل الفاتورة رقم " +
+    (sale.invoice_number || sale.id);
+  content.appendChild(heading);
+
+  const form = document.createElement("div");
+
+  form.innerHTML = `
+    <label>اسم الزبون</label>
+    <input id="editInvoiceCustomerName"
+      value="${sale.customer_name || ""}"
+      style="width:100%;padding:9px;box-sizing:border-box;">
+
+    <label>رقم الفاتورة</label>
+    <input id="editInvoiceNumber"
+      value="${sale.invoice_number || ""}"
+      style="width:100%;padding:9px;box-sizing:border-box;">
+
+    <label>طريقة الدفع</label>
+    <select id="editInvoicePayment" style="width:100%;padding:9px;">
+      <option value="نقدي">نقدي</option>
+      <option value="آجل">آجل</option>
+      <option value="واصل جزئي">واصل جزئي</option>
+    </select>
+
+    <label>المبلغ الواصل</label>
+    <input id="editInvoiceReceived"
+      type="number" min="0"
+      value="${sale.amount_received || 0}"
+      style="width:100%;padding:9px;box-sizing:border-box;">
+
+    <h4>منتجات الفاتورة</h4>
+    <div id="editInvoiceItems"></div>
+
+    <button type="button" id="editAddProductButton">
+      ➕ إضافة منتج
+    </button>
+
+    <h3 id="editInvoiceTotal"></h3>
+
+    <div id="editInvoiceMessage"></div>
+
+    <button type="button" id="editSaveInvoiceButton">
+      💾 حفظ التعديلات
+    </button>
+
+    <button type="button" id="editCancelInvoiceButton">
+      إلغاء
+    </button>
+  `;
+
+  content.appendChild(form);
+
+  $("editInvoicePayment").value = sale.payment_method;
+
+  const itemsContainer = $("editInvoiceItems");
+
+  function addProductRow(productId, quantity, unitPrice) {
+    const product = productMap.get(String(productId));
+
+    if (!product) return;
+
+    const row = document.createElement("div");
+
+    row.dataset.productId = product.id;
+
+    row.style.cssText =
+      "border:1px solid #ddd;border-radius:8px;padding:10px;margin:8px 0;";
+
+    const name = document.createElement("strong");
+    name.textContent = product.name;
+
+    const quantityInput = document.createElement("input");
+    quantityInput.type = "number";
+    quantityInput.min = "1";
+    quantityInput.value = quantity;
+    quantityInput.placeholder = "الكمية";
+    quantityInput.style.cssText =
+      "width:100%;padding:8px;margin-top:8px;";
+
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.min = "0";
+    priceInput.step = "any";
+    priceInput.value = unitPrice;
+    priceInput.placeholder = "سعر الوحدة";
+    priceInput.style.cssText =
+      "width:100%;padding:8px;margin-top:8px;";
+
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "🗑️ حذف المنتج";
+
+    removeButton.onclick = () => {
+      row.remove();
+      updateTotal();
+    };
+
+    quantityInput.oninput = updateTotal;
+    priceInput.oninput = updateTotal;
+
+    row.append(
+      name,
+      quantityInput,
+      priceInput,
+      removeButton
+    );
+
+    itemsContainer.appendChild(row);
+  }
+
+  (details || []).forEach(item => {
+    addProductRow(
+      item.product_id,
+      item.quantity,
+      item.unit_price
+    );
+  });
+
+  function updateTotal() {
+    let total = 0;
+
+    itemsContainer.querySelectorAll("[data-product-id]")
+      .forEach(row => {
+        const quantity = Number(row.children[1].value);
+        const price = Number(row.children[2].value);
+
+        if (quantity > 0 && price >= 0) {
+          total += quantity * price;
+        }
+      });
+
+    $("editInvoiceTotal").textContent =
+      "الإجمالي: " + money(total) + " د.ع";
+  }
+
+  $("editAddProductButton").onclick = () => {
+    const availableProducts = (products || []).filter(product =>
+      ![...itemsContainer.querySelectorAll("[data-product-id]")]
+        .some(row => row.dataset.productId === String(product.id))
+    );
+
+    if (!availableProducts.length) {
+      alert("لا توجد منتجات إضافية متاحة.");
+      return;
+    }
+
+    const productId = prompt(
+      "أدخل رقم المنتج:\n" +
+      availableProducts.map(p => `${p.id} - ${p.name}`).join("\n")
+    );
+
+    if (productId === null) return;
+
+    const product = productMap.get(String(productId.trim()));
+
+    if (!product || !availableProducts.some(p => String(p.id) === String(product.id))) {
+      alert("رقم المنتج غير صحيح.");
+      return;
+    }
+
+    addProductRow(product.id, 1, product.price);
+    updateTotal();
+  };
+
+  $("editSaveInvoiceButton").onclick = () => {
+    alert("سنربط زر الحفظ بدالة قاعدة البيانات بعد مراجعة النموذج.");
+  };
+
+  $("editCancelInvoiceButton").onclick = () => {
+    openCustomerInvoiceDetails(saleId);
+  };
+
+  updateTotal();
+}
   function closeCustomerInvoiceDetails() {
   $("customerInvoiceDetailsPage").classList.add("hidden");
 }
