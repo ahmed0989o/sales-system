@@ -1412,7 +1412,7 @@ content.appendChild(actions);
     content.appendChild(row);
   });
 }
-  async function deleteCustomerInvoice(saleId) {
+  async function deleteCustomerInvoice(saleId, customerId) {
   const confirmed = confirm(
     "هل أنت متأكد من حذف هذه الفاتورة؟ سيتم إرجاع الكمية إلى المخزون."
   );
