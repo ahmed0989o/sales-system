@@ -1388,9 +1388,9 @@ actions.innerHTML = `
     ✏️ تعديل الفاتورة
   </button>
 
-  <button type="button" onclick="deleteCustomerInvoice(${sale.id})">
-    🗑️ حذف الفاتورة
-  </button>
+  <button type="button" onclick="deleteCustomerInvoice(${sale.id}, ${sale.customer_id ?? 'null'})">
+  🗑️ حذف الفاتورة
+</button>
 
   <button type="button" onclick="printCustomerInvoice(${sale.id})">
     🖨️ طباعة الفاتورة
