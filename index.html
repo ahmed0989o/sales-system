@@ -1468,7 +1468,14 @@ content.appendChild(actions);
     <input id="editInvoiceCustomerName"
       value="${sale.customer_name || ""}"
       style="width:100%;padding:9px;box-sizing:border-box;">
-
+<label>رقم هاتف الزبون</label>
+<input id="editInvoiceCustomerPhone"
+  type="tel"
+  inputmode="numeric"
+  maxlength="11"
+  value="${sale.customer_phone || ""}"
+  placeholder="رقم هاتف الزبون"
+  style="width:100%;padding:9px;box-sizing:border-box;">
     <label>رقم الفاتورة</label>
     <input id="editInvoiceNumber"
       value="${sale.invoice_number || ""}"
