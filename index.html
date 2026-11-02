@@ -1365,6 +1365,8 @@ box.appendChild(heading);
   }
 }
   async function showCustomerDebtItems() {
+  
+async function showCustomerDebtItems() {
   const customerId = currentDebtItemsCustomerId;
 
   if (!customerId) {
@@ -1381,17 +1383,370 @@ box.appendChild(heading);
     return;
   }
 
+  const info = $("customerDebtItemsInfo");
+  const content = $("customerDebtItemsContent");
+
   $("customerDebtItemsPage").classList.remove("hidden");
 
-  $("customerDebtItemsInfo").innerHTML = `
-    <h3>${customer.name || "—"}</h3>
-    <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
-    <p>جارٍ إعداد كشف المواد المتبقية بذمة الزبون...</p>
+  info.innerHTML = `
+    <h3>${escapeDebtHtml(customer.name || "—")}</h3>
+    <p>الهاتف: ${escapeDebtHtml(customer.phone || "غير متوفر")}</p>
   `;
 
-  $("customerDebtItemsContent").textContent =
-    "جارٍ تحميل البيانات...";
+  content.textContent = "جارٍ تحميل الفواتير والتسديدات والمرتجعات...";
+
+  try {
+    // 1. جلب فواتير الزبون
+    const { data: sales, error: salesError } = await db
+      .from("sales")
+      .select(`
+        id,
+        invoice_number,
+        created_at,
+        total_amount,
+        amount_received
+      `)
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: true });
+
+    if (salesError) throw salesError;
+
+    if (!sales || sales.length === 0) {
+      content.innerHTML = "<p>لا توجد فواتير لهذا الزبون.</p>";
+      return;
+    }
+
+    const saleIds = sales.map(s => s.id);
+
+    // 2. جلب تفاصيل المواد
+    const { data: details, error: detailsError } = await db
+      .from("sale_details")
+      .select(`
+        id,
+        sale_id,
+        product_id,
+        quantity,
+        unit_price,
+        total
+      `)
+      .in("sale_id", saleIds);
+
+    if (detailsError) throw detailsError;
+
+    // 3. جلب سجل التسديدات من الدالة الموجودة
+    const { data: payments, error: paymentsError } = await db.rpc(
+      "get_customer_payment_history",
+      { p_customer_id: Number(customerId) }
+    );
+
+    if (paymentsError) throw paymentsError;
+
+    // 4. جلب المرتجعات
+    const { data: returns, error: returnsError } = await db
+      .from("sales_returns")
+      .select(`
+        id,
+        sale_id,
+        return_amount,
+        settlement_type
+      `)
+      .in("sale_id", saleIds);
+
+    if (returnsError) throw returnsError;
+
+    const returnIds = (returns || []).map(r => r.id);
+
+    let returnDetails = [];
+
+    if (returnIds.length > 0) {
+      const { data, error } = await db
+        .from("sales_return_details")
+        .select(`
+          return_id,
+          sale_detail_id,
+          product_id,
+          quantity,
+          line_total
+        `)
+        .in("return_id", returnIds);
+
+      if (error) throw error;
+      returnDetails = data || [];
+    }
+
+    // 5. جلب أسماء المواد
+    const productIds = [
+      ...new Set((details || []).map(d => d.product_id))
+    ];
+
+    let products = [];
+
+    if (productIds.length > 0) {
+      const { data, error } = await db
+        .from("products")
+        .select("id, name")
+        .in("id", productIds);
+
+      if (error) throw error;
+      products = data || [];
+    }
+
+    const productMap = new Map(
+      products.map(p => [String(p.id), p.name])
+    );
+
+    // 6. حساب المرتجعات على مستوى كل سطر بيع
+    const returnedByDetail = new Map();
+
+    returnDetails.forEach(r => {
+      const key = String(r.sale_detail_id);
+
+      if (!returnedByDetail.has(key)) {
+        returnedByDetail.set(key, {
+          quantity: 0,
+          amount: 0
+        });
+      }
+
+      const item = returnedByDetail.get(key);
+      item.quantity += Number(r.quantity || 0);
+      item.amount += Number(r.line_total || 0);
+    });
+
+    // 7. حساب المبلغ الذي يخفض الدين فعلياً
+    const debtReturnsBySale = new Map();
+
+    (returns || []).forEach(r => {
+      if (r.settlement_type === "reduce_debt") {
+        const key = String(r.sale_id);
+
+        debtReturnsBySale.set(
+          key,
+          (debtReturnsBySale.get(key) || 0) +
+          Number(r.return_amount || 0)
+        );
+      }
+    });
+
+    // 8. تجهيز رصيد كل فاتورة قبل التسديدات اللاحقة
+    const invoiceBalances = new Map();
+
+    sales.forEach(sale => {
+      const saleId = String(sale.id);
+
+      const debt = Math.max(
+        0,
+        Number(sale.total_amount || 0) -
+        Number(sale.amount_received || 0) -
+        (debtReturnsBySale.get(saleId) || 0)
+      );
+
+      invoiceBalances.set(saleId, debt);
+    });
+
+    // 9. توزيع التسديدات اللاحقة FIFO على أقدم الفواتير
+    const totalPayments = (payments || []).reduce(
+      (sum, p) => sum + Number(p.amount || 0),
+      0
+    );
+
+    let remainingPayments = totalPayments;
+
+    // sales مرتبة من الأقدم إلى الأحدث
+    for (const sale of sales) {
+      if (remainingPayments <= 0) break;
+
+      const saleId = String(sale.id);
+      const balance = invoiceBalances.get(saleId) || 0;
+
+      const allocated = Math.min(balance, remainingPayments);
+
+      invoiceBalances.set(
+        saleId,
+        Math.max(0, balance - allocated)
+      );
+
+      remainingPayments -= allocated;
+    }
+
+    // 10. تجميع المواد المتبقية
+    const rows = [];
+    let grandTotal = 0;
+
+    sales.forEach(sale => {
+      const saleId = String(sale.id);
+      const invoiceBalance = invoiceBalances.get(saleId) || 0;
+
+      if (invoiceBalance <= 0.009) return;
+
+      const saleLines = (details || []).filter(
+        d => String(d.sale_id) === saleId
+      );
+
+      const lineData = saleLines.map(d => {
+        const returned = returnedByDetail.get(String(d.id)) || {
+          quantity: 0,
+          amount: 0
+        };
+
+        const originalQty = Number(d.quantity || 0);
+
+        const returnedQty = Math.min(
+          originalQty,
+          returned.quantity
+        );
+
+        const remainingQty = Math.max(
+          0,
+          originalQty - returnedQty
+        );
+
+        const originalValue = Number(
+          d.total ?? (
+            originalQty * Number(d.unit_price || 0)
+          )
+        );
+
+        const netValue = Math.max(
+          0,
+          originalValue - returned.amount
+        );
+
+        return {
+          detail: d,
+          originalQty,
+          returnedQty,
+          remainingQty,
+          netValue
+        };
+      });
+
+      const totalNetValue = lineData.reduce(
+        (sum, line) => sum + line.netValue,
+        0
+      );
+
+      if (totalNetValue <= 0) return;
+
+      lineData.forEach(line => {
+        if (line.remainingQty <= 0 || line.netValue <= 0) {
+          return;
+        }
+
+        const remainingValue =
+          invoiceBalance *
+          (line.netValue / totalNetValue);
+
+        if (remainingValue <= 0.009) return;
+
+        rows.push({
+          invoiceNumber: sale.invoice_number || "—",
+          date: sale.created_at,
+          productName:
+            productMap.get(String(line.detail.product_id)) ||
+            "مادة غير معروفة",
+          originalQty: line.originalQty,
+          returnedQty: line.returnedQty,
+          remainingQty: line.remainingQty,
+          remainingValue
+        });
+
+        grandTotal += remainingValue;
+      });
+    });
+
+    // 11. عرض النتيجة
+    if (rows.length === 0) {
+      info.innerHTML += `
+        <p>إجمالي الدين المتبقي: 0 د.ع</p>
+      `;
+
+      content.innerHTML = `
+        <p style="text-align:center;padding:20px;">
+          لا توجد مواد عليها مبالغ متبقية.
+        </p>
+      `;
+
+      return;
+    }
+
+    const moneyText = value =>
+      Number(value).toLocaleString("en-US", {
+        maximumFractionDigits: 2
+      });
+
+    const tableRows = rows.map((r, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${escapeDebtHtml(r.productName)}</td>
+        <td>${escapeDebtHtml(r.invoiceNumber)}</td>
+        <td>${r.originalQty}</td>
+        <td>${r.returnedQty}</td>
+        <td>${r.remainingQty}</td>
+        <td>${moneyText(r.remainingValue)}</td>
+      </tr>
+    `).join("");
+
+    info.innerHTML += `
+      <p>
+        <strong>إجمالي قيمة المواد المتبقية بذمة الزبون:
+        ${moneyText(grandTotal)} د.ع</strong>
+      </p>
+    `;
+
+    content.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="
+          width:100%;
+          border-collapse:collapse;
+          text-align:center;
+          min-width:650px;
+        ">
+          <thead>
+            <tr style="background:#eef2f7;">
+              <th>ت</th>
+              <th>اسم المادة</th>
+              <th>رقم الفاتورة</th>
+              <th>الأصلية</th>
+              <th>المرتجعة</th>
+              <th>غير المرتجعة</th>
+              <th>المبلغ المتبقي (د.ع)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold;background:#eef2f7;">
+              <td colspan="6">الإجمالي</td>
+              <td>${moneyText(grandTotal)} د.ع</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    `;
+
+  } catch (error) {
+    console.error("Customer debt items:", error);
+
+    content.textContent =
+      "تعذر تحميل كشف المواد: " + error.message;
+
+    alert("خطأ في كشف المواد: " + error.message);
+  }
 }
+
+// حماية النصوص المعروضة داخل HTML
+function escapeDebtHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
   async function openCustomerInvoiceDetails(saleId) {
   const content = $("customerInvoiceDetailsContent");
 
