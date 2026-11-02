@@ -1746,10 +1746,20 @@ if (rows.length === 0 && openingBalance <= 0) {
 
     info.innerHTML += `
       <p>
-        <strong>إجمالي قيمة المواد المتبقية بذمة الزبون:
-        ${moneyText(grandTotal)} د.ع</strong>
-      </p>
-    `;
+    info.innerHTML += `
+  <p>
+    <strong>إجمالي قيمة المواد المتبقية:
+    ${moneyText(grandTotal)} د.ع</strong>
+  </p>
+  <p>
+    <strong>الرصيد الافتتاحي:
+    ${moneyText(openingBalance)} د.ع</strong>
+  </p>
+  <p style="font-size:17px;color:#b42318;">
+    <strong>إجمالي الدين المتبقي:
+    ${moneyText(totalDebt)} د.ع</strong>
+  </p>
+`;
 
     content.innerHTML = `
       <div style="overflow-x:auto;">
