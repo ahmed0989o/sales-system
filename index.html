@@ -686,9 +686,41 @@ hr{margin-top:28px}
     style="padding:8px 12px;font-size:13px;"
   >
     📦 كشف المواد بذمة الزبون
+  
   </button>
 </div>
-    <hr>
+
+<!-- بداية كشف الحساب المالي -->
+<div id="customerFinancialStatement"
+     style="margin:15px 0;padding:12px;background:white;border:1px solid #ddd;border-radius:8px;">
+
+  <h3>📊 كشف الحساب المالي للزبون</h3>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+    <div>
+      <label>من تاريخ</label>
+      <input type="date" id="financialDateFrom">
+    </div>
+
+    <div>
+      <label>إلى تاريخ</label>
+      <input type="date" id="financialDateTo">
+    </div>
+
+    <button type="button" onclick="loadCustomerFinancialStatement()">
+      🔍 عرض الكشف
+    </button>
+  </div>
+
+  <div id="customerFinancialStatementContent">
+    اختر الفترة ثم اضغط عرض الكشف.
+  </div>
+
+</div>
+<!-- نهاية كشف الحساب المالي -->
+
+<hr>
+
 
     <div id="customerFullAccountInvoices">
       فواتير الزبون ستظهر هنا
