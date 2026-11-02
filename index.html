@@ -1732,17 +1732,8 @@ if (rows.length === 0 && openingBalance <= 0) {
       <td>${moneyText(r.remainingValue)}</td>
     </tr>
   `)
-].join("");      <tr>
-        <td>${index + 1}</td>
-        <td>${escapeDebtHtml(r.productName)}</td>
-        <td>${escapeDebtHtml(r.invoiceNumber)}</td>
-        <td>${r.originalQty}</td>
-        <td>${r.returnedQty}</td>
-        <td>${r.remainingQty}</td>
-        <td>${moneyText(r.remainingValue)}</td>
-      </tr>
-    `).join("");
-
+].join("");   
+    
     info.innerHTML += `
       <p>
     info.innerHTML += `
