@@ -1687,7 +1687,9 @@ const openingBalance = Number(customerBalance?.opening_balance || 0);
     });
 
     // 11. عرض النتيجة
-    if (rows.length === 0) {
+    const totalDebt = grandTotal + openingBalance;
+
+if (rows.length === 0 && openingBalance <= 0) {
       info.innerHTML += `
         <p>إجمالي الدين المتبقي: 0 د.ع</p>
       `;
