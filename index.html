@@ -1397,6 +1397,264 @@ box.appendChild(heading);
   }
 }
 
+  
+async function loadCustomerFinancialStatement() {
+  const customerId = currentDebtItemsCustomerId;
+
+  if (!customerId) {
+    alert("يرجى فتح حساب الزبون أولاً.");
+    return;
+  }
+
+  const content = $("customerFinancialStatementContent");
+  const dateFrom = $("financialDateFrom").value;
+  const dateTo = $("financialDateTo").value;
+
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+    return;
+  }
+
+  content.textContent = "جارٍ إعداد كشف الحساب المالي...";
+
+  try {
+    // بيانات الزبون ورصيده الافتتاحي
+    const customer = customers.find(
+      c => String(c.id) === String(customerId)
+    );
+
+    if (!customer) {
+      throw new Error("لم يتم العثور على بيانات الزبون.");
+    }
+
+    const { data: customerData, error: customerError } = await db
+      .from("customers")
+      .select("id, opening_balance")
+      .eq("id", customerId)
+      .single();
+
+    if (customerError) throw customerError;
+
+    const openingBalance = Number(customerData.opening_balance || 0);
+
+    // جلب الفواتير
+    const { data: sales, error: salesError } = await db
+      .from("sales")
+      .select("id, invoice_number, created_at, total_amount, amount_received")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: true });
+
+    if (salesError) throw salesError;
+
+    // جلب التسديدات
+    const { data: payments, error: paymentsError } = await db.rpc(
+      "get_customer_payment_history",
+      { p_customer_id: Number(customerId) }
+    );
+
+    if (paymentsError) throw paymentsError;
+
+    // جلب المرتجعات
+    const saleIds = (sales || []).map(sale => sale.id);
+    let returns = [];
+
+    if (saleIds.length) {
+      const { data, error } = await db
+        .from("sales_returns")
+        .select("id, sale_id, return_date, return_amount, settlement_type, notes")
+        .in("sale_id", saleIds);
+
+      if (error) throw error;
+      returns = data || [];
+    }
+
+    // تجهيز الحركات المالية
+    const movements = [];
+
+    (sales || []).forEach(sale => {
+      const total = Number(sale.total_amount || 0);
+      const received = Number(sale.amount_received || 0);
+
+      movements.push({
+        date: sale.created_at,
+        description: `فاتورة رقم ${sale.invoice_number || sale.id}`,
+        debit: total,
+        credit: received
+      });
+    });
+
+    (payments || []).forEach(payment => {
+      movements.push({
+        date: payment.payment_date,
+        description: payment.notes
+          ? `تسديد - ${payment.notes}`
+          : "تسديد لاحق",
+        debit: 0,
+        credit: Number(payment.amount || 0)
+      });
+    });
+
+    (returns || []).forEach(item => {
+      if (item.settlement_type === "reduce_debt") {
+        movements.push({
+          date: item.return_date,
+          description: item.notes
+            ? `مرتجع - خصم من الدين - ${item.notes}`
+            : "مرتجع - خصم من الدين",
+          debit: 0,
+          credit: Number(item.return_amount || 0)
+        });
+      }
+    });
+
+    // ترتيب الحركات زمنياً
+    movements.sort((a, b) =>
+      new Date(a.date) - new Date(b.date)
+    );
+
+    // حساب الرصيد قبل بداية الفترة
+    let balance = openingBalance;
+
+    movements.forEach(movement => {
+      if (dateFrom && new Date(movement.date) < new Date(dateFrom)) {
+        balance += movement.debit - movement.credit;
+      }
+    });
+
+    const openingPeriodBalance = balance;
+
+    // اختيار الحركات الواقعة ضمن الفترة
+    const filteredMovements = movements.filter(movement => {
+      const movementDate = new Date(movement.date);
+      const afterStart = !dateFrom ||
+        movementDate >= new Date(dateFrom);
+
+      const beforeEnd = !dateTo ||
+        movementDate < new Date(dateTo + "T23:59:59.999");
+
+      return afterStart && beforeEnd;
+    });
+
+    // حساب المجاميع والرصيد المتحرك
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    let rows = `
+      <tr>
+        <td colspan="4"><strong>الرصيد السابق للفترة</strong></td>
+        <td><strong>${money(openingPeriodBalance)}</strong></td>
+      </tr>
+    `;
+
+    filteredMovements.forEach(movement => {
+      totalDebit += movement.debit;
+      totalCredit += movement.credit;
+      balance += movement.debit - movement.credit;
+
+      rows += `
+        <tr>
+          <td>${new Date(movement.date).toLocaleDateString("ar-IQ")}</td>
+          <td>${movement.description}</td>
+          <td>${movement.debit ? money(movement.debit) : "—"}</td>
+          <td>${movement.credit ? money(movement.credit) : "—"}</td>
+          <td>${money(balance)}</td>
+        </tr>
+      `;
+    });
+
+    // عرض الكشف
+    content.innerHTML = `
+      <div id="financialStatementPrintArea"
+           style="margin-top:15px;">
+
+        <h3 style="text-align:center;">كشف الحساب المالي</h3>
+
+        <p><strong>اسم الزبون:</strong> ${customer.name || "—"}</p>
+        <p><strong>الهاتف:</strong> ${customer.phone || "غير متوفر"}</p>
+        <p>
+          <strong>الفترة:</strong>
+          ${dateFrom || "من البداية"}
+          إلى
+          ${dateTo || "حتى اليوم"}
+        </p>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;text-align:center;">
+            <thead>
+              <tr>
+                <th style="border:1px solid #ccc;padding:7px;">التاريخ</th>
+                <th style="border:1px solid #ccc;padding:7px;">البيان</th>
+                <th style="border:1px solid #ccc;padding:7px;">مدين</th>
+                <th style="border:1px solid #ccc;padding:7px;">دائن</th>
+                <th style="border:1px solid #ccc;padding:7px;">الرصيد</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr>
+                <th colspan="2" style="border:1px solid #ccc;padding:7px;">مجموع الفترة</th>
+                <th style="border:1px solid #ccc;padding:7px;">${money(totalDebit)}</th>
+                <th style="border:1px solid #ccc;padding:7px;">${money(totalCredit)}</th>
+                <th style="border:1px solid #ccc;padding:7px;">${money(balance)}</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <h3 style="text-align:center;margin-top:15px;">
+          الدين المتبقي: ${money(balance)} د.ع
+        </h3>
+      </div>
+
+      <button type="button"
+        onclick="printCustomerFinancialStatement()"
+        style="margin-top:10px;">
+        🖨️ طباعة كشف الحساب
+      </button>
+    `;
+
+  } catch (error) {
+    console.error("Financial statement:", error);
+    content.textContent =
+      "تعذر تحميل كشف الحساب: " + error.message;
+  }
+}
+
+function printCustomerFinancialStatement() {
+  const area = $("financialStatementPrintArea");
+
+  if (!area) return;
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    alert("يرجى السماح بفتح النوافذ المنبثقة للطباعة.");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>كشف الحساب المالي</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #999; padding: 8px; }
+        th { background: #eee; }
+        h3 { text-align: center; }
+      </style>
+    </head>
+    <body>${area.innerHTML}</body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+}
+
 async function showCustomerDebtItems() {
   const customerId = currentDebtItemsCustomerId;
 
