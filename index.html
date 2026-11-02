@@ -1486,6 +1486,9 @@ content.appendChild(actions);
     content.appendChild(row);
   });
 }
+  function closeCustomerDebtItems() {
+  $("customerDebtItemsPage").classList.add("hidden");
+}
   async function deleteCustomerInvoice(saleId, customerId) {
   const confirmed = confirm(
     "هل أنت متأكد من حذف هذه الفاتورة؟ سيتم إرجاع الكمية إلى المخزون."
