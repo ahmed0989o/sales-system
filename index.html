@@ -1364,6 +1364,34 @@ box.appendChild(heading);
       "تعذر تحميل سجل التسديدات.";
   }
 }
+  async function showCustomerDebtItems() {
+  const customerId = currentDebtItemsCustomerId;
+
+  if (!customerId) {
+    alert("تعذر تحديد الزبون.");
+    return;
+  }
+
+  const customer = customers.find(
+    c => String(c.id) === String(customerId)
+  );
+
+  if (!customer) {
+    alert("لم يتم العثور على بيانات الزبون.");
+    return;
+  }
+
+  $("customerDebtItemsPage").classList.remove("hidden");
+
+  $("customerDebtItemsInfo").innerHTML = `
+    <h3>${customer.name || "—"}</h3>
+    <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
+    <p>جارٍ إعداد كشف المواد المتبقية بذمة الزبون...</p>
+  `;
+
+  $("customerDebtItemsContent").textContent =
+    "جارٍ تحميل البيانات...";
+}
   async function openCustomerInvoiceDetails(saleId) {
   const content = $("customerInvoiceDetailsContent");
 
