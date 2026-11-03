@@ -1467,7 +1467,19 @@ async function loadCustomerFinancialStatement() {
       if (error) throw error;
       returns = data || [];
     }
+    // جلب أسماء المستخدمين
+const { data: users, error: usersError } = await db.rpc(
+  "get_financial_statement_users"
+);
 
+if (usersError) throw usersError;
+
+const userNames = new Map(
+  (users || []).map(user => [
+    user.user_id,
+    user.display_name
+  ])
+);
     // تجهيز الحركات المالية
     const movements = [];
 
