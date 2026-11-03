@@ -1570,12 +1570,13 @@ const userNames = new Map(
 
       rows += `
         <tr>
-          <td>${new Date(movement.date).toLocaleDateString("ar-IQ")}</td>
-          <td>${movement.description}</td>
-          <td>${movement.debit ? money(movement.debit) : "—"}</td>
-          <td>${movement.credit ? money(movement.credit) : "—"}</td>
-          <td>${money(balance)}</td>
-        </tr>
+  <td>${new Date(movement.date).toLocaleDateString("ar-IQ")}</td>
+  <td>${movement.description}</td>
+  <td>${movement.debit ? money(movement.debit) : "—"}</td>
+  <td>${movement.credit ? money(movement.credit) : "—"}</td>
+  <td>${money(balance)}</td>
+  <td>${movement.userName || "غير مسجل"}</td>
+</tr>
       `;
     });
 
