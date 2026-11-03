@@ -3608,8 +3608,9 @@ customerName: isCashCustomer ? cashCustomerName : (customer ? customer.name : "Ø
   amountReceived: savedReceived,
   creditUsed: Number(data?.credit_used ?? 0),
   remaining: Number(
-    data?.remaining_amount ?? Math.max(0, savedTotal - savedReceived)
-  ),
+  data?.remaining_amount ??
+  Math.max(0, savedTotal - savedReceived - Number(data?.credit_used ?? 0))
+),
   createdAt: new Date().toISOString(),
   items: invoiceCart.map(item => ({
     name: String(item.name || ""),
