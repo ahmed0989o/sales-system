@@ -1488,11 +1488,12 @@ const userNames = new Map(
       const received = Number(sale.amount_received || 0);
 
       movements.push({
-        date: sale.created_at,
-        description: `فاتورة رقم ${sale.invoice_number || sale.id}`,
-        debit: total,
-        credit: received
-      });
+  date: sale.created_at,
+  description: `فاتورة رقم ${sale.invoice_number || sale.id}`,
+  debit: total,
+  credit: received,
+  userName: userNames.get(sale.created_by) || "غير مسجل"
+});
     });
 
     (payments || []).forEach(payment => {
