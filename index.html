@@ -1609,13 +1609,14 @@ const userNames = new Map(
             </thead>
             <tbody>${rows}</tbody>
             <tfoot>
-              <tr>
-                <th colspan="2" style="border:1px solid #ccc;padding:7px;">مجموع الفترة</th>
-                <th style="border:1px solid #ccc;padding:7px;">${money(totalDebit)}</th>
-                <th style="border:1px solid #ccc;padding:7px;">${money(totalCredit)}</th>
-                <th style="border:1px solid #ccc;padding:7px;">${money(balance)}</th>
-              </tr>
-            </tfoot>
+  <tr>
+    <th colspan="2" style="border:1px solid #ccc;padding:7px;">مجموع الفترة</th>
+    <th style="border:1px solid #ccc;padding:7px;">${money(totalDebit)}</th>
+    <th style="border:1px solid #ccc;padding:7px;">${money(totalCredit)}</th>
+    <th style="border:1px solid #ccc;padding:7px;">${money(balance)}</th>
+    <th style="border:1px solid #ccc;padding:7px;">—</th>
+  </tr>
+</tfoot>
           </table>
         </div>
 
