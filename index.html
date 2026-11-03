@@ -2959,6 +2959,7 @@ if (isOwner(currentUser)) {
   }
 }
 
+
 async function loadProducts() {
   $("product").innerHTML = '<option value="">جارٍ تحميل المنتجات...</option>';
 
@@ -2972,10 +2973,13 @@ async function loadProducts() {
     products = data || [];
 
     ["product", "purchaseProduct"].forEach(id => {
-  const select = $(id);
-  if (!select) return;
+      const select = $(id);
+      if (!select) return;
 
-  select.innerHTML = '<option value="">اختر المنتج</option>';
+      select.innerHTML = '<option value="">اختر المنتج</option>';
+
+      products.forEach(p => {
+        const option = document.createElement("option");
         option.value = p.id;
         option.textContent = `${p.name} — السعر: ${money(p.price)} — المتبقي: ${p.quantity}`;
         select.appendChild(option);
