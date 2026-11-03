@@ -2980,6 +2980,7 @@ async function loadProducts() {
       : "جدول المنتجات فارغ.");
   } catch (error) {
     console.error("Products:", error);
+    alert("خطأ تحميل المنتجات: " + error.message);
     $("product").innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
     $("purchaseProduct").innerHTML = '<option value="">تعذر تحميل المنتجات</option>';
     setMessage("status", "خطأ تحميل المنتجات: " + error.message);
