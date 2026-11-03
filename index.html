@@ -3606,6 +3606,7 @@ lastSavedInvoice = {
 customerName: isCashCustomer ? cashCustomerName : (customer ? customer.name : "بدون تحديد زبون"),  paymentMethod,
   total: savedTotal,
   amountReceived: savedReceived,
+  creditUsed: Number(data?.credit_used ?? 0),
   remaining: Number(
     data?.remaining_amount ?? Math.max(0, savedTotal - savedReceived)
   ),
