@@ -2965,10 +2965,10 @@ async function loadProducts() {
     products = data || [];
 
     ["product", "purchaseProduct"].forEach(id => {
-      const select = $(id);
-      select.innerHTML = '<option value="">اختر المنتج</option>';
-      products.forEach(p => {
-        const option = document.createElement("option");
+  const select = $(id);
+  if (!select) return;
+
+  select.innerHTML = '<option value="">اختر المنتج</option>';
         option.value = p.id;
         option.textContent = `${p.name} — السعر: ${money(p.price)} — المتبقي: ${p.quantity}`;
         select.appendChild(option);
