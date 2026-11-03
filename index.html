@@ -1495,17 +1495,19 @@ async function loadCustomerFinancialStatement() {
     });
 
     (returns || []).forEach(item => {
-      if (item.settlement_type === "reduce_debt") {
-        movements.push({
-          date: item.return_date,
-          description: item.notes
-            ? `مرتجع - خصم من الدين - ${item.notes}`
-            : "مرتجع - خصم من الدين",
-          debit: 0,
-          credit: Number(item.return_amount || 0)
-        });
-      }
+  if (item.settlement_type === "reduce_debt") {
+    const returnAmount = Number(item.return_amount || 0);
+
+    movements.push({
+      date: item.return_date,
+      description: item.notes
+        ? `مرتجع - خصم من الدين - ${item.notes}`
+        : "مرتجع - خصم من الدين",
+      debit: 0,
+      credit: returnAmount
     });
+  }
+});
 
     // ترتيب الحركات زمنياً
     movements.sort((a, b) =>
