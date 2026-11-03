@@ -1703,14 +1703,30 @@ function printCustomerFinancialStatement() {
           font-weight: bold;
         }
 
-        td:nth-child(1) {
-          width: 18%;
-        }
+        th:nth-child(1),
+td:nth-child(1) {
+  width: 14%;
+}
 
-        td:nth-child(2) {
-          width: 30%;
-          text-align: right;
-        }
+th:nth-child(2),
+td:nth-child(2) {
+  width: 25%;
+  text-align: right;
+}
+
+th:nth-child(3),
+td:nth-child(3),
+th:nth-child(4),
+td:nth-child(4),
+th:nth-child(5),
+td:nth-child(5) {
+  width: 12%;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 13%;
+}
 
         tr {
           page-break-inside: avoid;
