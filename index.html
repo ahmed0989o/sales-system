@@ -2574,7 +2574,12 @@ $("editSaveInvoiceButton").onclick = async () => {
   $("creditCustomerDetails").classList.toggle("hidden");
 }
 function setMessage(id, message) {
-  $(id).textContent = message || "";
+  const element = $(id);
+  if (!element) {
+    console.warn("العنصر غير موجود:", id);
+    return;
+  }
+  element.textContent = message || "";
 }
 
 function isOwner(user) {
