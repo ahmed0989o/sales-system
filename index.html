@@ -5698,6 +5698,8 @@ function printInvoice(existingWindow = null) {
             ${formatMoney(invoice.total)} د.ع</div>
           <div><strong>المبلغ الواصل:</strong>
             ${formatMoney(invoice.amountReceived)} د.ع</div>
+            <div><strong>الرصيد الدائن المستخدم:</strong>
+  ${formatMoney(invoice.creditUsed)} د.ع</div>
           <div><strong>المتبقي على الزبون:</strong>
             ${formatMoney(invoice.remaining)} د.ع</div>
         </div>
