@@ -1498,13 +1498,14 @@ const userNames = new Map(
 
     (payments || []).forEach(payment => {
       movements.push({
-        date: payment.payment_date,
-        description: payment.notes
-          ? `تسديد - ${payment.notes}`
-          : "تسديد لاحق",
-        debit: 0,
-        credit: Number(payment.amount || 0)
-      });
+  date: payment.payment_date,
+  description: payment.notes
+    ? `تسديد - ${payment.notes}`
+    : "تسديد لاحق",
+  debit: 0,
+  credit: Number(payment.amount || 0),
+  userName: payment.display_name || "غير مسجل"
+});
     });
 
     (returns || []).forEach(item => {
