@@ -1440,7 +1440,7 @@ async function loadCustomerFinancialStatement() {
     // جلب الفواتير
     const { data: sales, error: salesError } = await db
       .from("sales")
-      .select("id, invoice_number, created_at, total_amount, amount_received")
+      .select("id, invoice_number, created_at, total_amount, amount_received, created_by")
       .eq("customer_id", customerId)
       .order("created_at", { ascending: true });
 
