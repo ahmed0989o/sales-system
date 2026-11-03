@@ -1461,7 +1461,7 @@ async function loadCustomerFinancialStatement() {
     if (saleIds.length) {
       const { data, error } = await db
         .from("sales_returns")
-        .select("id, sale_id, return_date, return_amount, settlement_type, notes")
+        .select("id, sale_id, return_date, return_amount, settlement_type, notes, created_by")
         .in("sale_id", saleIds);
 
       if (error) throw error;
