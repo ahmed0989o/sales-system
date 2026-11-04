@@ -1486,19 +1486,21 @@ async function openCustomerFinancialStatement() {
 
   await loadCustomerFinancialStatement();
 
-  const content = $("customerFinancialStatementContent");
+    const content = $("customerFinancialStatementContent");
   const target = $("financialStatementOverlayContent");
 
   if (content && target) {
     target.innerHTML = content.innerHTML;
+  }
 
-    const oldPrintButton = target.querySelector(
-      'button[onclick="printCustomerFinancialStatement()"]'
-    );
+  const materialsTarget = $("debtItemsOverlayContent");
 
-    if (oldPrintButton) {
-      oldPrintButton.remove();
-    }
+  if (materialsTarget) {
+    materialsTarget.style.display = "none";
+  }
+
+  if (target) {
+    target.style.display = "block";
   }
 }
   function closeCustomerFinancialStatement() {
