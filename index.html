@@ -1524,7 +1524,13 @@ if (dateFrom && dateTo && dateFrom > dateTo) {
 
   printWindow.document.getElementById("statement").innerHTML =
     content.innerHTML;
+const oldPrintButton = printWindow.document.querySelector(
+  '#statement button[onclick="printCustomerFinancialStatement()"]'
+);
 
+if (oldPrintButton) {
+  oldPrintButton.remove();
+}
   printWindow.focus();
 }
   async function loadCustomerFinancialStatement() {
