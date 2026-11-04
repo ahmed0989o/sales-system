@@ -1494,6 +1494,13 @@ async function openCustomerFinancialStatement() {
     }
   }
 }
+  function closeCustomerFinancialStatement() {
+  const overlay = $("financialStatementOverlay");
+
+  if (overlay) {
+    overlay.style.display = "none";
+  }
+}
   async function loadCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
 
