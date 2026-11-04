@@ -1864,7 +1864,7 @@ td:nth-child(6) {
   };
 }
 
-async function showCustomerDebtItems() {
+async function showCustomerDebtItems(inOverlay = false) {
   const customerId = currentDebtItemsCustomerId;
 
   if (!customerId) {
