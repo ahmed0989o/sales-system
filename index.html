@@ -1892,7 +1892,9 @@ const openingBalance = Number(customerBalance?.opening_balance || 0);
   const info = $("customerDebtItemsInfo");
   const content = $("customerDebtItemsContent");
 
+  if (!inOverlay) {
   $("customerDebtItemsPage").classList.remove("hidden");
+}
 
   info.innerHTML = `
     <h3>${escapeDebtHtml(customer.name || "—")}</h3>
