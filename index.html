@@ -1465,11 +1465,18 @@ async function openCustomerFinancialStatement() {
             ">✕</button>
         </div>
 
-        <div id="financialStatementOverlayContent"
-          style="padding: 20px;">
-          جارٍ تحميل كشف الحساب...
-        </div>
-      </div>
+        <div style="padding:20px;">
+
+  <div id="financialStatementOverlayContent">
+    جارٍ تحميل كشف الحساب...
+  </div>
+
+  <div id="debtItemsOverlayContent" style="display:none;">
+    جارٍ تحميل كشف المواد...
+  </div>
+
+</div>
+</div>
     `;
 
     document.body.appendChild(overlay);
