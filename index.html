@@ -3496,7 +3496,7 @@ updatePartialPayment();
 
 async function saveSale() {
   const button = $("saveSaleButton");
-
+console.log("Current user:", currentUser);
   if (!currentUser) {
     setMessage("status", "سجّل الدخول أولًا.");
     return;
