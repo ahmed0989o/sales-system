@@ -1400,138 +1400,99 @@ box.appendChild(heading);
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
 
-if (!customerId) {
-  alert("يرجى فتح حساب الزبون أولاً.");
-  return;
-}
-
-const dateFrom = $("financialDateFrom").value;
-const dateTo = $("financialDateTo").value;
-
-if (dateFrom && dateTo && dateFrom > dateTo) {
-  alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
-  return;
-}
-  const printWindow = window.open("", "_blank");
-
-  if (!printWindow) {
-    alert("يرجى السماح بالنوافذ المنبثقة لهذا الموقع.");
+  if (!customerId) {
+    alert("يرجى فتح حساب الزبون أولاً.");
     return;
   }
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-      <meta charset="UTF-8">
-      <title>كشف الحساب المالي</title>
-      <style>
-        * {
-          box-sizing: border-box;
-        }
+  const dateFrom = $("financialDateFrom").value;
+  const dateTo = $("financialDateTo").value;
 
-        body {
-          margin: 0;
-          padding: 25px;
-          font-family: Tahoma, Arial, sans-serif;
-          background: #F6F5F1;
-          color: #172A43;
-        }
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+    return;
+  }
 
-        .toolbar {
+  let overlay = $("financialStatementOverlay");
+
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "financialStatementOverlay";
+
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(10, 20, 35, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    `;
+
+    overlay.innerHTML = `
+      <div style="
+        width: 100%;
+        height: 100%;
+        background: #F6F5F1;
+        border-radius: 14px;
+        overflow: auto;
+        font-family: Tahoma, Arial, sans-serif;
+        color: #172A43;
+      ">
+        <div style="
+          position: sticky;
+          top: 0;
+          z-index: 2;
           display: flex;
           justify-content: space-between;
-          gap: 10px;
-          margin-bottom: 20px;
-        }
-
-        button {
-          border: 0;
-          border-radius: 8px;
-          padding: 11px 22px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .close-btn {
+          align-items: center;
+          padding: 14px 20px;
           background: #172A43;
           color: white;
-        }
+        ">
+          <strong>📊 كشف الحساب المالي</strong>
+          <button type="button"
+            onclick="closeCustomerFinancialStatement()"
+            style="
+              background: #C5A15B;
+              color: #172A43;
+              border: 0;
+              border-radius: 8px;
+              padding: 8px 14px;
+              cursor: pointer;
+              font-size: 17px;
+            ">✕</button>
+        </div>
 
-        .print-btn {
-          background: #C5A15B;
-          color: #172A43;
-        }
-
-        #statement {
-          background: white;
-          border-radius: 14px;
-          padding: 25px;
-          border: 1px solid #E5E0D5;
-          max-width: 1400px;
-          margin: auto;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th, td {
-          border: 1px solid #ddd;
-          padding: 9px 6px;
-          text-align: center;
-        }
-
-        th {
-          background: #172A43;
-          color: white;
-        }
-
-        @media print {
-          body {
-            padding: 0;
-            background: white;
-          }
-
-          .toolbar {
-            display: none !important;
-          }
-
-          #statement {
-            border: 0;
-            border-radius: 0;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="toolbar">
-        <button class="close-btn" onclick="window.close()">✕ إغلاق الكشف</button>
-        <button class="print-btn" onclick="window.print()">🖨️ طباعة / PDF</button>
+        <div id="financialStatementOverlayContent"
+          style="padding: 20px;">
+          جارٍ تحميل كشف الحساب...
+        </div>
       </div>
+    `;
 
-      <div id="statement">جارٍ تحميل كشف الحساب...</div>
-    </body>
-    </html>
-  `);
+    document.body.appendChild(overlay);
+  }
 
-  printWindow.document.close();
+  overlay.style.display = "flex";
 
   await loadCustomerFinancialStatement();
 
   const content = $("customerFinancialStatementContent");
+  const target = $("financialStatementOverlayContent");
 
-  printWindow.document.getElementById("statement").innerHTML =
-    content.innerHTML;
-const oldPrintButton = printWindow.document.querySelector(
-  '#statement button[onclick="printCustomerFinancialStatement()"]'
-);
+  if (content && target) {
+    target.innerHTML = content.innerHTML;
 
-if (oldPrintButton) {
-  oldPrintButton.remove();
-}
-  printWindow.focus();
+    const oldPrintButton = target.querySelector(
+      'button[onclick="printCustomerFinancialStatement()"]'
+    );
+
+    if (oldPrintButton) {
+      oldPrintButton.remove();
+    }
+  }
 }
   async function loadCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
