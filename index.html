@@ -1398,6 +1398,20 @@ box.appendChild(heading);
 }
 
 async function openCustomerFinancialStatement() {
+  const customerId = currentDebtItemsCustomerId;
+
+if (!customerId) {
+  alert("يرجى فتح حساب الزبون أولاً.");
+  return;
+}
+
+const dateFrom = $("financialDateFrom").value;
+const dateTo = $("financialDateTo").value;
+
+if (dateFrom && dateTo && dateFrom > dateTo) {
+  alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+  return;
+}
   const printWindow = window.open("", "_blank");
 
   if (!printWindow) {
