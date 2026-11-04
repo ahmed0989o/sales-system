@@ -2952,7 +2952,7 @@ async function showApp() {
     (isOwner(currentUser) ? " — مسؤول" : "");
 
 console.log("Supabase authenticated user ID:", currentUser.id);
-
+console.log("Supabase session:", await db.auth.getSession());
 setMessage(
     "loginStatus",
     currentUser.id === OWNER_USER_ID
