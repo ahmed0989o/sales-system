@@ -1397,7 +1397,57 @@ box.appendChild(heading);
   }
 }
 
-  
+function openCustomerFinancialStatement() {
+  const customerId = currentDebtItemsCustomerId;
+
+  if (!customerId) {
+    alert("يرجى فتح حساب الزبون أولاً.");
+    return;
+  }
+
+  const dateFrom = $("financialDateFrom").value;
+  const dateTo = $("financialDateTo").value;
+
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    alert("يرجى السماح بالنوافذ المنبثقة لهذا الموقع.");
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>كشف الحساب المالي</title>
+      <style>
+        html, body {
+          margin: 0;
+          width: 100%;
+          min-height: 100%;
+        }
+        body {
+          font-family: Tahoma, Arial, sans-serif;
+          background: #F6F5F1;
+        }
+      </style>
+    </head>
+    <body>
+      <div style="padding:30px;text-align:center;color:#172A43">
+        جارٍ تجهيز كشف الحساب...
+      </div>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+}  
 async function loadCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
 
