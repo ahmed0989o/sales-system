@@ -1451,19 +1451,35 @@ async function openCustomerFinancialStatement() {
           background: #172A43;
           color: white;
         ">
-          <strong>📊 كشف الحساب المالي</strong>
-          <button type="button"
-            onclick="closeCustomerFinancialStatement()"
-            style="
-              background: #C5A15B;
-              color: #172A43;
-              border: 0;
-              border-radius: 8px;
-              padding: 8px 14px;
-              cursor: pointer;
-              font-size: 17px;
-            ">✕</button>
-        </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+
+  <button type="button"
+    onclick="showCustomerDebtItems(true)"
+    style="
+      background:#C5A15B;
+      color:#172A43;
+      border:0;
+      border-radius:8px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-size:13px;
+    ">📦 كشف المواد</button>
+
+  <strong>📊 كشف الحساب المالي</strong>
+
+</div>
+
+<button type="button"
+  onclick="closeCustomerFinancialStatement()"
+  style="
+    background:#C5A15B;
+    color:#172A43;
+    border:0;
+    border-radius:8px;
+    padding:8px 14px;
+    cursor:pointer;
+    font-size:17px;
+  ">✕</button>
 
         <div style="padding:20px;">
 
