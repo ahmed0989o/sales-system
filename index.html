@@ -2358,7 +2358,10 @@ content.appendChild(actions);
   });
 }
   function closeCustomerDebtItems() {
-  $("customerDebtItemsPage").classList.add("hidden");
+  const page = $("customerDebtItemsPage");
+
+  page.classList.add("hidden");
+  page.style.display = "none";
 }
   async function deleteCustomerInvoice(saleId, customerId) {
   const confirmed = confirm(
