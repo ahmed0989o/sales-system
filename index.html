@@ -2441,6 +2441,82 @@ content.appendChild(actions);
   document.addEventListener("pointerup", stop);
   document.addEventListener("pointercancel", stop);
 }
+  function startCustomerDebtItemsResize(event, direction) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const win = $("customerDebtItemsWindow");
+
+  if (!win || win.dataset.maximized === "true") return;
+
+  const rect = win.getBoundingClientRect();
+
+  const startX = event.clientX;
+  const startY = event.clientY;
+
+  const startWidth = rect.width;
+  const startHeight = rect.height;
+  const startLeft = rect.left;
+  const startTop = rect.top;
+
+  win.style.position = "fixed";
+  win.style.margin = "0";
+  win.style.left = startLeft + "px";
+  win.style.top = startTop + "px";
+  win.style.width = startWidth + "px";
+  win.style.height = startHeight + "px";
+  win.style.maxWidth = "none";
+  win.style.maxHeight = "none";
+
+  function resize(e) {
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    let width = startWidth;
+    let height = startHeight;
+    let left = startLeft;
+    let top = startTop;
+
+    if (direction.includes("e")) {
+      width = Math.min(
+        startWidth + dx,
+        window.innerWidth - startLeft
+      );
+    }
+
+    if (direction.includes("w")) {
+      width = Math.max(280, startWidth - dx);
+      left = startLeft + startWidth - width;
+    }
+
+    if (direction.includes("s")) {
+      height = Math.min(
+        startHeight + dy,
+        window.innerHeight - startTop
+      );
+    }
+
+    if (direction.includes("n")) {
+      height = Math.max(250, startHeight - dy);
+      top = startTop + startHeight - height;
+    }
+
+    win.style.width = width + "px";
+    win.style.height = height + "px";
+    win.style.left = Math.max(0, left) + "px";
+    win.style.top = Math.max(0, top) + "px";
+  }
+
+  function stop() {
+    document.removeEventListener("pointermove", resize);
+    document.removeEventListener("pointerup", stop);
+    document.removeEventListener("pointercancel", stop);
+  }
+
+  document.addEventListener("pointermove", resize);
+  document.addEventListener("pointerup", stop);
+  document.addEventListener("pointercancel", stop);
+}
   async function editCustomerInvoice(saleId) {
   const content = $("customerInvoiceDetailsContent");
 
