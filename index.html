@@ -2543,6 +2543,19 @@ content.appendChild(actions);
     resize: "none"
   });
 }
+  function handleCustomerDebtItemsDoubleClick(event) {
+  const bar = event.currentTarget;
+  const now = Date.now();
+  const lastClick = Number(bar.dataset.lastClickTime || 0);
+
+  if (now - lastClick < 400) {
+    bar.dataset.lastClickTime = "0";
+    event.preventDefault();
+    toggleCustomerDebtItemsMaximize();
+  } else {
+    bar.dataset.lastClickTime = String(now);
+  }
+}
   function startCustomerDebtItemsDrag(event) {
       if (event.target.closest("button") || event.detail > 1) return;
 
