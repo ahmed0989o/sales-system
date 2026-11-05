@@ -883,20 +883,19 @@ font-size:14px;
   </button>
 </div>
     <!-- مقابض تغيير حجم النافذة -->
-    style="position:absolute;top:0;left:10px;right:10px;height:12px;z-index:1000;cursor:ns-resize;"
-         style="position:absolute;top:0;left:10px;right:10px;height:7px;cursor:ns-resize;"></div>
 
-    style="position:absolute;bottom:0;left:10px;right:10px;height:12px;z-index:1000;cursor:ns-resize;"
-         style="position:absolute;bottom:0;left:10px;right:10px;height:7px;cursor:ns-resize;"></div>
+<div onpointerdown="startCustomerDebtItemsResize(event,'n')"
+     style="position:absolute;top:0;left:10px;right:10px;height:12px;z-index:1000;cursor:ns-resize;"></div>
 
-    <div onpointerdown="startCustomerDebtItemsResize(event,'e')"
-         style="position:absolute;right:0;top:10px;bottom:10px;width:7px;cursor:ew-resize;"></div>
+<div onpointerdown="startCustomerDebtItemsResize(event,'s')"
+     style="position:absolute;bottom:0;left:10px;right:10px;height:12px;z-index:1000;cursor:ns-resize;"></div>
 
-    <div onpointerdown="startCustomerDebtItemsResize(event,'w')"
-         style="position:absolute;left:0;top:10px;bottom:10px;width:7px;cursor:ew-resize;"></div>
+<div onpointerdown="startCustomerDebtItemsResize(event,'e')"
+     style="position:absolute;right:0;top:10px;bottom:10px;width:7px;z-index:1000;cursor:ew-resize;"></div>
 
-  </div>
-      <!-- آخر مقبض للحافة -->
+<div onpointerdown="startCustomerDebtItemsResize(event,'w')"
+     style="position:absolute;left:0;top:10px;bottom:10px;width:7px;z-index:1000;cursor:ew-resize;"></div>
+    <!-- آخر مقبض للحافة -->
 <div onpointerdown="startCustomerDebtItemsResize(event,'w')"
      style="position:absolute;left:0;top:10px;bottom:10px;width:7px;cursor:ew-resize;"></div>
 
