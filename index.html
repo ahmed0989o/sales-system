@@ -672,9 +672,15 @@ hr{margin-top:28px}
 
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <h2>👤 الحساب الكامل للزبون</h2>
-      <button type="button" onclick="closeCustomerFullAccount()">
-        ✕ إغلاق
-      </button>
+      <div style="display:flex;gap:6px;align-items:center;">
+  <button type="button" onclick="toggleCustomerFullAccountMaximize()">
+    ⛶
+  </button>
+
+  <button type="button" onclick="closeCustomerFullAccount()">
+    ✕ إغلاق
+  </button>
+</div>
     </div>
 
     <div id="customerFullAccountInfo"></div>
