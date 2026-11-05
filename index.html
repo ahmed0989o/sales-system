@@ -845,7 +845,7 @@ background:#dc2626 !important;
         ">✕</button>
 
     <div id="customerDebtItemsDragBar"
-      ondblclick="event.preventDefault(); event.stopPropagation(); toggleCustomerDebtItemsMaximize()"
+      onclick="handleCustomerDebtItemsDoubleClick(event)"
      onpointerdown="event.detail === 1 && startCustomerDebtItemsDrag(event)"
      style="
        position:relative;
