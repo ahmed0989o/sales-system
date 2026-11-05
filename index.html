@@ -1875,7 +1875,9 @@ if (inOverlay) {
 }
 
   if (!inOverlay) {
-  $("customerDebtItemsPage").classList.remove("hidden");
+  const page = $("customerDebtItemsPage");
+  page.classList.remove("hidden");
+  page.style.display = "flex";
 }
 
   info.innerHTML = `
