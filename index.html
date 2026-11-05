@@ -792,10 +792,26 @@ hr{margin-top:28px}
        resize:both;
      ">
 
-    <button type="button" class="secondary"
-            onclick="closeCustomerDebtItems()">
-      ↩️ العودة إلى حساب الزبون
-    </button>
+<button type="button"
+        onclick="closeCustomerDebtItems()"
+        style="
+          position:absolute;
+          top:-8px;
+          right:-8px;
+          width:27px;
+          height:27px;
+          padding:0;
+          border:0;
+          border-radius:50%;
+          background:#dc2626;
+          color:white;
+          font-size:16px;
+          font-weight:bold;
+          cursor:pointer;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+        ">✕</button>
 
     <div id="customerDebtItemsDragBar"
       ondblclick="toggleCustomerDebtItemsMaximize()"
