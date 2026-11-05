@@ -2360,6 +2360,32 @@ content.appendChild(actions);
   }
 }
   function startCustomerDebtItemsDrag(event) {
+    function toggleCustomerDebtItemsMaximize() {
+  const win = $("customerDebtItemsWindow");
+
+  if (!win) return;
+
+  if (win.dataset.maximized === "true") {
+    win.style.cssText = win._previousCssText;
+    win.dataset.maximized = "false";
+    return;
+  }
+
+  win._previousCssText = win.style.cssText;
+  win.dataset.maximized = "true";
+
+  win.style.position = "fixed";
+  win.style.inset = "0";
+  win.style.width = "100vw";
+  win.style.height = "100vh";
+  win.style.maxWidth = "none";
+  win.style.maxHeight = "none";
+  win.style.minWidth = "0";
+  win.style.minHeight = "0";
+  win.style.margin = "0";
+  win.style.borderRadius = "0";
+  win.style.resize = "none";
+}
   if (event.target.closest("button")) return;
 
   const win = $("customerDebtItemsWindow");
