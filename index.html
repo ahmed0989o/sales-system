@@ -865,11 +865,22 @@ background:#dc2626 !important;
       تفاصيل المواد ستظهر هنا
     </div>
 
-        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:15px;">
-      <button type="button" onclick="printCustomerDebtItems()">
-        🖨️ طباعة كشف المواد
-      </button>
-    </div>
+        <div style="display:flex;justify-content:center;margin-top:15px;">
+  <button type="button"
+          onclick="printCustomerDebtItems()"
+          style="
+            background:#16a34a;
+            color:white;
+            padding:7px 12px;
+            font-size:13px;
+            border:0;
+            border-radius:6px;
+            cursor:pointer;
+            width:auto;
+          ">
+    🖨️ طباعة كشف المواد
+  </button>
+</div>
 
     <!-- مقابض تغيير حجم النافذة -->
     <div onpointerdown="startCustomerDebtItemsResize(event,'n')"
