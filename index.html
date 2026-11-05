@@ -2543,7 +2543,7 @@ content.appendChild(actions);
 }
 
   function startCustomerDebtItemsDrag(event) {
-      if (event.target.closest("button")) return;
+      if (event.target.closest("button") || event.detail > 1) return;
 
   const win = $("customerDebtItemsWindow");
   const rect = win.getBoundingClientRect();
