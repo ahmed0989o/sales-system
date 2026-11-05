@@ -778,8 +778,16 @@ hr{margin-top:28px}
       ↩️ العودة إلى حساب الزبون
     </button>
 
-    <h2 style="text-align:center;">📦 كشف المواد بذمة الزبون</h2>
+    <div style="position:relative;text-align:center;margin:15px 0;">
+  <h2 style="margin:0;">📦 كشف المواد بذمة الزبون</h2>
 
+  <button type="button"
+          class="secondary"
+          onclick="closeCustomerDebtItems()"
+          style="position:absolute;top:0;right:0;padding:5px 11px;">
+    ✕
+  </button>
+</div>
     <div id="customerDebtItemsInfo"></div>
 
     <div id="customerDebtItemsContent">
