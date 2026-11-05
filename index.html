@@ -1284,6 +1284,17 @@ currentDebtItemsCustomerId = customerId;
   function closeCustomerFullAccount() {
   $("customerFullAccountPage").classList.add("hidden");
 }
+  function toggleCustomerFullAccountMaximize() {
+  const page = $("customerFullAccountPage");
+
+  if (page.dataset.maximized === "true") {
+    page.style.padding = "20px";
+    page.dataset.maximized = "false";
+  } else {
+    page.style.padding = "0";
+    page.dataset.maximized = "true";
+  }
+}
   async function loadCustomerAccount(customerId) {
  const invoicesBox = $("customerFullAccountInvoices");
 const paymentsBox = $("customerFullAccountPayments");
