@@ -846,7 +846,7 @@ background:#dc2626 !important;
 
     <div id="customerDebtItemsDragBar"
       ondblclick="event.preventDefault(); event.stopPropagation(); toggleCustomerDebtItemsMaximize()"
-     onpointerdown="if (event.detail < 2) startCustomerDebtItemsDrag(event)"
+     onpointerdown="event.detail === 1 && startCustomerDebtItemsDrag(event)"
      style="
        position:relative;
        text-align:center;
