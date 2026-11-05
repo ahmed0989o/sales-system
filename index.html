@@ -2358,6 +2358,49 @@ content.appendChild(actions);
     alert("تعذر حذف الفاتورة: " + error.message);
   }
 }
+  function startCustomerDebtItemsDrag(event) {
+  if (event.target.closest("button")) return;
+
+  const win = $("customerDebtItemsWindow");
+  const rect = win.getBoundingClientRect();
+
+  const startX = event.clientX;
+  const startY = event.clientY;
+
+  const startLeft = rect.left;
+  const startTop = rect.top;
+
+  win.style.position = "fixed";
+  win.style.margin = "0";
+  win.style.left = startLeft + "px";
+  win.style.top = startTop + "px";
+  win.style.width = rect.width + "px";
+  win.style.height = rect.height + "px";
+
+  function move(e) {
+    win.style.left = Math.max(
+      0,
+      Math.min(window.innerWidth - win.offsetWidth,
+        startLeft + e.clientX - startX)
+    ) + "px";
+
+    win.style.top = Math.max(
+      0,
+      Math.min(window.innerHeight - win.offsetHeight,
+        startTop + e.clientY - startY)
+    ) + "px";
+  }
+
+  function stop() {
+    document.removeEventListener("pointermove", move);
+    document.removeEventListener("pointerup", stop);
+    document.removeEventListener("pointercancel", stop);
+  }
+
+  document.addEventListener("pointermove", move);
+  document.addEventListener("pointerup", stop);
+  document.addEventListener("pointercancel", stop);
+}
   async function editCustomerInvoice(saleId) {
   const content = $("customerInvoiceDetailsContent");
 
