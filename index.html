@@ -2282,20 +2282,63 @@ if (rows.length === 0 && openingBalance <= 0) {
 ].join("");   
     
     info.innerHTML += `
-      <p>
-    <strong>إجمالي قيمة المواد المتبقية:
-    ${moneyText(grandTotal)} د.ع</strong>
-  </p>
-  <p>
-    <strong>الرصيد الافتتاحي:
-    ${moneyText(openingBalance)} د.ع</strong>
-  </p>
-  <p style="font-size:17px;color:#b42318;">
-    <strong>إجمالي الدين المتبقي:
-    ${moneyText(totalDebt)} د.ع</strong>
-  </p>
-`;
+  <div style="
+    width:100%;
+    box-sizing:border-box;
+    margin:0 auto 22px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    overflow:hidden;
+    color:#222;
+  ">
+    <div style="
+      padding:14px;
+      text-align:center;
+      background:#e9ecef;
+      font-size:17px;
+      font-weight:bold;
+    ">
+      ملخص الذمة المالية
+    </div>
 
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:17px 20px;
+      background:#fff;
+    ">
+      <strong>إجمالي قيمة المواد المتبقية</strong>
+      <strong>${moneyText(grandTotal)} د.ع</strong>
+    </div>
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:17px 20px;
+      background:#f3f4f6;
+    ">
+      <strong>الرصيد الافتتاحي</strong>
+      <strong>${moneyText(openingBalance)} د.ع</strong>
+    </div>
+
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:19px 20px;
+      background:#e9ecef;
+      font-size:18px;
+    ">
+      <strong>إجمالي الدين المتبقي</strong>
+      <strong>${moneyText(totalDebt)} د.ع</strong>
+    </div>
+  </div>
+`;
     content.innerHTML = `
       <div style="overflow-x:auto;">
         <table style="
