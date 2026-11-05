@@ -1944,11 +1944,33 @@ if (inOverlay) {
   page.style.display = "flex";
 }
 
-  info.innerHTML = `
-    <h3>${escapeDebtHtml(customer.name || "—")}</h3>
-    <p>الهاتف: ${escapeDebtHtml(customer.phone || "غير متوفر")}</p>
-  `;
+ info.innerHTML = `
+  <div style="
+    width:100%;
+    box-sizing:border-box;
+    margin:15px auto 20px;
+    padding:20px;
+    background:#f8f9fa;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    text-align:center;
+  ">
+    <h2 style="
+      margin:0 0 8px;
+      font-size:23px;
+      color:#222;
+    ">
+      ${escapeDebtHtml(customer.name || "—")}
+    </h2>
 
+    <div style="
+      color:#666;
+      font-size:14px;
+    ">
+      📱 الهاتف: ${escapeDebtHtml(customer.phone || "غير متوفر")}
+    </div>
+  </div>
+`;
   content.textContent = "جارٍ تحميل الفواتير والتسديدات والمرتجعات...";
 
   try {
