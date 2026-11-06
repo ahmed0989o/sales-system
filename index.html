@@ -709,20 +709,24 @@ background:#dc2626 !important;
 
   <h3>📊 كشف الحساب المالي للزبون</h3>
 
-  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;justify-content:flex-start;">
-    <div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;justify-content:flex-end;direction:ltr;">
+
+    <div style="text-align:right;direction:rtl;">
       <label>من تاريخ</label>
-      <input type="date" id="financialDateFrom" style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+      <input type="date" id="financialDateFrom"
+             style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
     </div>
 
-    <div>
+    <div style="text-align:right;direction:rtl;">
       <label>إلى تاريخ</label>
-      <input type="date" id="financialDateTo" style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+      <input type="date" id="financialDateTo"
+             style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
     </div>
 
     <button type="button" onclick="openCustomerFinancialStatement()">
       🔍 عرض الكشف
     </button>
+
   </div>
 
   <div id="customerFinancialStatementContent">
@@ -731,7 +735,6 @@ background:#dc2626 !important;
 
 </div>
 <!-- نهاية كشف الحساب المالي -->
-
 <hr>
 
 
