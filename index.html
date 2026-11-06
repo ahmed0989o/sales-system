@@ -709,16 +709,16 @@ background:#dc2626 !important;
 
   <h3>📊 كشف الحساب المالي للزبون</h3>
 
-  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;justify-content:flex-start;direction:ltr;">
+  <div style="display:flex;flex-direction:row;direction:ltr;gap:10px;align-items:end;justify-content:flex-start;flex-wrap:wrap;">
 
-    <div style="text-align:right;direction:rtl;">
-      <label>من تاريخ</label>
+    <div style="direction:rtl;text-align:center;">
+      <label style="display:block;">من تاريخ</label>
       <input type="date" id="financialDateFrom"
              style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
     </div>
 
-    <div style="text-align:right;direction:rtl;">
-      <label>إلى تاريخ</label>
+    <div style="direction:rtl;text-align:center;">
+      <label style="display:block;">إلى تاريخ</label>
       <input type="date" id="financialDateTo"
              style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
     </div>
@@ -736,7 +736,6 @@ background:#dc2626 !important;
 </div>
 <!-- نهاية كشف الحساب المالي -->
 <hr>
-
 
     <div id="customerFullAccountInvoices">
       فواتير الزبون ستظهر هنا
