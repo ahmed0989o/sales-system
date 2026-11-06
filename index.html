@@ -1500,38 +1500,7 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
       });
     }
 
-        if (!paymentRows.length) {
-      paymentsBox.textContent = "لا توجد تسديدات مسجلة.";
-    } else {
-      paymentsBox.innerHTML = "";
-
-      paymentRows.forEach(payment => {
-        const row = document.createElement("div");
-        row.style.cssText =
-          "border:1px solid #ddd;border-radius:8px;padding:8px;margin:6px 0;";
-
-        const amount = document.createElement("strong");
-        amount.textContent = money(payment.amount) + " د.ع";
-        row.appendChild(amount);
-
-        const date = document.createElement("p");
-        date.textContent =
-          "التاريخ: " +
-          new Date(payment.payment_date).toLocaleString("ar-IQ");
-        row.appendChild(date);
-
-        if (payment.notes) {
-          const notes = document.createElement("p");
-          notes.textContent = "ملاحظات: " + payment.notes;
-          row.appendChild(notes);
-        }
-
-        paymentsBox.appendChild(row);
-      });
-    }
-
-  } catch (error) {
-    console.error("Customer account:", error);
+           console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
     paymentsBox.textContent =
       "تعذر تحميل سجل التسديدات.";
