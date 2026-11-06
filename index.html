@@ -1329,12 +1329,49 @@ currentDebtItemsCustomerId = customerId;
   await loadCustomerAccount(customerId);
 
   $("customerFullAccountInfo").innerHTML = `
-    <h3>${customer.name || "—"}</h3>
-    <p>الهاتف: ${customer.phone || "غير متوفر"}</p>
-    <p>إجمالي المبيعات: ${$("creditCustomerSales").textContent} د.ع</p>
-    <p>إجمالي التسديدات: ${$("creditCustomerPayments").textContent} د.ع</p>
-    <p>الدين المتبقي: ${$("creditCustomerDebt").textContent}</p>
-  `;
+  <div style="
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr 1fr 1.6fr;
+    gap:8px;
+    align-items:center;
+    background:white;
+    border-radius:7px;
+    padding:10px;
+    text-align:center;
+    direction:rtl;
+    box-sizing:border-box;
+  ">
+
+    <div>
+      <h3 style="margin:0 0 5px;font-size:17px;">
+        ${customer.name || "—"}
+      </h3>
+      <div style="font-size:12px;">
+        الهاتف: ${customer.phone || "غير متوفر"}
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;">إجمالي المبيعات</div>
+      <strong>${$("creditCustomerSales").textContent}</strong>
+    </div>
+
+    <div>
+      <div style="font-size:12px;">إجمالي التسديدات</div>
+      <strong>${$("creditCustomerPayments").textContent}</strong>
+    </div>
+
+    <div>
+      <div style="font-size:12px;">الدين المتبقي</div>
+      <strong style="color:red;">
+        ${$("creditCustomerDebt").textContent}
+      </strong>
+    </div>
+
+    <div id="customerDebtItemsSlot"></div>
+
+  </div>
+`;
 }
   function closeCustomerFullAccount() {
   $("customerFullAccountPage").classList.add("hidden");
