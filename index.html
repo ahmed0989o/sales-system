@@ -1458,7 +1458,7 @@ const paymentsBox = $("customerFullAccountPayments");
 if (paymentsError) throw paymentsError;
     const invoiceRows = sales || [];
     const paymentRows = payments || [];
-console.log("بيانات تسديدات الزبون:", payments);
+console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2));
     // حساب إجمالي المبيعات والتسديدات
     const totalSales = invoiceRows.reduce(
       (sum, sale) => sum + Number(sale.total_amount || 0),
