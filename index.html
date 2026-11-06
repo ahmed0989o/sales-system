@@ -1533,9 +1533,6 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
   } catch (error) {
     console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
-    invoicesBox.textContent =
-      "تعذر تحميل الفواتير: " + error.message;
-
     paymentsBox.textContent =
       "تعذر تحميل سجل التسديدات.";
   }
