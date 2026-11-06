@@ -1508,74 +1508,7 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
       });
     }
 
-    // عرض الفواتير وتفاصيل المنتجات
-    if (!invoiceRows.length) {
-      invoicesBox.textContent = "لا توجد فواتير لهذا الزبون.";
-    } else {
-      invoicesBox.innerHTML = "";
-
-      invoiceRows.forEach(sale => {
-        const box = document.createElement("div");
-        box.style.cssText =
-          "border:1px solid #ddd;border-radius:8px;padding:8px;margin:8px 0;";
-
-        const heading = document.createElement("button");
-heading.type = "button";
-heading.textContent =
-  `🧾 فاتورة رقم ${sale.invoice_number || sale.id}`;
-
-heading.style.cssText =
-  "width:100%;text-align:right;padding:10px;font-weight:bold;cursor:pointer;";
-
-heading.onclick = function() {
-  openCustomerInvoiceDetails(sale.id);
-};
-
-box.appendChild(heading);
-        const date = document.createElement("p");
-        date.textContent =
-          "التاريخ: " +
-          new Date(sale.created_at).toLocaleString("ar-IQ");
-        box.appendChild(date);
-
-        const method = document.createElement("p");
-        method.textContent =
-          "طريقة الدفع: " + (sale.payment_method || "—");
-        box.appendChild(method);
-
-        const total = document.createElement("p");
-        total.textContent =
-          "الإجمالي: " + money(sale.total_amount) + " د.ع";
-        box.appendChild(total);
-
-        const received = document.createElement("p");
-        received.textContent =
-          "الواصل عند البيع: " + money(sale.amount_received) + " د.ع";
-        box.appendChild(received);
-
-        const items = details.filter(
-          item => String(item.sale_id) === String(sale.id)
-        );
-
-        items.forEach(item => {
-          const line = document.createElement("p");
-          line.style.cssText =
-            "font-size:13px;margin:4px 0;";
-          line.textContent =
-            `${productNames.get(String(item.product_id)) || "منتج"} — ` +
-            `الكمية: ${item.quantity} — ` +
-            `السعر: ${money(item.unit_price)} — ` +
-            `الإجمالي: ${money(item.total)} د.ع`;
-
-          box.appendChild(line);
-        });
-
-        invoicesBox.appendChild(box);
-      });
-    }
-
-    // عرض سجل التسديدات
-    if (!paymentRows.length) {
+        if (!paymentRows.length) {
       paymentsBox.textContent = "لا توجد تسديدات مسجلة.";
     } else {
       paymentsBox.innerHTML = "";
