@@ -2312,23 +2312,21 @@ if (rows.length === 0 && openingBalance <= 0) {
 ].join("");   
     
     info.innerHTML += `
-  <div style="
-    display:flex;
-    align-items:center;
-    gap:12px;
-    flex:0 0 auto;
-    color:#222;
-    font-size:11px;
-    white-space:nowrap;
-  ">
-    <span>باقي المواد: <strong>${moneyText(grandTotal)} د.ع</strong></span>
-    <span>الدين السابق: <strong>${moneyText(openingBalance)} د.ع</strong></span>
-    <span style="
-      padding:5px 8px;
-      background:#e9ecef;
-      border-radius:7px;
-      font-weight:bold;
-    ">المبلغ الكلي: ${moneyText(totalDebt)} د.ع</span>
+  <dinfo.innerHTML += `
+  <div style="grid-column:1;text-align:right;padding:7px 10px;font-size:11px;color:#666;">
+    📱 ${escapeDebtHtml(customer.phone || "غير متوفر")}
+  </div>
+
+  <div style="padding:7px 10px;text-align:center;font-weight:bold;">
+    ${moneyText(grandTotal)}
+  </div>
+
+  <div style="padding:7px 10px;text-align:center;font-weight:bold;">
+    ${moneyText(openingBalance)}
+  </div>
+
+  <div style="padding:7px 10px;text-align:center;font-weight:bold;background:#e9ecef;border-radius:7px;">
+    ${moneyText(totalDebt)}
   </div>
 `;
     content.innerHTML = `
