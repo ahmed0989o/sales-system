@@ -685,81 +685,70 @@ hr{margin-top:28px}
      
   <div style="max-width:1000px;margin:auto;">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <h2>👤 الحساب الكامل للزبون</h2>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
 
-  <div style="display:flex;align-items:center;gap:4px;direction:rtl;">
-    <label>من</label>
-    <input type="date" id="financialDateFrom"
-           style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+  <h2>👤 الحساب الكامل للزبون</h2>
+
+  <div style="display:flex;align-items:center;gap:6px;direction:rtl;">
+
+    <div style="display:flex;align-items:center;gap:4px;">
+      <label>من</label>
+      <input type="date" id="financialDateFrom"
+             style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+    </div>
+
+    <div style="display:flex;align-items:center;gap:4px;">
+      <label>إلى</label>
+      <input type="date" id="financialDateTo"
+             style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+    </div>
+
+    <button type="button"
+            onclick="openCustomerFinancialStatement()"
+            style="width:45px;height:45px;padding:0;background:#2563eb !important;color:white;border:0;border-radius:5px;font-size:18px;cursor:pointer;">
+      🔍
+    </button>
+
+    <button type="button"
+            onclick="toggleCustomerFullAccountMaximize()"
+            style="position:fixed;top:10px;right:65px;z-index:5001;width:45px;height:45px;padding:0;background:#2563eb !important;color:white;border:0;border-radius:5px;font-size:20px;cursor:pointer;">
+      ⛶
+    </button>
+
+    <button type="button"
+            onclick="closeCustomerFullAccount()"
+            style="position:fixed;top:10px;right:10px;z-index:5001;width:45px;height:45px;padding:0;background:#2563eb !important;color:red;border:0;border-radius:5px;font-size:20px;cursor:pointer;">
+      ✕
+    </button>
+
   </div>
-
-  <div style="display:flex;align-items:center;gap:4px;direction:rtl;">
-    <label>إلى</label>
-    <input type="date" id="financialDateTo"
-           style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
-  </div>
-
-<button type="button"
-        onclick="openCustomerFinancialStatement()"
-        style="width:45px;height:45px;padding:0;background:#2563eb !important;color:white;border:0;border-radius:5px;font-size:18px;cursor:pointer;">
-  🔍
-</button>
-
-<button type="button"
-        onclick="toggleCustomerFullAccountMaximize()"
-        style="position:fixed;top:10px;right:65px;z-index:5001;width:45px;height:45px;padding:0;background:#2563eb !important;color:white;border:0;border-radius:5px;font-size:20px;cursor:pointer;"
-  ⛶
-</button>
-
-<button type="button"
-        onclick="closeCustomerFullAccount()"
-        style="position:fixed;top:10px;right:10px;z-index:5001;width:45px;height:45px;padding:0;background:#2563eb !important;color:red;border:0;border-radius:5px;font-size:20px;cursor:pointer;"
-  ✕
-</button>
-
-</div>
 </div>
 
 <div style="display:flex;justify-content:flex-start;margin:12px 0;">
   <button
-  type="button"
-  onclick="showCustomerDebtItems()"
-  style="
-    padding:2px 2px !important;
-font-size:9px !important;
-line-height:1 !important;
-background:#dc2626 !important;
-    color:white;
-    border:0;
-    border-radius:6px;
-    cursor:pointer;
-  "
->
-  📦 المواد في ذمة الزبون
-</button>
+    type="button"
+    onclick="showCustomerDebtItems()"
+    style="padding:2px 2px !important;font-size:9px !important;line-height:1 !important;background:#dc2626 !important;color:white;border:0;border-radius:6px;cursor:pointer;">
+    📦 المواد في ذمة الزبون
+  </button>
 </div>
 
 <!-- بداية كشف الحساب المالي -->
 <div id="customerFinancialStatement"
      style="margin:15px 0;padding:12px;background:white;border:1px solid #ddd;border-radius:8px;">
 
-    <div id="customerFinancialStatementContent">
-  </div>
+  <div id="customerFinancialStatementContent"></div>
+
 </div>
 <!-- نهاية كشف الحساب المالي -->
+
 <hr>
 
-    <div id="customerFullAccountInvoices">
-      فواتير الزبون ستظهر هنا
-    </div>
+<div id="customerFullAccountInvoices">
+  فواتير الزبون ستظهر هنا
+</div>
 
-    <hr>
-
-    <h3>💰 سجل التسديدات</h3>
-    <div id="customerFullAccountPayments"></div>
+<hr>
 
   </div>
 </div>
