@@ -1468,9 +1468,6 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
     );
 
       // تحميل تفاصيل المنتجات
-    let details = [];
-
-    if (saleIds.length) {
       const { data, error } = await db
         .from("sale_details")
         .select("sale_id, product_id, quantity, unit_price, total")
