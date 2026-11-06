@@ -1470,13 +1470,7 @@ if (paymentsError) throw paymentsError;
       0
     );
 
-   $("customerFullAccountInfo").innerHTML = `
-  <h3>${customers.find(c => String(c.id) === String(customerId))?.name || "—"}</h3>
-  <p>إجمالي المبيعات: ${money(totalSales)} د.ع</p>
-  <p>إجمالي التسديدات: ${money(invoiceReceived + laterPayments)} د.ع</p>
-  <p>الدين المتبقي: ${$("creditCustomerDebt").textContent}</p>
-`;
-    // تحميل تفاصيل المنتجات
+      // تحميل تفاصيل المنتجات
     const saleIds = invoiceRows.map(sale => sale.id);
     let details = [];
 
