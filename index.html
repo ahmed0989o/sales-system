@@ -2289,50 +2289,22 @@ if (rows.length === 0 && openingBalance <= 0) {
     
     info.innerHTML += `
   <div style="
-    width:100%;
-    box-sizing:border-box;
-    margin:0 auto 22px;
-    border:1px solid #e5e7eb;
-    border-radius:12px;
-    overflow:hidden;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex:0 0 auto;
     color:#222;
+    font-size:11px;
+    white-space:nowrap;
   ">
-    <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:17px 20px;
-      background:#fff;
-    ">
-      <strong>باقي المواد</strong>
-      <strong>${moneyText(grandTotal)} د.ع</strong>
-    </div>
-
-    <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:17px 20px;
-      background:#f3f4f6;
-    ">
-      <strong>الدين السابق</strong>
-      <strong>${moneyText(openingBalance)} د.ع</strong>
-    </div>
-
-    <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding:19px 20px;
+    <span>باقي المواد: <strong>${moneyText(grandTotal)} د.ع</strong></span>
+    <span>الدين السابق: <strong>${moneyText(openingBalance)} د.ع</strong></span>
+    <span style="
+      padding:5px 8px;
       background:#e9ecef;
-      font-size:18px;
-    ">
-      <strong>المبلغ الكلي</strong>
-      <strong>${moneyText(totalDebt)} د.ع</strong>
-    </div>
+      border-radius:7px;
+      font-weight:bold;
+    ">المبلغ الكلي: ${moneyText(totalDebt)} د.ع</span>
   </div>
 `;
     content.innerHTML = `
