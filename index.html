@@ -6482,6 +6482,91 @@ function resetSingleWindow(sectionId) {
 
   saveWindowState(win);
 }
+  function printCustomerDebtItems() {
+  const info = $("customerDebtItemsInfo");
+  const content = $("customerDebtItemsContent");
+
+  if (!info || !content) {
+    alert("تعذر تجهيز بيانات الطباعة.");
+    return;
+  }
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    alert("يرجى السماح بفتح النوافذ المنبثقة للطباعة.");
+    return;
+  }
+
+  printWindow.document.open();
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>المواد في ذمة الزبون</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 12mm;
+        }
+
+        body {
+          direction: rtl;
+          text-align: right;
+          font-family: Tahoma, Arial, sans-serif;
+          color: #222;
+          font-size: 13px;
+        }
+
+        h2 {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 15px;
+        }
+
+        th, td {
+          border: 1px solid #777;
+          padding: 7px 5px;
+          text-align: center;
+        }
+
+        th {
+          background: #e9ecef !important;
+          font-weight: bold;
+        }
+
+        tr {
+          page-break-inside: avoid;
+        }
+
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>📦 المواد في ذمة الزبون</h2>
+      ${info.innerHTML}
+      ${content.innerHTML}
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  printWindow.onload = function() {
+    printWindow.focus();
+    printWindow.print();
+  };
+}
 </script>
 </body>
 </html>
