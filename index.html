@@ -1392,8 +1392,20 @@ currentDebtItemsCustomerId = customerId;
 
     <div id="customerDebtItemsSlot"></div>
 
-  </div>
+    </div>
 `;
+
+  const debtButton = $("customerDebtItemsButton");
+  const debtSlot = $("customerDebtItemsSlot");
+
+  if (debtButton && debtSlot) {
+    const oldContainer = debtButton.parentElement;
+    debtSlot.appendChild(debtButton);
+
+    if (oldContainer) {
+      oldContainer.style.display = "none";
+    }
+  }
 }
   function closeCustomerFullAccount() {
   $("customerFullAccountPage").classList.add("hidden");
