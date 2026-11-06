@@ -1475,21 +1475,7 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
       ...new Set(details.map(item => item.product_id))
     ];
 
-    let productNames = new Map();
-
-    if (productIds.length) {
-      const { data, error } = await db
-        .from("products")
-        .select("id, name")
-        .in("id", productIds);
-
-      if (error) throw error;
-
-      (data || []).forEach(product => {
-        productNames.set(String(product.id), product.name);
-      });
-    }
-
+    
           console.error("Customer account:", error);
 alert("خطأ تحميل حساب الزبون: " + error.message);
   }
