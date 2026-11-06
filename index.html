@@ -1470,11 +1470,11 @@ console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2
     
 
     
-          console.error("Customer account:", error);
-alert("خطأ تحميل حساب الزبون: " + error.message);
+       } catch (error) {
+    console.error("Customer account:", error);
+    alert("خطأ تحميل حساب الزبون: " + error.message);
   }
 }
-
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
 
