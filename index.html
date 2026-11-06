@@ -673,6 +673,26 @@ hr{margin-top:28px}
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <h2>👤 الحساب الكامل للزبون</h2>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+
+  <div style="display:flex;align-items:center;gap:4px;direction:rtl;">
+    <label>من</label>
+    <input type="date" id="financialDateFrom"
+           style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+  </div>
+
+  <div style="display:flex;align-items:center;gap:4px;direction:rtl;">
+    <label>إلى</label>
+    <input type="date" id="financialDateTo"
+           style="width:135px;padding:5px;font-size:12px;box-sizing:border-box;">
+  </div>
+
+  <button type="button"
+          onclick="openCustomerFinancialStatement()"
+          style="background:#2563eb;color:white;border:0;border-radius:6px;padding:6px 9px;font-size:15px;cursor:pointer;">
+    🔍
+  </button>
+
   <button type="button" onclick="toggleCustomerFullAccountMaximize()" style="background:#2563eb;color:white;border:0;">
     ⛶
   </button>
@@ -680,8 +700,8 @@ hr{margin-top:28px}
   <button type="button" onclick="closeCustomerFullAccount()">
     ✕ إغلاق
   </button>
+
 </div>
-    </div>
 
     <div id="customerFullAccountInfo"></div>
 <div style="display:flex;justify-content:flex-start;margin:12px 0;">
