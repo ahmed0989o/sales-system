@@ -1939,37 +1939,6 @@ if (inOverlay) {
   page.classList.remove("hidden");
   page.style.display = "flex";
 }
-
- info.innerHTML = `
-  <div style="
-    width:max-content;
-max-width:100%;
-    box-sizing:border-box;
-    margin:0;
-flex:0 0 auto;
-    padding:6px 10px;
-    background:#fff;
-border:1px solid #e5e7eb;
-border-radius:10px;
-    text-align:right;
-  ">
-    <h2 style="
-      margin:0 0 4px;
-      font-size:15px;
-font-weight:700;
-      color:#222;
-    ">
-      ${escapeDebtHtml(customer.name || "—")}
-    </h2>
-
-    <div style="
-      color:#666;
-      font-size:11px;
-    ">
-      📱 الهاتف: ${escapeDebtHtml(customer.phone || "غير متوفر")}
-    </div>
-  </div>
-`;
   info.innerHTML = `
   <div style="padding:7px 10px;font-weight:bold;text-align:right;">
     ${escapeDebtHtml(customer.name || "—")}
