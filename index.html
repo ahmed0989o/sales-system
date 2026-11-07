@@ -1857,7 +1857,9 @@ overlay.querySelector("#deleteVoucher").addEventListener("click", async () => {
     alert("تم حذف سند التسديد بنجاح.");
     overlay.remove();
 
-    await loadCustomerAccount(customerId);
+    await loadCustomers();
+updateCreditCustomerDetails();
+await loadCustomerAccount(customerId);
   } catch (error) {
     console.error("Delete payment voucher:", error);
     alert("تعذر حذف السند: " + error.message);
