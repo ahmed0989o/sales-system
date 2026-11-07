@@ -1688,6 +1688,42 @@ ledgerBox.innerHTML = `
     alert("خطأ تحميل حساب الزبون: " + error.message);
   }
 }
+  // فتح سند التسديد
+async function openCustomerPaymentVoucher(paymentId) {
+  const customerId = currentDebtItemsCustomerId;
+
+  if (!customerId) {
+    alert("يرجى فتح حساب الزبون أولاً.");
+    return;
+  }
+
+  const { data: payments, error } = await db.rpc(
+    "get_customer_payment_history",
+    { p_customer_id: Number(customerId) }
+  );
+
+  if (error) {
+    alert("تعذر تحميل سند التسديد: " + error.message);
+    return;
+  }
+
+  const payment = (payments || []).find(
+    item => String(item.id) === String(paymentId)
+  );
+
+  if (!payment) {
+    alert("لم يتم العثور على سند التسديد.");
+    return;
+  }
+
+  alert(
+    "سند تسديد رقم: " + payment.id +
+    "\nالمبلغ: " + money(payment.amount) +
+    "\nالتاريخ: " + new Date(payment.payment_date).toLocaleString("ar-IQ") +
+    "\nالبيان: " + (payment.notes || "—") +
+    "\nالمستخدم: " + (payment.display_name || "غير مسجل")
+  );
+}
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
 
