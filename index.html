@@ -1571,8 +1571,8 @@ movements.sort((a, b) =>
   new Date(a.date) - new Date(b.date)
 );
     // قراءة الفترة المحددة
-const dateFrom = $("financialDateFrom").value;
-const dateTo = $("financialDateTo").value;
+const dateFrom = $("financialDateFrom")?.value || "";
+const dateTo = $("financialDateTo")?.value || "";
 
 // تحديد بداية ونهاية الفترة
 const startDate = dateFrom
