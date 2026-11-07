@@ -1829,7 +1829,9 @@ overlay.querySelector("#saveVoucherEdit").addEventListener("click", async () => 
     alert("تم تعديل سند التسديد بنجاح.");
     overlay.remove();
 
-    await loadCustomerAccount(customerId);
+    await loadCustomers();
+updateCreditCustomerDetails();
+await loadCustomerAccount(customerId);
   } catch (error) {
     console.error("Update payment voucher:", error);
     alert("تعذر تعديل السند: " + error.message);
