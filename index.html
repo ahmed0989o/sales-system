@@ -1452,6 +1452,31 @@ if (paymentsError) throw paymentsError;
     const invoiceRows = sales || [];
 const paymentRows = payments || [];
 
+// جلب الرصيد الافتتاحي
+const { data: customerData, error: customerError } = await db
+  .from("customers")
+  .select("opening_balance")
+  .eq("id", customerId)
+  .single();
+
+if (customerError) throw customerError;
+
+const openingBalance = Number(customerData.opening_balance || 0);
+
+// جلب المرتجعات
+const saleIds = invoiceRows.map(sale => sale.id);
+let returns = [];
+
+if (saleIds.length) {
+  const { data, error } = await db
+    .from("sales_returns")
+    .select("id, sale_id, return_date, return_amount, settlement_type, notes, created_by")
+    .in("sale_id", saleIds);
+
+  if (error) throw error;
+  returns = data || [];
+}
+
 // جلب أسماء المستخدمين
 const { data: users, error: usersError } = await db.rpc(
   "get_financial_statement_users"
