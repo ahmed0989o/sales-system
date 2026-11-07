@@ -3814,6 +3814,10 @@ $("customerSelect").value = selectedCustomerId;
       "customerStatus",
       `تم تحميل ${customers.length} زبون.`
     );
+    if (selectedCustomerId) {
+  $("customerSelect").value = selectedCustomerId;
+  updateCreditCustomerDetails();
+}
   } catch (error) {
     console.error("Customers:", error);
     customers = [];
