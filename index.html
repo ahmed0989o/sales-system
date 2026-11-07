@@ -1716,13 +1716,86 @@ async function openCustomerPaymentVoucher(paymentId) {
     return;
   }
 
-  alert(
-    "سند تسديد رقم: " + payment.id +
-    "\nالمبلغ: " + money(payment.amount) +
-    "\nالتاريخ: " + new Date(payment.payment_date).toLocaleString("ar-IQ") +
-    "\nالبيان: " + (payment.notes || "—") +
-    "\nالمستخدم: " + (payment.display_name || "غير مسجل")
-  );
+  // إنشاء نافذة سند التسديد
+const overlay = document.createElement("div");
+overlay.id = "customerPaymentVoucherOverlay";
+
+overlay.style.cssText = `
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  background:rgba(0,0,0,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  direction:rtl;
+`;
+
+overlay.innerHTML = `
+  <div style="
+    width:380px;
+    max-width:100%;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 5px 25px rgba(0,0,0,0.25);
+    box-sizing:border-box;
+  ">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;">🧾 سند تسديد رقم ${payment.id}</h3>
+      <button type="button"
+        onclick="document.getElementById('customerPaymentVoucherOverlay').remove()"
+        style="border:0;background:none;font-size:23px;cursor:pointer;">
+        ✕
+      </button>
+    </div>
+
+    <hr>
+
+    <label>مبلغ التسديد</label>
+    <input id="voucherEditAmount" type="number"
+      min="0.01" step="0.01"
+      style="width:100%;padding:9px;margin:7px 0 12px;box-sizing:border-box;">
+
+    <label>تاريخ ووقت التسديد</label>
+    <input id="voucherEditDate" type="datetime-local"
+      style="width:100%;padding:9px;margin:7px 0 12px;box-sizing:border-box;">
+
+    <label>البيان</label>
+    <textarea id="voucherEditNotes"
+      style="width:100%;padding:9px;margin:7px 0 12px;box-sizing:border-box;"></textarea>
+
+    <div style="font-size:13px;margin:5px 0 15px;">
+      المستخدم: ${payment.display_name || "غير مسجل"}
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button type="button" id="saveVoucherEdit"
+        style="flex:1;padding:10px;background:#2563eb;color:white;border:0;border-radius:6px;">
+        💾 حفظ التعديل
+      </button>
+
+      <button type="button" id="deleteVoucher"
+        style="flex:1;padding:10px;background:#dc2626;color:white;border:0;border-radius:6px;">
+        🗑️ حذف السند
+      </button>
+    </div>
+  </div>
+`;
+
+// تعبئة بيانات السند
+const paymentDate = new Date(payment.payment_date);
+const localDate = new Date(
+  paymentDate.getTime() - paymentDate.getTimezoneOffset() * 60000
+).toISOString().slice(0, 16);
+
+overlay.querySelector("#voucherEditAmount").value = payment.amount;
+overlay.querySelector("#voucherEditDate").value = localDate;
+overlay.querySelector("#voucherEditNotes").value = payment.notes || "";
+
+document.body.appendChild(overlay);
 }
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
