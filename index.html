@@ -1332,19 +1332,27 @@ currentDebtItemsCustomerId = customerId;
   $("customerFullAccountInfo").innerHTML = `
   <div style="
     display:grid;
-    grid-template-columns:1.2fr 1fr 1fr 1fr 1.6fr;
-    gap:8px;
-    align-items:center;
-    background:white;
-    border-radius:7px;
-    padding:10px;
-    text-align:center;
+    grid-template-columns:1fr 1.5fr 1fr;
+    gap:12px;
+    align-items:start;
     direction:rtl;
+    padding:10px;
+    background:white;
+    border-radius:8px;
     box-sizing:border-box;
   ">
 
-    <div>
-      <h3 style="margin:0 0 5px;font-size:17px;">
+    <!-- الجهة اليمنى: أزرار التحكم وبيانات الزبون -->
+    <div style="text-align:right;">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button onclick="closeCustomerFullAccount()"
+          style="width:30px;height:30px;background:#dc3545;color:white;border:0;border-radius:50%;font-size:20px;cursor:pointer;">×</button>
+
+        <button onclick="toggleCustomerFullAccountMaximize()"
+          style="width:30px;height:30px;background:#0d6efd;color:white;border:0;border-radius:5px;font-size:18px;cursor:pointer;">▣</button>
+      </div>
+
+      <h3 style="margin:10px 0 4px;font-size:17px;">
         ${customer.name || "—"}
       </h3>
       <div style="font-size:12px;">
@@ -1352,28 +1360,64 @@ currentDebtItemsCustomerId = customerId;
       </div>
     </div>
 
-    <div>
-      <div style="font-size:12px;">إجمالي المبيعات</div>
-      <strong>${$("creditCustomerSales").textContent}</strong>
+    <!-- الوسط: العنوان والإجماليات الفعلية -->
+    <div style="text-align:center;">
+      <h3 style="margin:4px 0 14px;font-size:19px;">
+        👤 الحساب الكامل للزبون
+      </h3>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:8px;
+      ">
+        <div>
+          <div style="font-size:12px;">إجمالي المبيعات</div>
+          <strong>${$("creditCustomerSales").textContent}</strong>
+        </div>
+
+        <div>
+          <div style="font-size:12px;">إجمالي التسديدات</div>
+          <strong>${$("creditCustomerPayments").textContent}</strong>
+        </div>
+
+        <div>
+          <div style="font-size:12px;">الدين المتبقي</div>
+          <strong style="color:red;">
+            ${$("creditCustomerDebt").textContent}
+          </strong>
+        </div>
+      </div>
     </div>
 
-    <div>
-      <div style="font-size:12px;">إجمالي التسديدات</div>
-      <strong>${$("creditCustomerPayments").textContent}</strong>
+    <!-- الجهة اليسرى: الفترة والبحث والمواد -->
+    <div style="text-align:left;">
+      <div style="
+        display:flex;
+        align-items:end;
+        justify-content:flex-start;
+        gap:5px;
+        flex-wrap:wrap;
+      ">
+        <div>
+          <label style="display:block;font-size:12px;">من</label>
+          <input type="date" id="financialDateFrom">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;">إلى</label>
+          <input type="date" id="financialDateTo">
+        </div>
+
+        <button onclick="openCustomerFinancialStatement()"
+          style="width:34px;height:34px;background:#0d6efd;color:white;border:0;border-radius:5px;cursor:pointer;">🔍</button>
+      </div>
+
+      <div id="customerDebtItemsSlot" style="margin-top:10px;"></div>
     </div>
 
-    <div>
-      <div style="font-size:12px;">الدين المتبقي</div>
-      <strong style="color:red;">
-        ${$("creditCustomerDebt").textContent}
-      </strong>
-    </div>
-
-    <div id="customerDebtItemsSlot"></div>
-
-    </div>
+  </div>
 `;
-
   const debtButton = $("customerDebtItemsButton");
   const debtSlot = $("customerDebtItemsSlot");
 
