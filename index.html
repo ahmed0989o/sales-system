@@ -3805,7 +3805,9 @@ customers = result.data || [];
       }
 
       $("paymentCustomer").appendChild(paymentOption);
-    });
+});
+
+$("customerSelect").value = selectedCustomerId;
 
     setMessage(
       "customerStatus",
