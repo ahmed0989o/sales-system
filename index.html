@@ -1562,6 +1562,26 @@ const endDate = dateTo
 if (startDate && endDate && startDate > endDate) {
   throw new Error("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
 }
+    // حساب رصيد ما قبل الفترة
+let balanceBeforePeriod = openingBalance;
+
+movements.forEach(item => {
+  const itemDate = new Date(item.date);
+
+  if (startDate && itemDate < startDate) {
+    balanceBeforePeriod += item.debit - item.credit;
+  }
+});
+
+// استخراج الحركات الواقعة ضمن الفترة
+const filteredMovements = movements.filter(item => {
+  const itemDate = new Date(item.date);
+
+  if (startDate && itemDate < startDate) return false;
+  if (endDate && itemDate > endDate) return false;
+
+  return true;
+});
   } catch (error) {
     console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
