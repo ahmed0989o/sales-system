@@ -1490,26 +1490,63 @@ const userNames = new Map(
     user.display_name
   ])
 );
-    // حساب إجمالي المبيعات والتسديدات
-    const totalSales = invoiceRows.reduce(
-      (sum, sale) => sum + Number(sale.total_amount || 0),
-      0
-    );
+    // إنشاء الحركات المالية
+const movements = [];
 
-    const invoiceReceived = invoiceRows.reduce(
-      (sum, sale) => sum + Number(sale.amount_received || 0),
-      0
-    );
+// فواتير المبيعات
+invoiceRows.forEach(sale => {
+  movements.push({
+    id: sale.id,
+    date: sale.created_at,
+    debit: Number(sale.total_amount || 0),
+    credit: Number(sale.amount_received || 0),
+    voucher: sale.invoice_number || sale.id,
+    type: "فاتورة مبيعات",
+    description: sale.payment_method || "—",
+    userName: userNames.get(String(sale.created_by)) || "غير مسجل",
+    operation: "sale"
+  });
+});
 
-    const laterPayments = paymentRows.reduce(
-      (sum, payment) => sum + Number(payment.amount || 0),
-      0
-    );
+// سندات التسديد
+paymentRows.forEach(payment => {
+  movements.push({
+    id: payment.id,
+    date: payment.payment_date,
+    debit: 0,
+    credit: Number(payment.amount || 0),
+    voucher: payment.id,
+    type: "سند تسديد",
+    description: payment.notes || "تسديد من الزبون",
+    userName: payment.display_name ||
+      userNames.get(String(payment.created_by)) ||
+      "غير مسجل",
+    operation: "payment"
+  });
+});
 
-    
+// المرتجعات التي تخصم من الدين
+returns.forEach(item => {
+  if (item.settlement_type === "reduce_debt") {
+    movements.push({
+      id: item.id,
+      date: item.return_date,
+      debit: 0,
+      credit: Number(item.return_amount || 0),
+      voucher: item.id,
+      type: "مرتجع",
+      description: item.notes || "مرتجع - خصم من الدين",
+      userName: userNames.get(String(item.created_by)) || "غير مسجل",
+      operation: "return"
+    });
+  }
+});
 
-    
-       } catch (error) {
+// ترتيب الحركات من الأقدم إلى الأحدث
+movements.sort((a, b) =>
+  new Date(a.date) - new Date(b.date)
+);
+  } catch (error) {
     console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
   }
