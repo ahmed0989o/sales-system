@@ -1345,9 +1345,8 @@ currentDebtItemsCustomerId = customerId;
   $("customerFullAccountInvoices").textContent =
     "جارٍ تحميل الفواتير...";
 
-  $("customerFullAccountPayments").textContent =
-    "جارٍ تحميل التسديدات...";
-
+  $("customerAccountLedger").innerHTML =
+    "جارٍ تحميل كشف الحساب...";
   await loadCustomerAccount(customerId);
 
   $("customerFullAccountInfo").innerHTML = `
