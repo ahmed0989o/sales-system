@@ -1450,8 +1450,21 @@ ledgerBox.innerHTML = "جارٍ تحميل كشف الحساب...";
 
 if (paymentsError) throw paymentsError;
     const invoiceRows = sales || [];
-    const paymentRows = payments || [];
-console.log("تفاصيل التسديدات:", JSON.stringify(payments, null, 2));
+const paymentRows = payments || [];
+
+// جلب أسماء المستخدمين
+const { data: users, error: usersError } = await db.rpc(
+  "get_financial_statement_users"
+);
+
+if (usersError) throw usersError;
+
+const userNames = new Map(
+  (users || []).map(user => [
+    String(user.user_id),
+    user.display_name
+  ])
+);
     // حساب إجمالي المبيعات والتسديدات
     const totalSales = invoiceRows.reduce(
       (sum, sale) => sum + Number(sale.total_amount || 0),
