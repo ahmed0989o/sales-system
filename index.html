@@ -1837,6 +1837,32 @@ overlay.querySelector("#saveVoucherEdit").addEventListener("click", async () => 
     button.textContent = "💾 حفظ التعديل";
   }
 });
+  // حذف سند التسديد
+overlay.querySelector("#deleteVoucher").addEventListener("click", async () => {
+  if (!confirm("هل أنت متأكد من حذف سند التسديد؟")) return;
+
+  const button = overlay.querySelector("#deleteVoucher");
+  button.disabled = true;
+  button.textContent = "جارٍ الحذف...";
+
+  try {
+    const { error } = await db.rpc("delete_customer_payment", {
+      p_payment_id: Number(payment.id)
+    });
+
+    if (error) throw error;
+
+    alert("تم حذف سند التسديد بنجاح.");
+    overlay.remove();
+
+    await loadCustomerAccount(customerId);
+  } catch (error) {
+    console.error("Delete payment voucher:", error);
+    alert("تعذر حذف السند: " + error.message);
+    button.disabled = false;
+    button.textContent = "🗑️ حذف السند";
+  }
+});
 }
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
