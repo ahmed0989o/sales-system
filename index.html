@@ -1627,6 +1627,62 @@ const ledgerRows = filteredMovements.map((item, index) => {
     </tr>
   `;
 }).join("");
+    // عرض كشف الحساب الموحد
+ledgerBox.innerHTML = `
+  <div style="width:100%;overflow-x:auto;direction:rtl;">
+    <table style="
+      width:100%;
+      min-width:1250px;
+      border-collapse:collapse;
+      text-align:center;
+      background:white;
+      white-space:nowrap;
+    ">
+      <thead>
+        <tr style="background:#eee;">
+          <th>التسلسل</th>
+          <th>دائن</th>
+          <th>مدين</th>
+          <th>رقم الوصل</th>
+          <th>التاريخ</th>
+          <th>نوع العملية</th>
+          <th>الرصيد</th>
+          <th>البيان</th>
+          <th>المستخدم</th>
+          <th>المطابقة</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${ledgerRows}
+      </tbody>
+
+      <tfoot>
+        <tr style="font-weight:bold;background:#f3f4f6;">
+          <td>المجموع</td>
+          <td>${money(totalCredit)}</td>
+          <td>${money(totalDebit)}</td>
+          <td colspan="7"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-top:15px;
+    padding:12px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:8px;
+  ">
+    <strong>المتبقي على الزبون: ${money(finalBalance)}</strong>
+    <span id="customerDebtItemsSlot"></span>
+  </div>
+`;
   } catch (error) {
     console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
