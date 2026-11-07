@@ -1546,6 +1546,22 @@ returns.forEach(item => {
 movements.sort((a, b) =>
   new Date(a.date) - new Date(b.date)
 );
+    // قراءة الفترة المحددة
+const dateFrom = $("financialDateFrom").value;
+const dateTo = $("financialDateTo").value;
+
+// تحديد بداية ونهاية الفترة
+const startDate = dateFrom
+  ? new Date(dateFrom + "T00:00:00")
+  : null;
+
+const endDate = dateTo
+  ? new Date(dateTo + "T23:59:59.999")
+  : null;
+
+if (startDate && endDate && startDate > endDate) {
+  throw new Error("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
+}
   } catch (error) {
     console.error("Customer account:", error);
     alert("خطأ تحميل حساب الزبون: " + error.message);
