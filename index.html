@@ -1421,9 +1421,8 @@ currentDebtItemsCustomerId = customerId;
   }
 }
   async function loadCustomerAccount(customerId) {
-const paymentsBox = $("customerFullAccountPayments");
-  paymentsBox.textContent = "جارٍ تحميل التسديدات...";
-
+const ledgerBox = $("customerAccountLedger");
+ledgerBox.innerHTML = "جارٍ تحميل كشف الحساب...";
   try {
     // تحميل فواتير الزبون
     const { data: sales, error: salesError } = await db
