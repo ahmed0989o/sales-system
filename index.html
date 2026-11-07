@@ -1796,6 +1796,47 @@ overlay.querySelector("#voucherEditDate").value = localDate;
 overlay.querySelector("#voucherEditNotes").value = payment.notes || "";
 
 document.body.appendChild(overlay);
+  // حفظ تعديل سند التسديد
+overlay.querySelector("#saveVoucherEdit").addEventListener("click", async () => {
+  const amount = Number(overlay.querySelector("#voucherEditAmount").value);
+  const dateValue = overlay.querySelector("#voucherEditDate").value;
+  const notes = overlay.querySelector("#voucherEditNotes").value.trim();
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert("أدخل مبلغاً صحيحاً أكبر من صفر.");
+    return;
+  }
+
+  if (!dateValue) {
+    alert("يرجى تحديد تاريخ التسديد.");
+    return;
+  }
+
+  const button = overlay.querySelector("#saveVoucherEdit");
+  button.disabled = true;
+  button.textContent = "جارٍ الحفظ...";
+
+  try {
+    const { error } = await db.rpc("update_customer_payment", {
+      p_payment_id: Number(payment.id),
+      p_amount: amount,
+      p_payment_date: new Date(dateValue).toISOString(),
+      p_notes: notes || null
+    });
+
+    if (error) throw error;
+
+    alert("تم تعديل سند التسديد بنجاح.");
+    overlay.remove();
+
+    await loadCustomerAccount(customerId);
+  } catch (error) {
+    console.error("Update payment voucher:", error);
+    alert("تعذر تعديل السند: " + error.message);
+    button.disabled = false;
+    button.textContent = "💾 حفظ التعديل";
+  }
+});
 }
 async function openCustomerFinancialStatement() {
   const customerId = currentDebtItemsCustomerId;
