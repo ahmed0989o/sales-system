@@ -3729,6 +3729,8 @@ async function loadProducts() {
 
 
 async function loadCustomers() {
+  const selectedCustomerId = $("customerSelect").value;
+
   $("customerSelect").innerHTML =
     '<option value="">جارٍ تحميل الزبائن...</option>';
   $("paymentCustomer").innerHTML =
