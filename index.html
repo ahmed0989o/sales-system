@@ -2317,7 +2317,7 @@ function escapeDebtHtml(value) {
 
   const { data: sale, error: saleError } = await db
     .from("sales")
-    .select("id, invoice_number, created_at, total_amount, payment_method, amount_received, customer_name")
+    .select("id, invoice_number, created_at, total_amount, payment_method, amount_received, customer_name, customer_id")
     .eq("id", saleId)
     .single();
 
