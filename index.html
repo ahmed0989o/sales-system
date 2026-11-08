@@ -1269,14 +1269,48 @@ currentDebtItemsCustomerId = customerId;
 
     <!-- الجهة اليمنى: أزرار التحكم وبيانات الزبون -->
     <div style="text-align:right;">
-      <div style="display:flex;gap:6px;align-items:center;">
-        <button onclick="closeCustomerFullAccount()"
-          style="width:30px;height:30px;background:#dc3545;color:white;border:0;border-radius:50%;font-size:20px;cursor:pointer;">×</button>
+      <div style="display:flex;gap:7px;align-items:center;">
 
-        <button onclick="toggleCustomerFullAccountMaximize()"
-          style="width:30px;height:30px;background:#0d6efd;color:white;border:0;border-radius:5px;font-size:18px;cursor:pointer;">▣</button>
-      </div>
+  <button type="button"
+    onclick="closeCustomerFullAccount()"
+    style="
+      width:27px;
+      height:27px;
+      padding:0;
+      border:0;
+      border-radius:50%;
+      background:#dc2626;
+      color:white;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    ">✕</button>
 
+  <button type="button"
+    onclick="toggleCustomerFullAccountMaximize()"
+    style="
+      width:27px;
+      height:27px;
+      padding:0;
+      border:0;
+      border-radius:5px;
+      background:#2563eb;
+      color:white;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    ">
+    <span style="position:relative;display:block;width:15px;height:15px;">
+      <span style="position:absolute;top:0;right:0;width:9px;height:9px;border:1.5px solid white;border-radius:1px;"></span>
+      <span style="position:absolute;bottom:0;left:0;width:9px;height:9px;border:1.5px solid white;border-radius:1px;"></span>
+    </span>
+  </button>
+
+</div>
       <h3 style="margin:10px 0 4px;font-size:17px;">
         ${customer.name || "—"}
       </h3>
