@@ -1918,8 +1918,8 @@ async function openCustomerFinancialStatement() {
   }
 
   const content = $("customerFinancialStatementContent");
-  const dateFrom = $("financialDateFrom").value;
-  const dateTo = $("financialDateTo").value;
+  const dateFrom = $("financialDateFrom")?.value || "";
+const dateTo = $("financialDateTo")?.value || "";
 
   if (dateFrom && dateTo && dateFrom > dateTo) {
     alert("تاريخ البداية يجب أن يكون قبل تاريخ النهاية.");
