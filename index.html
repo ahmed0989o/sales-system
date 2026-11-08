@@ -1552,8 +1552,10 @@ currentDebtItemsCustomerId = customerId;
   function toggleCustomerFullAccountMaximize() {
   const page = $("customerFullAccountPage");
 
+  if (!page) return;
+
   if (page.dataset.maximized === "true") {
-    page.style.padding = "20px";
+    page.style.padding = "10px";
     page.dataset.maximized = "false";
   } else {
     page.style.padding = "0";
