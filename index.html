@@ -7064,6 +7064,13 @@ function resetSingleWindow(sectionId) {
     printWindow.print();
   };
 }
+  function toggleSystemFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
 </script>
 </body>
 </html>
