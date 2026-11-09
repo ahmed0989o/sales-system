@@ -1350,8 +1350,27 @@ currentDebtItemsCustomerId = customerId;
   font-size:12px;
   text-align:center;
 ">
-  ${customer.phone || "غير متوفر"}
+   ${customer.phone || "غير متوفر"}
 </div>
+
+<button
+  type="button"
+  id="customerDebtItemsButton"
+  onclick="showCustomerDebtItems()"
+  style="
+    margin-top:5px;
+    min-height:30px;
+    padding:5px 7px;
+    background:#dc3545;
+    color:white;
+    border:0;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:11px;
+    white-space:nowrap;
+  ">
+  📦 المواد في ذمة الزبون
+</button>
     </div>
 
     <!-- الوسط: العنوان والإجماليات -->
