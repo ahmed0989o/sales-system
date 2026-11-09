@@ -399,15 +399,32 @@ hr{margin-top:28px}
 <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:start;text-align:center;direction:rtl;">
 
   <!-- العمود الأول: الزبائن -->
-  <div style="min-width:0;">
-    <label for="customerSelect" style="display:block;text-align:center;margin-bottom:5px;">
-      زبون آجل
-    </label>
-    <select id="customerSelect"
-      style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
-      <option value="">بدون تحديد زبون</option>
-    </select>
-<button
+<div style="min-width:0;">
+  <label for="customerSelect" style="display:block;text-align:center;margin-bottom:5px;">
+    زبون آجل
+  </label>
+
+  <select id="customerSelect"
+    style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
+    <option value="">بدون تحديد زبون</option>
+  </select>
+
+  <!-- بيانات الزبون المختار -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:5px;">
+
+    <div id="selectedCustomerName"
+      style="width:105px;min-height:27px;box-sizing:border-box;border:1px solid #ccc;border-radius:4px;padding:3px;text-align:center;font-size:12px;">
+      —
+    </div>
+
+    <div id="selectedCustomerPhone"
+      style="width:105px;min-height:27px;box-sizing:border-box;border:1px solid #ccc;border-radius:4px;padding:3px;text-align:center;font-size:12px;">
+      —
+    </div>
+
+  </div>
+</div>
+  <button
   id="showCustomerDetailsButton"
   type="button"
   onclick="toggleCreditCustomerDetails()"
