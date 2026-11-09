@@ -349,8 +349,17 @@ hr{margin-top:28px}
 
 <section id="appPanel" class="hidden">
 <div class="note" ondblclick="if(event.target === event.currentTarget) toggleSystemFullscreen()">
-<span id="userInfo"></span>
-<button type="button" class="secondary" onclick="logout()">تسجيل الخروج</button>
+  <span id="userInfo"></span>
+
+  <button type="button" class="secondary"
+    onclick="logout()">تسجيل الخروج</button>
+
+  <button type="button"
+    onclick="minimizeMainApp()"
+    title="تصغير النظام"
+    style="width:42px;height:38px;padding:4px;margin:0;">
+    −
+  </button>
 </div>
   <!-- القائمة الرئيسية -->
 <div id="mainMenu">
