@@ -7090,7 +7090,17 @@ function resetSingleWindow(sectionId) {
     printWindow.print();
   };
 }
-  function toggleSystemFullscreen() {
+  function minimizeMainApp() {
+  document.getElementById("appPanel").style.display = "none";
+  document.getElementById("mainAppRestoreBar").style.display = "block";
+}
+
+function restoreMainApp() {
+  document.getElementById("appPanel").style.display = "";
+  document.getElementById("mainAppRestoreBar").style.display = "none";
+}
+
+function toggleSystemFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
   } else {
