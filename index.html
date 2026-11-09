@@ -7101,19 +7101,6 @@ function restoreMainApp() {
   document.getElementById("appPanel").style.display = "";
   document.getElementById("mainAppRestoreBar").style.display = "none";
 }
-function updateSelectedCustomerInfo() {
-  const customerId = $("customerSelect").value;
-
-  const customer = customers.find(
-    c => String(c.id) === String(customerId)
-  );
-
-  $("selectedCustomerName").textContent =
-    customer ? (customer.name || "—") : "—";
-
-  $("selectedCustomerPhone").textContent =
-    customer ? (customer.phone || "غير متوفر") : "—";
-}
 function toggleSystemFullscreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
