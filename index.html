@@ -407,11 +407,17 @@ hr{margin-top:28px}
   <select id="customerSelect"
     style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
     <option value="">بدون تحديد زبون</option>
-  </select>
-</div>
+    </select>
 
-<button
-  id="showCustomerDetailsButton"
+  <button
+    id="showCustomerDetailsButton"
+    type="button"
+    onclick="toggleCreditCustomerDetails()"
+    title="ملف الزبون"
+    style="width:34px;height:30px;padding:3px;margin-top:5px;font-size:18px;">
+    👤
+  </button>
+</div>
   type="button"
   onclick="toggleCreditCustomerDetails()"
   title="ملف الزبون"
