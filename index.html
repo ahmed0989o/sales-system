@@ -348,7 +348,7 @@ hr{margin-top:28px}
 </section>
 
 <section id="appPanel" class="hidden">
-<div class="note" onclick="if(event.target.tagName !== 'BUTTON') toggleSystemFullscreen()">
+<div class="note" ondblclick="if(event.target === event.currentTarget) toggleSystemFullscreen()">
 <span id="userInfo"></span>
 <button type="button" class="secondary" onclick="logout()">تسجيل الخروج</button>
 </div>
