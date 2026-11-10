@@ -7599,7 +7599,52 @@ win.dataset.sectionId = menu.dataset.sectionId || "";
       dragging = false;
     });
   }
+window.saveAppCustomizeLayout = async function () {
+  const windows = Array.from(
+    document.querySelectorAll(
+      "#appCustomizeToolsLayer .appCustomizeToolWindow"
+    )
+  ).map(function (win) {
+    const rect = win.getBoundingClientRect();
 
+    return {
+      toolName: win.dataset.toolName,
+      sectionId: win.dataset.sectionId,
+      left: rect.left / window.innerWidth,
+      top: rect.top / window.innerHeight,
+      width: rect.width,
+      height: rect.height
+    };
+  });
+
+  const button = document.getElementById("appCustomizeSave");
+  button.disabled = true;
+  button.textContent = "جارٍ الحفظ...";
+
+  try {
+    const { error } = await db
+      .from("shared_app_layout")
+      .upsert({
+        id: "main",
+        layout_data: { windows: windows },
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+
+    button.textContent = "✓ تم حفظ التصميم";
+  } catch (error) {
+    console.error("Save layout error:", error);
+    button.textContent = "فشل الحفظ";
+    alert("تعذر حفظ التصميم: " + error.message);
+  } finally {
+    button.disabled = false;
+
+    setTimeout(function () {
+      button.textContent = "💾 حفظ التصميم";
+    }, 2500);
+  }
+};
   items.addEventListener("click", function (event) {
     const button = event.target.closest("button");
     if (!button) return;
