@@ -7139,6 +7139,129 @@ function toggleSystemFullscreen() {
   }
 }
 </script>
+
+<style>
+#appCustomizeMenu {
+  display: none;
+  position: fixed;
+  width: 235px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.18);
+  padding: 10px;
+  z-index: 1000000;
+  direction: rtl;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+#appCustomizeMenu .customize-menu-title {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 7px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 7px;
+}
+
+#appCustomizeMenu button {
+  display: block;
+  width: 100%;
+  padding: 9px;
+  margin: 4px 0;
+  background: white;
+  color: #222;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: right;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#appCustomizeMenu button:hover {
+  background: #f2f2f2;
+}
+</style>
+
+<div id="appCustomizeMenu">
+  <div class="customize-menu-title" id="appCustomizeMenuTitle">
+    تخصيص أدوات القسم
+  </div>
+  <div id="appCustomizeMenuItems"></div>
+</div>
+
+<script>
+(function () {
+  const menu = document.getElementById("appCustomizeMenu");
+  const title = document.getElementById("appCustomizeMenuTitle");
+  const items = document.getElementById("appCustomizeMenuItems");
+
+  const sectionTools = {
+    salesPanel: {
+      name: "أدوات المبيعات",
+      tools: ["بحث عن زبون", "الحساب الكامل للزبون", "المواد في ذمة الزبون", "كشف الحساب المالي", "طباعة الفاتورة"]
+    },
+    purchasePanel: {
+      name: "أدوات المشتريات",
+      tools: ["البحث عن مادة", "سجل المشتريات", "تحديث المشتريات", "طباعة المشتريات"]
+    },
+    cashboxPanel: {
+      name: "أدوات الصندوق",
+      tools: ["ملخص الصندوق", "تحديث حركة الصندوق", "تفاصيل الصندوق"]
+    },
+    rentPanel: {
+      name: "أدوات الإيجار",
+      tools: ["دفعات الإيجار", "سجل الإيجار"]
+    },
+    customerPaymentsPanel: {
+      name: "أدوات تسديد الديون",
+      tools: ["اختيار الزبون", "تسجيل الدفعة"]
+    }
+  };
+
+  document.addEventListener("contextmenu", function (event) {
+    const toolbar = event.target.closest(".section-window-controls");
+    if (!toolbar) return;
+
+    const section = toolbar.closest("section[id]");
+    if (!section || !sectionTools[section.id]) return;
+
+    event.preventDefault();
+
+    const config = sectionTools[section.id];
+    title.textContent = config.name;
+    items.innerHTML = "";
+
+    config.tools.forEach(function (tool) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "☰  " + tool;
+      items.appendChild(button);
+    });
+
+    menu.style.display = "block";
+
+    const x = Math.min(event.clientX, window.innerWidth - 245);
+    const y = Math.min(event.clientY, window.innerHeight - 100);
+
+    menu.style.left = Math.max(5, x) + "px";
+    menu.style.top = Math.max(5, y) + "px";
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!menu.contains(event.target)) {
+      menu.style.display = "none";
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      menu.style.display = "none";
+    }
+  });
+})();
+</script>
   
 </body>
 </html>
