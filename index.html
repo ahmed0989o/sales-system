@@ -7658,6 +7658,45 @@ window.saveAppCustomizeLayout = async function () {
     }, 2500);
   }
 };
+  window.loadAppCustomizeLayout = async function () {
+  try {
+    const { data, error } = await db
+      .from("shared_app_layout")
+      .select("layout_data")
+      .eq("id", "main")
+      .maybeSingle();
+
+    if (error) throw error;
+
+    const windows = data?.layout_data?.windows || [];
+
+    windows.forEach(function (saved) {
+      menu.dataset.sectionId = saved.sectionId;
+
+      openCustomizeToolWindow(saved.toolName);
+
+      const win = Array.from(
+        document.querySelectorAll(
+          "#appCustomizeToolsLayer .appCustomizeToolWindow"
+        )
+      ).find(function (item) {
+        return item.dataset.toolName === saved.toolName &&
+               item.dataset.sectionId === saved.sectionId;
+      });
+
+      if (!win) return;
+
+      win.style.transform = "none";
+      win.style.left = (saved.left * window.innerWidth) + "px";
+      win.style.top = (saved.top * window.innerHeight) + "px";
+      win.style.width = saved.width + "px";
+      win.style.height = saved.height + "px";
+    });
+
+  } catch (error) {
+    console.error("Load layout error:", error);
+  }
+};
   items.addEventListener("click", function (event) {
     const button = event.target.closest("button");
     if (!button) return;
