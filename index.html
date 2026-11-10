@@ -4106,6 +4106,34 @@ $("customerSelect").value = selectedCustomerId;
   $("customerSelect").value = selectedCustomerId;
   updateCreditCustomerDetails();
 }
+    $("customerSearchInput").oninput = function () {
+  const typedName = this.value.trim();
+
+  const matchedOption = Array.from(
+    $("customerSelect").options
+  ).find(option =>
+    option.textContent.trim() === typedName
+  );
+
+  const previousId = $("customerSelect").value;
+
+  $("customerSelect").value = matchedOption
+    ? matchedOption.value
+    : "";
+
+  if (matchedOption && previousId !== matchedOption.value) {
+    $("customerSelect").dispatchEvent(
+      new Event("change", { bubbles: true })
+    );
+  }
+};
+
+const selectedOption = $("customerSelect").selectedOptions[0];
+
+$("customerSearchInput").value =
+  selectedOption && selectedOption.value
+    ? selectedOption.textContent
+    : "";
   } catch (error) {
     console.error("Customers:", error);
     customers = [];
