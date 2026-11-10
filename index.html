@@ -7379,7 +7379,9 @@ function toggleSystemFullscreen() {
     const content = document.createElement("div");
     content.style.cssText =
       "padding:15px;text-align:center;font-size:13px;color:#555;";
-    content.textContent = "مساحة الأداة — سيتم ربط وظيفتها لاحقاً.";
+    content.textContent = toolName === "بحث عن زبون"
+  ? "أداة بحث عن زبون"
+  : "مساحة الأداة — سيتم ربط وظيفتها لاحقاً.";
 
     win.appendChild(header);
     win.appendChild(content);
