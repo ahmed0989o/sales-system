@@ -7409,7 +7409,19 @@ function toggleSystemFullscreen() {
 
   function openCustomizeToolWindow(toolName) {
     const layer = document.getElementById("appCustomizeToolsLayer");
+const sectionId = menu.dataset.sectionId || "";
 
+const existingWindow = Array.from(
+  layer.querySelectorAll(".appCustomizeToolWindow")
+).find(function (win) {
+  return win.dataset.toolName === toolName &&
+         win.dataset.sectionId === sectionId;
+});
+
+if (existingWindow) {
+  existingWindow.style.zIndex = 1000;
+  return;
+}
     const win = document.createElement("div");
     win.className = "appCustomizeToolWindow";
 win.dataset.toolName = toolName;
