@@ -7379,9 +7379,52 @@ function toggleSystemFullscreen() {
     const content = document.createElement("div");
     content.style.cssText =
       "padding:15px;text-align:center;font-size:13px;color:#555;";
-    content.textContent = toolName === "بحث عن زبون"
-  ? "أداة بحث عن زبون"
-  : "مساحة الأداة — سيتم ربط وظيفتها لاحقاً.";
+    if (toolName === "بحث عن زبون") {
+  const originalSelect = document.getElementById("customerSelect");
+
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "اكتب اسم الزبون للبحث...";
+  searchInput.style.cssText =
+    "width:100%;padding:10px;box-sizing:border-box;margin-bottom:10px;text-align:center;";
+
+  const customerSelect = originalSelect.cloneNode(true);
+  customerSelect.removeAttribute("id");
+  customerSelect.style.cssText =
+    "width:100%;padding:10px;box-sizing:border-box;text-align:center;";
+
+  const allOptions = Array.from(originalSelect.options);
+
+  function filterCustomers() {
+    const query = searchInput.value.trim().toLowerCase();
+
+    customerSelect.replaceChildren();
+
+    allOptions.forEach(function (option) {
+      if (option.textContent.toLowerCase().includes(query)) {
+        customerSelect.appendChild(option.cloneNode(true));
+      }
+    });
+  }
+
+  searchInput.addEventListener("input", filterCustomers);
+
+  customerSelect.addEventListener("change", function () {
+    originalSelect.value = customerSelect.value;
+    originalSelect.dispatchEvent(
+      new Event("change", { bubbles: true })
+    );
+  });
+
+  filterCustomers();
+
+  content.style.padding = "15px";
+  content.appendChild(searchInput);
+  content.appendChild(customerSelect);
+
+} else {
+  content.textContent = "مساحة الأداة — سيتم ربط وظيفتها لاحقاً.";
+}
 
     win.appendChild(header);
     win.appendChild(content);
