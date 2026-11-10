@@ -4063,7 +4063,7 @@ customers = result.data || [];
       '<option value="">بدون تحديد زبون</option>';
     $("paymentCustomer").innerHTML =
       '<option value="">اختر الزبون</option>';
-
+$("customerSearchList").innerHTML = "";
     customers.forEach(c => {
       const label = c.phone
         ? `${c.name} — ${c.phone}`
