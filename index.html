@@ -426,12 +426,30 @@ hr{margin-top:28px}
        text-align:right;
      ">
 
-  <div style="display:flex;align-items:center;justify-content:center;position:relative;">
-    <h3>👤 ملف الزبون</h3>
+    <div style="display:flex;align-items:center;justify-content:center;position:relative;min-height:35px;">
+    <h3 style="margin:0;">👤 ملف الزبون</h3>
+
     <button type="button"
-      onclick="$('creditCustomerDetails').classList.add('hidden')">
-      ✕
-    </button>
+      onclick="$('creditCustomerDetails').classList.add('hidden')"
+      style="
+        position:absolute;
+        right:0;
+        top:50%;
+        transform:translateY(-50%);
+        width:27px;
+        height:27px;
+        padding:0;
+        border:0;
+        border-radius:50%;
+        background:#dc2626;
+        color:white;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      ">✕</button>
   </div>
 
   <hr>
