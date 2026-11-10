@@ -453,14 +453,24 @@ hr{margin-top:28px}
 
  <!-- العمود الأول: الزبائن -->
 <div style="min-width:0;">
-  <label for="customerSelect" style="display:block;text-align:center;margin-bottom:5px;">
-    زبون آجل
-  </label>
+  <label for="customerSearchInput" style="display:block;text-align:center;margin-bottom:5px;">
+  ابحث عن الزبون
+</label>
 
-  <select id="customerSelect"
-    style="width:100%;padding:9px 3px;font-size:12px;box-sizing:border-box;text-align:center;">
-    <option value="">بدون تحديد زبون</option>
-    </select>
+<input
+  id="customerSearchInput"
+  type="text"
+  list="customerSearchList"
+  placeholder="اكتب اسم الزبون..."
+  autocomplete="off"
+  style="width:100%;padding:9px 5px;font-size:12px;box-sizing:border-box;text-align:center;"
+>
+
+<datalist id="customerSearchList"></datalist>
+
+<select id="customerSelect" style="display:none;">
+  <option value=""></option>
+</select>
 
   <button
     id="showCustomerDetailsButton"
