@@ -6222,68 +6222,6 @@ function renderReturnItems() {
   const container = $("returnItems");
   container.replaceChildren();
 
-/* مقابض تغيير حجم النافذة من الجهات الثماني */
-.appResizeHandle {
-  position: absolute;
-  z-index: 20;
-  touch-action: none;
-  background: transparent;
-}
-
-.appResizeHandle.n,
-.appResizeHandle.s {
-  left: 10px;
-  right: 10px;
-  height: 10px;
-  cursor: ns-resize;
-}
-
-.appResizeHandle.n { top: -5px; }
-.appResizeHandle.s { bottom: -5px; }
-
-.appResizeHandle.e,
-.appResizeHandle.w {
-  top: 10px;
-  bottom: 10px;
-  width: 10px;
-  cursor: ew-resize;
-}
-
-.appResizeHandle.e { right: -5px; }
-.appResizeHandle.w { left: -5px; }
-
-.appResizeHandle.ne,
-.appResizeHandle.nw,
-.appResizeHandle.se,
-.appResizeHandle.sw {
-  width: 16px;
-  height: 16px;
-}
-
-.appResizeHandle.ne {
-  top: -5px;
-  right: -5px;
-  cursor: nesw-resize;
-}
-
-.appResizeHandle.nw {
-  top: -5px;
-  left: -5px;
-  cursor: nwse-resize;
-}
-
-.appResizeHandle.se {
-  bottom: -5px;
-  right: -5px;
-  cursor: nwse-resize;
-}
-
-.appResizeHandle.sw {
-  bottom: -5px;
-  left: -5px;
-  cursor: nesw-resize;
-}
-
   if (!currentReturnItems.length) {
     container.textContent = "لا توجد منتجات.";
     return;
