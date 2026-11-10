@@ -4074,7 +4074,9 @@ $("customerSearchList").innerHTML = "";
       customerOption.value = c.id;
       customerOption.textContent = label;
       $("customerSelect").appendChild(customerOption);
-
+const searchOption = document.createElement("option");
+searchOption.value = label;
+$("customerSearchList").appendChild(searchOption);
       // قائمة التسديد تعرض الدين المتبقي
       const paymentOption = document.createElement("option");
       paymentOption.value = c.id;
