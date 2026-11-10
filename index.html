@@ -7385,6 +7385,75 @@ function toggleSystemFullscreen() {
     win.appendChild(content);
     layer.appendChild(win);
 
+    const resizeDirections = [
+      "n", "s", "e", "w", "ne", "nw", "se", "sw"
+    ];
+
+    resizeDirections.forEach(function (direction) {
+      const handle = document.createElement("div");
+      handle.className = "appResizeHandle " + direction;
+      win.appendChild(handle);
+
+      let startX, startY, startWidth, startHeight;
+      let startLeft, startTop;
+
+      handle.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const rect = win.getBoundingClientRect();
+
+        startX = event.clientX;
+        startY = event.clientY;
+        startWidth = rect.width;
+        startHeight = rect.height;
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        handle.setPointerCapture(event.pointerId);
+      });
+
+      handle.addEventListener("pointermove", function (event) {
+        if (!handle.hasPointerCapture(event.pointerId)) return;
+
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+
+        let width = startWidth;
+        let height = startHeight;
+        let left = startLeft;
+        let top = startTop;
+
+        if (direction.includes("e")) width += dx;
+        if (direction.includes("w")) {
+          width -= dx;
+          left += dx;
+        }
+
+        if (direction.includes("s")) height += dy;
+        if (direction.includes("n")) {
+          height -= dy;
+          top += dy;
+        }
+
+        if (width < 180) {
+          if (direction.includes("w")) left -= 180 - width;
+          width = 180;
+        }
+
+        if (height < 120) {
+          if (direction.includes("n")) top -= 120 - height;
+          height = 120;
+        }
+
+        win.style.width = width + "px";
+        win.style.height = height + "px";
+        win.style.left = left + "px";
+        win.style.top = top + "px";
+        win.style.transform = "none";
+      });
+    });
+
     let dragging = false;
     let startX = 0;
     let startY = 0;
