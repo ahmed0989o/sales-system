@@ -3967,6 +3967,7 @@ if (isOwner(currentUser)) {
 }
 
     await loadDailyReport();
+       await loadAppCustomizeLayout();
   } catch (error) {
     console.error("Loading app:", error);
   } finally {
