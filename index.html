@@ -7387,6 +7387,7 @@ function toggleSystemFullscreen() {
     if (!section || !sectionTools[section.id]) return;
 
     const config = sectionTools[section.id];
+    menu.dataset.sectionId = section.id;
     title.textContent = config.name;
     items.innerHTML = "";
 
