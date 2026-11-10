@@ -7220,14 +7220,10 @@ function toggleSystemFullscreen() {
     }
   };
 
-  document.addEventListener("contextmenu", function (event) {
-    const toolbar = event.target.closest(".section-window-controls");
-    if (!toolbar) return;
-
+  
+  function showCustomizeMenu(event, toolbar) {
     const section = toolbar.closest("section[id]");
     if (!section || !sectionTools[section.id]) return;
-
-    event.preventDefault();
 
     const config = sectionTools[section.id];
     title.textContent = config.name;
@@ -7247,6 +7243,49 @@ function toggleSystemFullscreen() {
 
     menu.style.left = Math.max(5, x) + "px";
     menu.style.top = Math.max(5, y) + "px";
+  }
+
+  document.addEventListener("contextmenu", function (event) {
+    const toolbar = event.target.closest(".section-window-controls");
+    if (!toolbar) return;
+
+    event.preventDefault();
+    showCustomizeMenu(event, toolbar);
+  });
+
+  let customizePressTimer = null;
+  let customizeLongPressTriggered = false;
+
+  document.addEventListener("touchstart", function (event) {
+    const toolbar = event.target.closest(".section-window-controls");
+    if (!toolbar) return;
+
+    customizeLongPressTriggered = false;
+
+    const touch = event.touches[0];
+
+    customizePressTimer = setTimeout(function () {
+      customizeLongPressTriggered = true;
+
+      showCustomizeMenu({
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      }, toolbar);
+
+      if (navigator.vibrate) navigator.vibrate(40);
+    }, 550);
+  }, { passive: true });
+
+  document.addEventListener("touchend", function () {
+    clearTimeout(customizePressTimer);
+  });
+
+  document.addEventListener("touchmove", function () {
+    clearTimeout(customizePressTimer);
+  });
+
+  document.addEventListener("touchcancel", function () {
+    clearTimeout(customizePressTimer);
   });
 
   document.addEventListener("click", function (event) {
