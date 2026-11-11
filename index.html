@@ -7476,7 +7476,10 @@ win.dataset.sectionId = menu.dataset.sectionId || "";
       "padding:15px;text-align:center;font-size:13px;color:#555;";
 
 if (toolName === "بحث عن زبون") {
-    const originalList =
+  const originalInput =
+    document.getElementById("customerSearchInput");
+
+  const originalList =
     document.getElementById("customerSearchList");
 
   console.log("فحص أداة بحث الزبون:", {
@@ -7485,9 +7488,6 @@ if (toolName === "بحث عن زبون") {
   });
 
   if (originalInput && originalList) {
-    if (toolName === "بحث عن زبون") {
-  win.style.display = "none";
-}
     const label = document.createElement("label");
     label.textContent = "ابحث عن الزبون";
     label.style.cssText =
