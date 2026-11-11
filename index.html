@@ -7421,8 +7421,7 @@ function toggleSystemFullscreen() {
 
   function openCustomizeToolWindow(toolName) {
     const layer = document.getElementById("appCustomizeToolsLayer");
-const sectionId = menu.dataset.sectionId || "";
-
+const sectionId = menu.dataset.sectionId || "salesPanel";
 const existingWindow = Array.from(
   layer.querySelectorAll(".appCustomizeToolWindow")
 ).find(function (win) {
