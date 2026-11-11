@@ -3933,7 +3933,7 @@ async function showApp() {
   $("loginPanel").classList.add("hidden");
   $("appPanel").classList.remove("hidden");
   showMainMenu();
-  await loadAppCustomizeLayout();
+  loadAppCustomizeLayout();
   $("userInfo").textContent =
     "الحساب: " + (currentUser.email || "مستخدم") +
     (isOwner(currentUser) ? " — مسؤول" : "");
