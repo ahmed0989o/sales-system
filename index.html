@@ -7441,6 +7441,17 @@ const existingWindow = Array.from(
 });
 
 if (existingWindow) {
+  if (toolName === "بحث عن زبون") {
+    const invoiceForm = document.getElementById("salesInvoiceForm");
+
+    existingWindow.style.display =
+      invoiceForm && !invoiceForm.classList.contains("hidden")
+        ? "block"
+        : "none";
+  } else {
+    existingWindow.style.display = "block";
+  }
+
   existingWindow.style.zIndex = 1000;
   return;
 }
