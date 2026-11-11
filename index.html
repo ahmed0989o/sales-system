@@ -7672,7 +7672,14 @@ window.saveAppCustomizeLayout = async function () {
       });
 
       if (!win) return;
+if (saved.toolName === "بحث عن زبون") {
+  const invoiceForm = document.getElementById("salesInvoiceForm");
 
+  win.style.display =
+    invoiceForm && !invoiceForm.classList.contains("hidden")
+      ? "block"
+      : "none";
+}
       win.style.transform = "none";
       win.style.left = (saved.left * window.innerWidth) + "px";
       win.style.top = (saved.top * window.innerHeight) + "px";
