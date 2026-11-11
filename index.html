@@ -7483,6 +7483,9 @@ if (toolName === "بحث عن زبون") {
     document.getElementById("customerSearchList");
 
   if (originalInput && originalList) {
+    if (toolName === "بحث عن زبون") {
+  win.style.display = "none";
+}
     const label = document.createElement("label");
     label.textContent = "ابحث عن الزبون";
     label.style.cssText =
