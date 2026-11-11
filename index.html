@@ -6840,6 +6840,11 @@ function openSalesHistory() {
   $("salesMenu").classList.add("hidden");
   $("salesPanel").classList.remove("hidden");
   $("salesInvoiceForm").classList.add("hidden");
+  document.querySelectorAll(
+  '#appCustomizeToolsLayer .appCustomizeToolWindow[data-tool-name="بحث عن زبون"][data-section-id="salesPanel"]'
+).forEach(function (win) {
+  win.style.display = "none";
+});
   viewSalesInvoices();
 }
 
@@ -6850,6 +6855,11 @@ function openDailyReport() {
   $("returnsPanel").classList.add("hidden");
   $("salesPanel").classList.remove("hidden");
   $("salesInvoiceForm").classList.add("hidden");
+  document.querySelectorAll(
+  '#appCustomizeToolsLayer .appCustomizeToolWindow[data-tool-name="بحث عن زبون"][data-section-id="salesPanel"]'
+).forEach(function (win) {
+  win.style.display = "none";
+});
   $("dailyReportControls").classList.remove("hidden");
   $("dailyReportPrint").classList.remove("hidden");
   loadDailyReport();
