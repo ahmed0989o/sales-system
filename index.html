@@ -7476,11 +7476,13 @@ win.dataset.sectionId = menu.dataset.sectionId || "";
       "padding:15px;text-align:center;font-size:13px;color:#555;";
 
 if (toolName === "بحث عن زبون") {
-  const originalInput =
-    document.getElementById("customerSearchInput");
-
-  const originalList =
+    const originalList =
     document.getElementById("customerSearchList");
+
+  console.log("فحص أداة بحث الزبون:", {
+    input: !!originalInput,
+    list: !!originalList
+  });
 
   if (originalInput && originalList) {
     if (toolName === "بحث عن زبون") {
