@@ -6811,13 +6811,13 @@ function openSalesInvoice() {
   }
 
   $("salesInvoiceForm").classList.remove("hidden");
-}
+
   document.querySelectorAll(
-  '#appCustomizeToolsLayer .appCustomizeToolWindow[data-tool-name="بحث عن زبون"][data-section-id="salesPanel"]'
-).forEach(function (win) {
-  win.style.display = "block";
-});
-// فتح المرتجعات
+    '#appCustomizeToolsLayer .appCustomizeToolWindow[data-tool-name="بحث عن زبون"][data-section-id="salesPanel"]'
+  ).forEach(function (toolWindow) {
+    toolWindow.style.display = "block";
+  });
+}// فتح المرتجعات
 function openSalesReturns() {
   if (!isOwner(currentUser)) return;
 
