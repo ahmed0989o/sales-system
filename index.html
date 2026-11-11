@@ -6864,16 +6864,6 @@ function openDailyReport() {
   $("dailyReportPrint").classList.remove("hidden");
   loadDailyReport();
 }
-  // فتح التقرير اليومي
-function openDailyReport() {
-  $("mainMenu").classList.remove("hidden");
-  $("salesMenu").classList.add("hidden");
-  $("salesPanel").classList.remove("hidden");
-  $("salesInvoiceForm").classList.add("hidden");
-  $("dailyReportControls").classList.remove("hidden");
-  $("dailyReportPrint").classList.remove("hidden");
-  loadDailyReport();
-}
   // فتح حركة الصندوق
  async function openPurchases() {
   const { data: allowed, error } = await db.rpc("has_app_permission", {
