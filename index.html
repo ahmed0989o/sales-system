@@ -7510,7 +7510,13 @@ if (toolName === "بحث عن زبون") {
     win.appendChild(header);
     win.appendChild(content);
     layer.appendChild(win);
-
+console.log("تم إنشاء نافذة الأداة:", {
+  tool: win.dataset.toolName,
+  section: win.dataset.sectionId,
+  display: getComputedStyle(win).display,
+  width: win.getBoundingClientRect().width,
+  height: win.getBoundingClientRect().height
+});
     const resizeDirections = [
       "n", "s", "e", "w", "ne", "nw", "se", "sw"
     ];
